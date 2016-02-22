@@ -1,0 +1,3 @@
+var_arrays
+"[{""id"": 1, ""sentence_id"": ""sentence-1"", ""pred_token"": 5, ""pred_lemma"": ""eat"",  ""sentence"": ""I like to eat, eat, <span class=\\""predicate\\"">eat</span>, apples and bananas!""}]"
+"[{""id"": 1, ""sentence_id"": ""sentence-2"", ""pred_token"": 2, ""pred_lemma"": ""like"", ""sentence"": ""Do you <span class=\\""predicate\\"">like</span> green eggs and ham?""}]"

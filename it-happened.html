@@ -1,0 +1,394 @@
+<!-- Bootstrap v3.0.3 -->
+<link href="https://s3.amazonaws.com/mturk-public/bs30/css/bootstrap.min.css" rel="stylesheet" /><script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<section class="container" id="Other" style="margin-bottom:15px; padding: 10px 10px; font-family: Arial, Helvetica, Verdana, Geneva, sans-serif; color:#333333; font-size:1.2em;"><!-- style -->
+  <style type="text/css">.panel-heading {
+    background-color: #FFFFFF !important;
+    color:#333333 !important;
+    font-size:2.0em;
+    border: 0px solid #FFFFFF;
+    }
+
+    .panel-primary {
+    border-color: #FFFFFF;
+    border: 0px solid #FFFFFF;
+    }
+    .sentence_section {
+	margin-bottom: 2em;
+    }
+
+    .predicate {
+    background-color: #EEDA6E;
+    padding-left: 3px;
+    padding-right: 3px;
+    }
+    p.example_sentence {
+    border: 1px solid #E0E0E0;
+    background-color: #F0F0FF;
+    margin-left: 0em;
+    padding: 0.5em;
+    }
+  </style>
+<script type="text/javascript">
+
+// taken from: http://www.javascriptkit.com/javatutors/dom3.shtml
+function hideshow(which){
+    if (!document.getElementById)
+	return
+    if (which.style.display=="block")
+	which.style.display="none"
+    else
+	which.style.display="block"
+}
+
+/**
+ ** id       the unique ID for this particular select (when the same name
+ **          is being used multiple times on the same page)
+ ** 
+ ** name     the select.name
+ **
+ ** options  a list of (option.value, label) pairs
+ */
+function getSelectHTML(id, name, options) {
+    select_html = '<select name="' + id + '_' + name + '">';
+    
+    for (var i = 0; i < options.length; i++) {
+	select_html += '<option value="' + options[i][0] + '">' + options[i][1] + '</option>';
+    }
+    
+    select_html += '</select>';
+    
+    return select_html;
+}
+
+
+  /** Add HTML for questions to DOM element with ID 'questions'
+   ** 
+   ** Assumes var_arrays is a list of tuples:
+   ** id : a numeric id that is used in the generation of the headers when the HIT data comes back
+   ** sentence_id : e.g., "en-ud-train.conllu 12"
+   ** pred_token : e.g., "6"
+   ** pred_lemma : e.g., "announce"
+   ** sentence
+   **
+  */
+  function writeQuestions() {
+      // Mechanical Turk will fill in '$ { varname }' variables when
+      // HTML template is rendered
+      var var_arrays = jQuery.parseJSON('${var_arrays}');
+
+      var question_html = '';
+      question_html += '<div class="sentence_section">';
+      
+      for (var i = 0; i < var_arrays.length; i++) {
+       	  var var_array = var_arrays[i];
+	  var id = var_array['id'];
+
+	  var select_happened = getSelectHTML(id,"happened",
+					      [['na', ' ----- '],
+					       ['5', 'very likely'],
+					       ['4', 'somewhat likely'],
+					       ['3', 'hard to tell whether'],
+					       ['2', 'somewhat unlikely'],
+					       ['1', 'very unlikely']]);
+	  
+	  var select_duration = getSelectHTML(id,"duration",
+					      [['na', '  -------  '],
+					       ['0', '(near) instant'],
+					       ['1', 'seconds'],
+					       ['60', 'minutes'],
+					       ['360', 'hours'],
+					       ['8640', 'days'],
+					       ['60480', 'weeks'],
+					       ['241920', 'months'],
+					       ['2903040', 'years'],
+					       ['29030400', 'decades'],
+					       ['290404000', 'centuries']]);
+	  
+	  var select_perspective = getSelectHTML(id,"perspective",
+						 [['author','the author'],
+						  ['secondary','a secondary source']]);
+	  
+	  var select_orientation = getSelectHTML(id,"orientation",
+						 [['-1','happened'],
+						  ['0','is happening'],
+						  ['1','will happen']]);
+	  
+	  var select_generic = getSelectHTML(id,"generic",
+					     [['false','not generic'],
+					      ['true','generic']]);
+
+	  var select_predicate = getSelectHTML(id,"predicate",
+					       [['true','does'],
+						['false','does not']]);
+	  
+	  question_html += '<h3>' + var_array['sentence'] + '</h3>';
+
+	  question_html += '<br><p>The highlighted word ' + select_predicate + ' refer to a predicate: the remaining questions make sense to ask</p>';
+
+	  question_html += '<br><p>It is ' + select_happened + ' the situation ' + select_orientation + ' and is ' + select_generic + '</p>';
+	  
+	  question_html += '<br><p>The situation was reported via ' + select_perspective + '</p>';
+	  
+	  question_html += '<br><p>If you said that the situation was (somewhat) likely to have happened, then you expect it most likely lasted ' + select_duration + '</p>';
+
+	  question_html += '<br/><hr>';
+      }
+
+      question_html += '</div>';
+
+	  
+      
+      $("#questions").prepend(question_html);
+  }
+
+// read when document is ready (like a "main" function)
+$(document).ready(function() {
+    console.log("**** run ready function");
+    writeQuestions();
+});
+
+
+</script>
+
+    <div class="row col-xs-12 col-md-12"><!-- Instructions -->
+    <div class="panel panel-primary"><!--
+    <div class="panel-heading"><strong>Task Name</strong></div>
+    --><!-- <div class="panel-body"> -->
+    <h1>Instructions</h1>
+
+    <div class="instructions_intro">
+
+    <p class="instructions_intro">In this task, a sentence with <span class="predicate">a yellow-highlighted word</span> is presented, followed by questions about that word.  We call these words <i>predicates</i>: they refer to some kind of situation (an event, or a state).  We are interested in how likely the situation actually happened (or will happen), and whether the situation happened (or will happen) as according to the author themselves, or if the author is instead reporting a situation described by a secondary source.  If you think a situation happened (or will happen) then you will be asked for its likely <i>duration</i>, such <i>seconds</i>, or <i>hours</i>, or <i>years</i>.
+
+The very first question of the task is whether you believe the highlighted word refers to a situation at all: sometimes our automatic  processing makes mistakes, and we want your help in filtering out those errors.  If you have a hard time making sense of the rest of the questions for the highlighted word, then likely there was an error in creating the HIT: in those cases, please change the first option such that it reports the error, and ignore the rest of the questions for that example.
+
+We have provided a variety of examples and further discussion, broken into categories: click any of the links to hide or reveal them for clarification.</p>
+    </div>
+
+    <a href="javascript:hideshow(document.getElementById('happened'))">Happened</a>
+
+    <div id="happened" style="display: none">
+    <p>The following examples illustrate situations (events and states), and are paired with discussion on when we would say they do or do not happen.</p>
+
+    <blockquote>Sue <span class="predicate">hugged</span> Jack.</blockquote>
+    
+    <p>We would say that according to the author, <u>hugged</u> refers to a situation that did happen. As a simple test that you can use for many examples, try saying something to yourself like: "... and because of the <i>hug</i>, something else happened (or will happen)".  If you can imagine a sentence such that as that following the example sentence provided, then that is good evidence that the situation did really happen (or will happen).</p>
+    
+    <blockquote>Sue <span class="predicate">wanted</span> to hug Jack.</blockquote>
+    
+    <p>Here we would say that the <u>wanting</u> did happen.  For example, we can imagine saying: "Because she wanted to hug Jack, she walked over and gave him a hug."</p>
+    
+
+    <blockquote>Sue wanted to <span class="predicate">hug</span> Jack.</blockquote>
+
+    <p>While the <i>wanting</i> did happen, the <i>hug</i> we are uncertain about: there is not enough information to say that it did or did not happen, we are unsure.</p>
+
+
+    <blockquote>Sue will <span class="predicate">hug</span> Jack.</blockquote>
+    <p>According to the author a <u>hug</u> is very likely to happen in the future.</p>
+    
+
+    <blockquote>Sue may <span class="predicate">hug</span> Jack.</blockquote>
+    <p>A <u>hug</u> is possible, in the future.</p>
+    
+      <blockquote>Sue did not <span class="predicate">hug</span> Jack.</blockquote>
+    <p>The author is stating that the <u>hug</u> did not happen.</p>
+
+  <blockquote>Sue probably did not want to <span class="predicate">hug</span> Jack.</blockquote>
+
+    <p>The author is unsure about whether Sue <i>wanted</i> to perform a hug: we might think that the sentence does or does not imply that the hugging took place.  In these cases use your best judgement: if you think that the sentence implies that an event probably took place, then go ahead and say that.</p>
+
+      <blockquote>I wish that Sue would <span class="predicate">hug</span> Jack.</blockquote>
+    <p>The situation did not happen, it is being described as a desire, not as something that actually may have happened.</p>
+
+      <blockquote>Mary wishes that Sue would <span class="predicate">hug</span> Jack.</blockquote>
+    <p>Again, the situation did not happen.</p>
+      
+      <!-- <p>The <u>hug</u> did not happen, but consider the next example:</p> -->
+
+      <!-- <blockquote>Sue <span class="predicate">did</span> not hug Jack.</blockquote> -->
+
+      <!-- <p>There was a situation, refered to by <u>did</u> that happened: it -->
+      <!-- 	was the situation where Sue did not hug Jack.  We describe such -->
+      <!-- 	situations all the time in language: they "happen" in the sense that -->
+      <!-- 	they can have real results.  Consider:</p> -->
+
+      <!-- <blockquote>Jack told Sue that he needed a -->
+      <!-- 	hug.  Sue <span class="predicate">did</span> not hug Jack.  This made Jack sad.</blockquote> -->
+
+      <!-- <p>In the above, what made Jack sad?  It was the situation of Sue -->
+      <!-- 	not giving him a hug.  The lack of a hug is a situation that -->
+      <!-- 	happened, unfortunately for Jack.  Let's consider one more example of this sort:</p> -->
+
+      <!-- <blockquote>It <span class="predicate">did</span> not rain for months.</blockquote> -->
+
+      <!-- <p>The <u>did</u> again refers to a situation that happened.  We -->
+      <!-- 	call such a situation a <i>drought</i>, as in: <i>The severe drought -->
+      <!-- 	  happened last Summer, bankrupting the farm.</i><p> -->
+
+      <br>
+      <p>Now we will gives examples of <i>states</i>, which are things that
+	"happen" over the course of time, such being <u>happy</u>, or being
+	<u>tall</u>.<p>
+	
+	<blockquote>Sue is <span class="predicate">happy</span>.</blockquote>
+      <p>According to the author, Sue being <u>happy</u> is something that is happening currently.</p>
+
+      
+      <blockquote>Sue was <span class="predicate">happy</span>.</blockquote>
+
+      <p>Sue being <u>happy</u> is something that happened in the past.</p>
+</div>
+
+
+    <hr>
+    <a href="javascript:hideshow(document.getElementById('generic'))">Generic</a>
+    <div id="generic" style="display: none">
+<p>In langauge there is a special category of situation called <i>generic</i> descriptions: we will explain these here in order that you can recognize them and then say that they <i>did not</i> happen, for purposes of this task.  We are concerned with finding just the specific, concrete situations that are being described in text, not generic descriptions.</p>
+
+      <blockquote>Lions <span class="predicate">roar</span>.</blockquote>
+      <p>This is an example of a <i>generic</i> sentence: it does not
+      refer to a specific set of lions, rather, the author is making a general claim about the world.
+       Since the author is not describing a specific instance of roaring, then
+we would say the situation did not happen, and that it is <i>generic</i>.  </p>
+
+      <blockquote>Everyone knows that babies <span class="predicate">cry</span>.</blockquote>
+
+
+    <p>Again, there is no specific event being described as happening, it is generic.</p>
+
+      <blockquote>Acme never <span class="predicate">cheats</span> customers.</blockquote>
+
+
+    <p>No event happened, and it is again a generic description.</p>
+
+<blockquote>Acme usually <span class="predicate">cheats</span> customers.</blockquote>
+
+
+    <p>No one specific event is being described, this is also a
+    generic description (these sort of generic sentences are sometimes called <i>habitual</i>
+    statements).</p>
+
+<blockquote>John likes to  <span class="predicate">smoke</span> fine cigars.</blockquote>
+
+    <p>This is another example of a habitual statement: no specific event is being described, and it is generic.</p>
+
+//    <blockquote>John should <span class="predicate">excercise</span>.</blockquote>
+//    <p>This is another example of a habitual statement: no specific event is being described, and it is generic.</p>
+
+
+      <blockquote>The lions <span class="predicate">roared</span> at the zebras.</blockquote>
+    <p>These are specific lions roaring at a specific time and place: it is a situation that actually happened, and it is not generic.</p>
+
+      <blockquote>The lions <span class="predicate">roared</span> at the zebras on Monday and Tuesday.</blockquote>
+     <p>These are specific lions roaring: it is a complex situation involving multiple times, but it is not generic, the roaring in this case is something that actually happened.  This is different from the example of <i>Acme usually cheating customers</i>: in that case the author was not describing any particular situation, but was instead making a statement about a general tendency.</p>
+</div>
+
+
+    <hr>
+    <a href="javascript:hideshow(document.getElementById('secondary'))">Secondary</a>
+    <div id="secondary" style="display: none">
+
+<p>We are concerned with whether the author is the one reporting on something directly, as compared to describing someone else's statements or beliefs.  If something is described as if it is happening or has happened, but that the author is ascribing this to someone else, then we call this a <i>secondary</i> report.  If something is coming from a secondary source, please judge the likelihood of something happening from the perspective of that secondary source.</p>
+
+      <br>
+      <blockquote>Sue said that Jack was <span class="predicate">happy</span>.</blockquote>
+
+      <p>Is is not clear whether the author thinks Jack being <u>happy</u> actually
+      happened: they are reporting on a statement made by Sue.
+      You would say that the event happened, but
+      then also check the optional box for "secondary". You might
+      recognize this style of writing as being common in newspaper
+      articles: reporters regularly do not state things directly, but
+      phrase them in ways such as: </p>
+
+      <blockquote><i>"The Martians <span class="predicate">took</span> my husband!"</i>, said Mrs. Smith.</blockquote>
+
+    <p>Here, even if it seems unlikely the author believes that the abduction happened, we would want you to judge the likelihood based on what is said of Mrs. Smith: she seems certain that the event happened.</p>
+
+    <br>
+    <blockquote>Sue thinks that Jack is <span class="predicate">happy</span>, but I do not.</blockquote>
+
+    <p>Again, this is a secondary report of something happening, and from the perspective of that secondary source, it is likely that it happened.</p>
+
+    <br>
+    <blockquote>Sue does not believe that Jack is <span class="predicate">happy</span>, but I do.</blockquote>
+
+    <p>Conversely, it is unlikely the situation happened, from the perspective of the secondary source.</p>
+</div>
+
+    <hr>
+    <a href="javascript:hideshow(document.getElementById('duration'))">Duration</a>
+    <div id="duration" style="display: none">
+
+
+      <p>Examples regarding the duration of a situation.</p>
+      
+      <br>
+      <blockquote>Sue <span class="predicate">remodeled</span> her kitchen.</blockquote>
+	
+      <p>The <u>remodeling</u> happened, and it could have
+      taken <i>days</i>, or more likely took <i>weeks</i>,
+      or <i>months</i>.  Use your best judgement: we would
+      say <i>weeks</i>, but perhaps in your experience you would
+say <i>months</i>, and that would be OK too.  Clearly the remodeling did not take seconds, nor centuries.</p>
+
+      <br>
+      <blockquote>Sue <span class="predicate">smiled</span> at Jack.</blockquote>
+
+      <p>This likely took <i>seconds</i>.</p>
+
+      <br>
+      <blockquote>Sue <span class="predicate">sneezed</span>.</blockquote>
+
+    <p>We usually think of activities like sneezes happening <i>near-instantly</i>, rather than "seconds".</p>
+
+      <br>
+      <blockquote>The bomb <span class="predicate">exploded</span>.</blockquote>
+
+    <p>Similarly, explosions are things we tend to think of as events that happen in an instant.</i>
+
+
+      <br>
+      <blockquote>Sue <span class="predicate">danced</span> with Jack all evening.</blockquote>
+
+      <p>This took <i>hours</i>.</p>
+
+      <br>
+      <blockquote>Sue is very <span class="predicate">tall</span>.</blockquote>
+
+      <p>Being <u>tall</u> is not likely to change through most of a person's life, so we would say this happened over <i>decades</i>.</p>
+
+      <br>
+      <blockquote>Russia is one of the <span class="predicate">largest</span> countries in the world.</blockquote>
+
+      <p>This happens over the course of <i>centuries</i>.</p>
+
+      <br>
+      <blockquote>Three is <span class="predicate">prime</span>.</blockquote>
+
+      <p>This is a mathematical truth, it happens <i>forever</i>: we would pick the largest value available (centuries).</p>
+</div>
+      <br>
+      
+<!-- if we want to host images instead:   <p><img src="https://copy.com/6KoADM1lZ9UR3Hcq" /></p> -->
+
+<!-- </div> --> <!-- Panel-body --></div>
+<!-- Panel-primary --><!-- End Instructions --><!-- Content Body -->
+
+<section>
+  <div id="hit">
+    <h1>Sentences</h1>
+
+    <fieldset>
+      <div id="questions">&nbsp;</div>
+    </fieldset>
+
+    <div><input class="btn btn-primary btn-lg" id="submit_button" type="submit" value="Submit" /></div>
+  </div>
+  <!-- hit--></section>
+<!-- End Content Body --></div>
+</section>
+<!-- close container -->
+<style type="text/css">fieldset { padding: 10px; background:#fbfbfb; border-radius:5px; margin-bottom:5px; }
+</style>
