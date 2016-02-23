@@ -38,9 +38,24 @@
     td.topic_alt_word {
       background-color: #f3f9ff;
     }
+
+    .invisible__ {
+      display: none;
+    }
   </style>
 
   <script type="text/javascript">
+    function toggleVisible(id) {
+      var elt = document.getElementById(id);
+      var i = elt.className.indexOf('invisible__');
+      if (i < 0) {
+        elt.className += ' invisible__';
+      } else {
+        elt.className = elt.className.substring(0, i) +
+                        elt.className.substring(i + 'invisible__ '.length);
+      }
+    }
+
     function generateWordListTable(id, wl, checked, disabled) {
       var wl_html = '';
       wl_html += '<table class="topic_table">';
@@ -77,6 +92,7 @@
 
       return wl_html;
     }
+
     /* Add HTML for word lists to DOM element with ID 'word_lists'
      *
      * Assumes var_arrays is a dict:
@@ -118,15 +134,21 @@
 
       <div class="instructions_intro">
 
-        <p class="instructions_intro">
+        <p>
           In this task you are presented with a topic, represented by its
           top five words, and a sixth word not from that topic.  The
           order of the six words is randomized.  You are requested to
           select the word that is not from the topic.  We refer to this
-          word as the intruder.  We now provide four example word
-          lists including brief justifications of the intruder word
-          selection:
+          word as the intruder.
         </p>
+          
+        <p>
+          <a onclick="toggleVisible('instructions_examples');" href="#">Click here to show/hide examples.</a>
+        </p>
+
+      </div>
+
+      <div id="instructions_examples" class="invisible__">
 
         <script type="text/javascript">
           document.write(generateWordListTable('example-0',
