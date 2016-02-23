@@ -16,11 +16,19 @@
       border: 0px solid #FFFFFF;
     }
 
+    .topic_table {
+      margin: 1em 0 1em 0;
+    }
+
     .topic_table tr td {
       padding: 0.5em 2em 0.5em 2em;
       margin: 0;
       border: none;
       text-align: center;
+    }
+
+    .inline_tw {
+      font-style: italic;
     }
 
     td.topic_word {
@@ -90,7 +98,7 @@
         var wl = var_array['wl'];
 
         wl_html += '<div>';
-        wl_html += generateWordListTable(id + '_' + wl_id, wl);
+        wl_html += generateWordListTable(id, wl);
         wl_html += '</div>';
       }
   
@@ -111,12 +119,13 @@
       <div class="instructions_intro">
 
         <p class="instructions_intro">
-            In this task you are presented with a topic, represented by its
-            top five words, and a sixth word not from that topic.  The
-            order of the six words is randomized.  You are requested to
-            select the word that is not from the topic.  We refer to this
-            word as the intruder.  Example word lists with decisions and
-            explanations about the intruder words are given below.
+          In this task you are presented with a topic, represented by its
+          top five words, and a sixth word not from that topic.  The
+          order of the six words is randomized.  You are requested to
+          select the word that is not from the topic.  We refer to this
+          word as the intruder.  We now provide four example word
+          lists including brief justifications of the intruder word
+          selection:
         </p>
 
         <script type="text/javascript">
@@ -126,9 +135,12 @@
         </script>
 
         <p>
-            We note that five of the words in this list concern
-            computers, specifically computer hardware, whereas alphabet
-            does not.  We select alphabet as the intruder.
+          We note that five of the words in this list concern
+          computers, specifically computer hardware, whereas
+          <span class="inline_tw">alphabet</span>
+          does not.  We select
+          <span class="inline_tw">alphabet</span>
+          as the intruder.
         </p>
 
         <script type="text/javascript">
@@ -138,12 +150,20 @@
         </script>
 
         <p>
-            The words education, study, university, school, and student
-            concern education, perhaps university-level education in
-            particular.  Whereas a student might study properties of
-            molecules, the word molecule is too specific for a topic on
-            general university-level education.  We select molecule as the
-            intruder.
+          The words
+          <span class="inline_tw">education</span>,
+          <span class="inline_tw">study</span>,
+          <span class="inline_tw">university</span>,
+          <span class="inline_tw">school</span>, and
+          <span class="inline_tw">student</span>
+          concern education, perhaps university-level education in
+          particular.  Whereas a student might study properties of
+          molecules, the word
+          <span class="inline_tw">molecule</span>
+          is too specific for a topic on
+          general university-level education.  We select
+          <span class="inline_tw">molecule</span>
+          as the intruder.
         </p>
 
         <script type="text/javascript">
@@ -153,9 +173,10 @@
         </script>
 
         <p>
-            The latter five words concern cinema whereas the first word
-            refers to the study of language.  While language and cinema
-            are not unrelated, it is clear linguistics is the intruder.
+          The latter five words concern cinema whereas the first word
+          refers to the study of language.  While language and cinema
+          are not unrelated, it is clear
+          <span class="inline_tw">linguistics</span> is the intruder.
         </p>
 
         <script type="text/javascript">
@@ -165,11 +186,14 @@
         </script>
 
         <p>
-            The first four words could be from a topic about islands.
-            Portugal has a coast on the ocean, so the latter three words
-            are also somewhat related.  However, neither the first four
-            words nor the last word, mainland, pertain to Portugal in
-            particular, so we decide the intruder is portuguese.
+          The first four words could be from a topic about islands.
+          Portugal has a coast on the ocean, so the latter three words
+          are also somewhat related.  However, neither the first four
+          words nor the last word,
+          <span class="inline_tw">mainland</span>,
+          pertain to Portugal in
+          particular, so we decide the intruder is
+          <span class="inline_tw">portuguese</span>.
         </p>
 
       </div>
