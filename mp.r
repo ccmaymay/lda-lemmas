@@ -35,6 +35,12 @@ mp <- function(results.path, key.path) {
     d.agg
 }
 
-results.path <- 'wiki-ru-dll.big.results.nocr.csv'
-key.path <- 'wiki-ru-dll-lda-trunc50-big.key.tsv'
-print(mp(results.path, key.path))
+results.prefix <- 'wiki.ru.dll.big.'
+results.suffix <- '.nocr.csv'
+key.prefix <- 'wiki.ru.dll.big.'
+key.suffix <- '.tsv'
+for (i in c(1,3,5,7)) {
+    results.path <- paste(results.prefix, i, results.suffix, sep='')
+    key.path <- paste(key.prefix, i, key.suffix, sep='')
+    print(mp(results.path, key.path))
+}
