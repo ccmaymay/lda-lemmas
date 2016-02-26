@@ -49,9 +49,9 @@ mp <- function(results.path, key.path) {
     print(ci)
 }
 
-results.prefix <- 'wiki.ru.dll.big.'
+results.prefix <- 'results/wiki.ru.dll.big.'
 results.suffix <- '.nocr.csv'
-key.prefix <- 'wiki.ru.dll.big.'
+key.prefix <- 'keys/wiki.ru.dll.big.'
 key.suffix <- '.tsv'
 for (i in c(1,3,5,7)) {
     results.path <- paste(results.prefix, i, results.suffix, sep='')
