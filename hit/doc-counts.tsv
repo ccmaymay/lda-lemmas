@@ -1,0 +1,9 @@
+experiment-key	doc-count	filename
+wiki.ru:dl:10k-100:p/lda	131072000	wiki-ru-dll-10k-100-p-lda.csv
+wiki.ru:dll:10k-100:p/lda	131072000	wiki-ru-dll-10k-100-p-lda.csv
+wiki.ru:dl:10k-100:p/lda:big	16384000	wiki-ru-dll-10k-100-p-lda-big.csv
+wiki.ru:dll:10k-100:p/lda:big	16384000	wiki-ru-dll-10k-100-p-lda-big.csv
+wiki.ru:dl:10k-100:p/lda:trunc50	262144000	wiki-ru-dll-10k-100-p-lda-trunc50.csv
+wiki.ru:dll:10k-100:p/lda:trunc50	262144000	wiki-ru-dll-10k-100-p-lda-trunc50.csv
+wiki.ru:dl:10k-100:p/lda:trunc50:big	32768000	wiki-ru-dll-10k-100-p-lda-trunc50-big.csv
+wiki.ru:dll:10k-100:p/lda:trunc50:big	32768000	wiki-ru-dll-10k-100-p-lda-trunc50-big.csv
