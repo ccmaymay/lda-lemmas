@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 dllk="$1"
 dlk=`echo "$1" | sed 's/dll/dl/'`
 dc="$2"
