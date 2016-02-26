@@ -7,3 +7,11 @@ wiki.ru:dl:10k-100:p/lda:trunc50	262144000	wiki-ru-dll-10k-100-p-lda-trunc50.csv
 wiki.ru:dll:10k-100:p/lda:trunc50	262144000	wiki-ru-dll-10k-100-p-lda-trunc50.csv
 wiki.ru:dl:10k-100:p/lda:trunc50:big	32768000	wiki-ru-dll-10k-100-p-lda-trunc50-big.csv
 wiki.ru:dll:10k-100:p/lda:trunc50:big	32768000	wiki-ru-dll-10k-100-p-lda-trunc50-big.csv
+wiki.ru:dl/lda	65536000	wiki-ru-dll-10k-100-p-lda.csv
+wiki.ru:dll/lda	65536000	wiki-ru-dll-10k-100-p-lda.csv
+wiki.ru:dl/lda:big	16384000	wiki-ru-dll-10k-100-p-lda-big.csv
+wiki.ru:dll/lda:big	16384000	wiki-ru-dll-10k-100-p-lda-big.csv
+wiki.ru:dl/lda:trunc50	262144000	wiki-ru-dll-10k-100-p-lda-trunc50.csv
+wiki.ru:dll/lda:trunc50	262144000	wiki-ru-dll-10k-100-p-lda-trunc50.csv
+wiki.ru:dl/lda:trunc50:big	65536000	wiki-ru-dll-10k-100-p-lda-trunc50-big.csv
+wiki.ru:dll/lda:trunc50:big	65536000	wiki-ru-dll-10k-100-p-lda-trunc50-big.csv
