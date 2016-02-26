@@ -1,4 +1,5 @@
 require(jsonlite)
+require(reshape2)
 
 mp <- function(results.path, key.path) {
     results <- read.csv(results.path, header=T)
@@ -10,7 +11,7 @@ mp <- function(results.path, key.path) {
                          function(x) {fromJSON(as.character(x))})
 
     key <- read.delim(key.path, header=T)
-    key.ids <- vapply(1:dim(results)[1],
+    key.ids <- vapply(1:nrow(results),
                       function(i) {
                           j <- which(key$wl.id ==
                                      results.va[[i]]$wl_id)
@@ -23,16 +24,41 @@ mp <- function(results.path, key.path) {
 
     d <- data.frame(ans.human=results[,answer.col.idx],
                     ans.model=key$intruder.idx[key.ids],
-                    experiment=factor(key$experiment[key.ids]))
+                    experiment=key$experiment[key.ids])
     d$correct <- d$ans.human == d$ans.model
-    d$total <- rep(1, dim(d)[1])
 
-    d.agg <- aggregate(cbind(correct, total) ~ experiment,
-                       data=d,
-                       FUN=sum)
-    d.agg$mp <- d.agg$correct / d.agg$total
+    d.agg <- dcast(d,
+                   experiment ~ correct,
+                   value.var='correct',
+                   fun.aggregate=length)
+    d.agg$total <- d.agg[,'TRUE'] + d.agg[,'FALSE']
+    d.agg$mp <- d.agg[,'TRUE'] / d.agg$total
 
-    d.agg
+    if (nrow(d.agg) != 2) {
+        stop('too many rows in aggregated data')
+    }
+    alt.idx <- which(grepl(':dll', as.character(d.agg$experiment)))
+    if (length(alt.idx) != 1 || alt.idx > 2) {
+        stop('too many :dll experiments in aggregated data')
+    }
+    null.idx <- 3 - alt.idx
+
+    d.alt <- subset(d, experiment == d.agg$experiment[alt.idx])
+    d.null <- subset(d, experiment == d.agg$experiment[null.idx])
+
+    ex.levels <- levels(d$experiment)
+    ex.dll <- grepl(':dll', as.character(ex.levels))
+    d.tab <- table(factor(d$experiment,
+                          levels=c(ex.levels[which(ex.dll)[1]],
+                                   ex.levels[which(!ex.dll)[1]])),
+                   factor(d$correct,
+                          levels=c(TRUE, FALSE)))
+    d.ci <- prop.test(d.tab,
+                    conf.level=0.99,
+                    alternative='greater',
+                    correct=F)
+
+    list(data=d.agg, ci=d.ci)
 }
 
 results.prefix <- 'wiki.ru.dll.big.'
@@ -42,5 +68,10 @@ key.suffix <- '.tsv'
 for (i in c(1,3,5,7)) {
     results.path <- paste(results.prefix, i, results.suffix, sep='')
     key.path <- paste(key.prefix, i, key.suffix, sep='')
-    print(mp(results.path, key.path))
+    ret <- mp(results.path, key.path)
+    data <- ret$data
+    ci <- ret$ci
+    cat('\n\n\n')
+    print(data)
+    print(ci)
 }
