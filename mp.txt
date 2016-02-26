@@ -1,0 +1,76 @@
+
+
+
+           experiment FALSE TRUE total   mp
+1  wiki.ru:dl/lda:big    46   54   100 0.54
+2 wiki.ru:dll/lda:big    48   52   100 0.52
+
+	2-sample test for equality of proportions without continuity
+	correction
+
+data:  d.tab
+X-squared = 0.080289, df = 1, p-value = 0.6115
+alternative hypothesis: greater
+99 percent confidence interval:
+ -0.1841683  1.0000000
+sample estimates:
+prop 1 prop 2 
+  0.52   0.54 
+
+
+
+
+                   experiment FALSE TRUE total   mp
+1  wiki.ru:dl/lda:trunc50:big    63   37   100 0.37
+2 wiki.ru:dll/lda:trunc50:big    63   37   100 0.37
+
+	2-sample test for equality of proportions without continuity
+	correction
+
+data:  d.tab
+X-squared = 0, df = 1, p-value = 0.5
+alternative hypothesis: greater
+99 percent confidence interval:
+ -0.1588403  1.0000000
+sample estimates:
+prop 1 prop 2 
+  0.37   0.37 
+
+
+
+
+                     experiment FALSE TRUE total   mp
+1  wiki.ru:dl:10k-100:p/lda:big    50   50   100 0.50
+2 wiki.ru:dll:10k-100:p/lda:big    35   65   100 0.65
+
+	2-sample test for equality of proportions without continuity
+	correction
+
+data:  d.tab
+X-squared = 4.6036, df = 1, p-value = 0.01595
+alternative hypothesis: greater
+99 percent confidence interval:
+ -0.01075384  1.00000000
+sample estimates:
+prop 1 prop 2 
+  0.65   0.50 
+
+
+
+
+                             experiment FALSE TRUE total   mp
+1  wiki.ru:dl:10k-100:p/lda:trunc50:big    57   43   100 0.43
+2 wiki.ru:dll:10k-100:p/lda:trunc50:big    53   47   100 0.47
+
+	2-sample test for equality of proportions without continuity
+	correction
+
+data:  d.tab
+X-squared = 0.32323, df = 1, p-value = 0.2848
+alternative hypothesis: greater
+99 percent confidence interval:
+ -0.1235408  1.0000000
+sample estimates:
+prop 1 prop 2 
+  0.47   0.43 
+
