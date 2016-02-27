@@ -1,0 +1,240 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage{rotating}
+\usepackage{acl2016}
+\usepackage{times}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{appendix}
+\usepackage{booktabs}
+\usepackage[small]{caption}
+\usepackage{subcaption}
+\usepackage{xspace}
+\usepackage{multirow}
+\usepackage{rotating}
+
+\usepackage[inline,shortlabels]{enumitem}
+\setlist*[enumerate,1]{label=$(\arabic*)$}
+\setlist*[itemize,1]{label=$\bullet$}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb}
+\usepackage[russian,english]{babel}
+
+\usepackage{cleveref}
+\crefname{section}{§}{§§}
+\Crefname{section}{§}{§§}
+\crefname{figure}{Fig}{}
+\crefname{algorithm}{Alg.}{}
+\crefformat{section}{§#2#1#3}  % remove space between section symbol and the number
+
+
+\long\def\devour#1{\ignorespaces}
+
+\renewcommand{\vec}{\boldsymbol}   % optional
+\newcommand{\vf}{{\vec{f}}}
+\newcommand{\vg}{{\vec{g}}}
+\newcommand{\vh}{{\vec{h}}}
+\newcommand{\vx}{{\vec{x}}}
+\newcommand{\vz}{{\vec{z}}}
+\newcommand{\vm}{{\vec{m}}}
+\newcommand{\vw}{{\vec{w}}}
+\newcommand{\vc}{{\vec{c}}}
+\newcommand{\vy}{{\vec{y}}}
+\newcommand{\vl}{{\vec{l}}}
+\newcommand{\vs}{{\vec{s}}}
+\newcommand{\vphi}{{\vec{\phi}}}
+\newcommand{\valpha}{{\vec{\alpha}}}
+\newcommand{\vxi}{{\vec{\xi}}}
+
+\newcommand{\vmu}{{\vec{\mu}}}
+\newcommand{\vtheta}{{\vec{\theta}}}
+\newcommand{\veta}{{\vec{\eta}}}
+\newcommand{\vomega}{{\vec{\omega}}}
+\newcommand{\vpsi}{{\vec{\psi}}}
+
+% reduce space before \paragraph command -- http://tex.stackexchange.com/questions/219676/how-to-change-spacing-before-and-after-paragraph-command/219677#219677
+%\makeatletter
+%\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+%                                    {3.25ex \@plus1ex \@minus.2ex}%
+%                                    {-1em}%
+%                                    {\normalfont\normalsize\bfseries}}
+%\makeatother
+
+\usepackage{amssymb}
+\DeclareMathOperator*{\Expect}{\mathop{\mathbb{E}}}
+\DeclareMathOperator*{\argmax}{\mathop{\text{argmax}}}
+
+
+% new math commands
+
+\usepackage{color}
+\usepackage{xcolor}
+\definecolor{darkgrey}{rgb}{0.2,0.2,0.2}
+\definecolor{grey}{rgb}{0.9,0.9,0.9}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.5}
+\definecolor{darkpurple}{rgb}{0.4,0.0,0.4}
+\definecolor{darkred}{rgb}{0.5,0.0,0.0}
+\definecolor{darkorange}{rgb}{0.5,0.45,0.4}
+\definecolor{darkgreen}{rgb}{0.0,0.5,0.0}
+\definecolor{darkergreen}{rgb}{0.0,0.4,0.0}
+\definecolor{lightblue}{rgb}{0.8,0.8,1.0}
+\definecolor{lightgreen}{rgb}{0.8,1.0,0.8}
+\definecolor{lightred}{rgb}{1.0,0.8,0.8}
+\definecolor{lightyellow}{rgb}{1.0,1.0,0.8}
+\definecolor{lightorange}{rgb}{1.0,0.9,0.8}
+\definecolor{lightgrey}{rgb}{0.96,0.97,0.98}
+\definecolor{brilliantlavender}{rgb}{0.96, 0.73, 1.0}
+
+% define notes
+\usepackage[russian,english]{babel}
+\usepackage{soul}
+\usepackage{color}
+\newcommand{\Note}[3]{\sethlcolor{#2}\hl{[\textbf{#1}: #3]}}
+%\renewcommand{\Note}[3]{}
+
+\newcommand{\timv}[1]{\Note{timv}{brilliantlavender}{#1}}
+\newcommand{\ryan}[1]{\Note{ryan}{lightorange}{#1}}
+\newcommand{\todo}[1]{\Note{todo}{red}{#1}}
+
+
+
+\newcommand{\defn}[1]{{\bf #1}}%
+
+%i commented this out because i cannot compile this option
+%what's the easiest way to install this on my mac?
+%\usepackage[subtle]{savetrees}
+
+\newcommand{\software}[1]{\textsc{#1}}
+\newcommand{\word}[1]{{\em #1}}
+\newcommand{\lemma}[1]{\textsc{#1}}
+\newcommand{\att}[2]{{\small \texttt{#1}}=\textsc{#2}}
+\newcommand{\gloss}[1]{``#1''}
+\newcommand{\UNK}{\textsc{unk}\xspace}
+
+%\newcommand{\func}{\mathcal{E}(t, s, u, w)}
+%\newcommand{\grad}{\nabla_{\vtheta}\,\func}
+%\newcommand{\funcw}{\mathcal{E}(t, s, u)}
+%\newcommand{\gradw}{\nabla_{\vtheta}\,\funcw}
+
+\def\figref#1{Figure~\ref{fig:#1}}
+\def\figlabel#1{\label{fig:#1}\label{p:#1}}
+\def\Tabref#1{Table~\ref{tab:#1}}
+\def\tabref#1{Table~\ref{tab:#1}}
+\def\tablabel#1{\label{tab:#1}\label{p:#1}}
+\def\Secref#1{Section~\ref{sec:#1}}
+\def\secref#1{Section~\ref{sec:#1}}
+\def\seclabel#1{\label{sec:#1}\label{p:#1}}
+\def\eqref#1{Eq.~\ref{eqn:#1}}
+\def\eqrefn#1{\ref{eqn:#1}}
+\def\eqsref#1#2{Eqs.~\ref{eqn:#1}-\ref{eqn:#2}}
+\def\eqlabel#1{\label{eqn:#1}}
+\def\subsp#1{P_{\mbox{{\scriptsize\rm #1}}}}
+
+
+
+% space hacks
+%\setlength\belowcaptionskip{-4pt}
+%\setlength\titlebox{2cm}
+
+% You can expand the titlebox if you need extra space
+% to show all the authors. Please do not make the titlebox
+% smaller than 5cm (the original size); we will check this
+% in the camera-ready version and ask you to change it back.
+
+%\titlespacing\section{0pt}{1pt plus 4pt minus 4pt}{12pt plus 4pt minus 4pt}
+%\titlespacing\subsection{0pt}{1pt plus 0pt minus 0pt}{1pt plus 0pt minus 0pt}
+%\titlespacing\subsubsection{0pt}{1pt plus 0pt minus 0pt}{1pt plus 0pt minus 0pt}
+
+\title{Topic Modeling for Morphologically Rich Languages}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+\end{abstract}
+
+\section{Introduction}\label{sec:introduction}
+Topic modeling is a standard tool for unsupervised analysis of large
+text corpora. At the core, almost all topic models pick up on
+cooccurrence signals between different words in the corpus, i.e.,
+words that occur often in the same sentence, are likely to belong to
+the same latent topic. In languages that exhibit rich inflection
+morphology, the signal becomes weaker given the proliferation of
+unique tokens. In this work, we explore the effect of token-based
+lemmatization on the performance of topic models.
+
+Syntactic information is not generally considered to exert a strong
+force on the thematic nature of a document.  Indeed, for this reason
+topic models often make a bag-of-words assumption, the whereby exact
+order of the words in a sentence is discard. In morphologically rich
+languages, however, syntactic information is often encoded in the word
+form itself. Nevertheless, most commonly employed approaches to topic
+modeling ignore the influence of morphology. Consider the Russian name
+{\em Putin}; in English, we have a single type that represents in the
+concept in all syntactic contexts, whereas in Russian
+{\selectlanguage{russian} Путин} appears with various inflections,
+e.g., {\selectlanguage{russian}Путина},
+{\selectlanguage{russian}Путину}, {\selectlanguage{russian}Путине},
+and {\selectlanguage{russian}Путином}. Which form of the name one uses
+is fully dependent on the syntactic structure of the sentence. Compare
+the utterances {{\selectlanguage{russian}мы говорим о Путине} ({\em we
+    are speaking about Putin}) and {{\selectlanguage{russian}мы
+      говорим Путину} ({\em we are speaking to Putin})}, both sentence
+  are thematically centered on Putin, but two different words forms
+  are employed.
+
+  \ryan{Make connection here to stop words. We filter stop words (or try to) in topic models, so we should
+    fitler these endings as well?}
+  
+\section{Morphology and Lemmatization}\label{sec:inflectional}
+Morphology concerns itself with the iternal structure of individual
+words.  Specifically, we focus on {\em inflectional morphology}, word
+internal structure that marks syntactically relevant linguistic
+properties, e.g., person, number, case and gender on the word form
+itself. While inflectional morphology is minimal in English and
+virtually non-existent in Chinese, it occupies a prevalent position in
+many languages' grammars, e.g., Russian. In fact, Russian will often
+express relations marked in English with prepositions, simply through
+the addition of a suffix, often reducing the number of words in a
+given sentence.  \ryan{Need to say more?}
+
+In the context of NLP, heavily inflected inflected languages have an
+increased token to type ratio, greatly increasing the number of
+unknown owords. One method to combat is to {\em lemmatize} the sentence.
+A lemmatizer maps each inflection of a word, to a canonicalized form. 
+
+
+\begin{table}
+  \begin{tabular}{l | l l }
+    & {\bf Singular} & {\bf Plural} \\ \hline
+    {\bf Nominative} &  {\selectlanguage{russian}пес} ({\em pyos}) & {\selectlanguage{russian}псы}    ({\em psy})   \\
+    {\bf Genitive} &  {\selectlanguage{russian}пса} ({\em psa}) & {\selectlanguage{russian}псов}    ({\em psov})  \\
+    {\bf Accusative} &  {\selectlanguage{russian}пса} ({\em psa}) & {\selectlanguage{russian}псов}    ({\em psov})  \\
+    {\bf Dative} &  {\selectlanguage{russian}псу} ({\em psu}) & {\selectlanguage{russian}псам}    ({\em psam})  \\
+    {\bf Locative} &  {\selectlanguage{russian}псе} ({\em psye}) & {\selectlanguage{russian}псах}   ({\em psax})  \\
+    {\bf Instrumental} &  {\selectlanguage{russian}псом} ({\em psom}) & {\selectlanguage{russian}псами}  ({\em psami}) \\
+  \end{tabular}
+  \caption{A declension table for the Russian word
+    {\selectlanguage{russian}пес} ({\em pyos}), meaning ``dog''.  Each
+    of the 12 different entries in the table occurs in a distinct
+    syntactic context. A lemmatizer canonicalizes these forms to
+    single form, which is the nominative singular in the case of
+    Russian, greatly reducing the sparsity present in the corpus.  }
+\end{table}
+
+  
+
+\section{Related Work}\label{sec:related-work}
+\ryan{I can probably do the non-topic-modeling part of this section.}
+
+
+\section{Conclusion}\label{sec:conclusion}
+
+\bibliographystyle{acl2016}
+\bibliography{russian}
+
+\end{document}
