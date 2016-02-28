@@ -169,6 +169,7 @@
 \begin{abstract}
 \end{abstract}
 
+
 \section{Introduction}\label{sec:introduction}
 
 Topic modeling is a standard tool for unsupervised analysis of large
@@ -197,13 +198,16 @@ is fully dependent on the syntactic structure of the sentence. Compare
 the utterances {{\selectlanguage{russian}мы говорим о Путине} ({\em we
     are speaking about Putin}) and {{\selectlanguage{russian}мы
       говорим Путину} ({\em we are speaking to Putin})}, both sentence
-  are thematically centered on Putin, but two different words forms
+  are thematically centered on Putin, but two different word forms
   are employed.
 
   \ryan{Make connection here to stop words. We filter stop words (or try to) in topic models, so we should
     fitler these endings as well?}
+\chandler{I don't understand, what is the connection to stop words?}
   
+
 \section{Morphology and Lemmatization}\label{sec:inflectional}
+
 Morphology concerns itself with the internal structure of individual
 words.  Specifically, we focus on {\em inflectional morphology}, word
 internal structure that marks syntactically relevant linguistic
@@ -214,6 +218,7 @@ many languages' grammars, e.g., Russian. In fact, Russian will often
 express relations marked in English with prepositions, simply through
 the addition of a suffix, often reducing the number of words in a
 given sentence.  \ryan{Need to say more?}
+\chandler{Yes please!}
 
 In the context of NLP, heavily inflected inflected languages have an
 increased token to type ratio, greatly increasing the number of
@@ -244,6 +249,7 @@ A lemmatizer maps each inflection of a word, to a canonicalized form.
 
 \section{Related Work}\label{sec:related-work}
 \ryan{I can probably do the non-topic-modeling part of this section.}
+\chandler{Please do, and make this a priority, after the ingest/lemmatizer details---the related work in topic modeling is non-existent.}
 
 Though applied in many
 studies~\cite{deerwester1990,hofmann1999,mei2007,nallapati2008,lin2009},
@@ -334,7 +340,7 @@ We specified $K = 100$ topics to all models.
 Uniform priors with \todo{hyperparameters} were given to models on
 filtered vocabularies; non-uniform priors with \todo{hyperparameters}
 were given to models on unfiltered vocabularies.
-\todo{give details of data collection, lemmatizer};
+\todo{ryan: please give details of data collection, lemmatizer};
 \todo{explain unknown backoff, give num/frac unknown};
 
 The detection rate for all four configurations and the
@@ -365,10 +371,12 @@ unfiltered models are benefitted by lemmatization.
     \label{tab:detection-rate}
 \end{table}
 
+
 \section{Discussion}\label{sec:discussion}
 
 
 \section{Conclusion}\label{sec:conclusion}
+
 
 \bibliographystyle{acl2016}
 \bibliography{russian}
