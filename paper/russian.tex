@@ -90,6 +90,8 @@
 \definecolor{lightgrey}{rgb}{0.96,0.97,0.98}
 \definecolor{brilliantlavender}{rgb}{0.96, 0.73, 1.0}
 \definecolor{deeppink}{rgb}{1.0,0.08,0.58}
+\definecolor{hotpink}{rgb}{1.0,0.41,0.71}
+\definecolor{pink}{rgb}{1.0,0.75,0.80}
 
 % define notes
 \usepackage[russian,english]{babel}
@@ -100,7 +102,7 @@
 
 \newcommand{\timv}[1]{\Note{timv}{brilliantlavender}{#1}}
 \newcommand{\ryan}[1]{\Note{ryan}{lightorange}{#1}}
-\newcommand{\chandler}[1]{\Note{chandler}{deeppink}{#1}}
+\newcommand{\chandler}[1]{\Note{chandler}{pink}{#1}}
 \newcommand{\todo}[1]{\Note{todo}{red}{#1}}
 
 
@@ -266,6 +268,8 @@ unaware of any direct prior work, and we wish for our results to be
 widely applicable across research and industry.  Thus we leave these
 alternative topic models as considerations for future work.
 
+\todo{LDA is defined as...}
+
 We must also determine how to measure the quality of a
 topic model.  In particular, in this study we require an evaluation
 metric that is comparable across different views of the same corpus.
@@ -281,13 +285,51 @@ The intruder is randomly selected from the set of high-probability
 words from other topics in the model.
 The judge is tasked with identifying the intruder in each list of
 $m + 1$ words (where each list corresponds to a topic from the model).
+As in prior work~\cite{chang2009}, we instruct the judge to ignore
+syntactic and morphological patterns.  Examples from our word
+intrusion interface on both the lemmatized and unlemmatized data
+are depicted in Figure~\ref{fig:word-intrusion}.
+
+\begin{figure}
+    \caption{\todo{word intrusion examples}}
+    \label{fig:word-intrusion}
+\end{figure}
+
 If the model is interpretable, the $m$ words from a topic will be
 internally coherent whereas the intruder word is likely to stand out.
 Thus a model's interpretability can be quantified by the fraction
 of topics for which the judge correctly idenfies the intruder, called
-\emph{model precision}~\cite{chang2009}.
+\emph{model precision}~\cite{chang2009}:
+\text{\todo{model precision eqn}}
 
-\chandler{topic model quality correlates with size} \cite{mimno2011}
+\chandler{topic model quality correlates with size (we should be
+          able to measure this)} \cite{mimno2011}
+
+We learn all models by stochastic variational
+inference~\cite{hoffman2013}, initializing the models randomly and
+using fixed priors.\footnote{In preliminary experiments Gibbs
+sampling with hyper-parameter optimization was generally found to not
+help, or even to hinder, interpretability.}
+We specified $K = 100$ topics to all models.
+Uniform priors with \todo{hyperparameters} were given to models on
+filtered vocabularies; non-uniform priors with \todo{hyperparameters}
+were given to models on unfiltered vocabularies.
+
+The model precision for all four configurations and the
+p-values for the model precision differences are reported in
+Table~\ref{tab:model-precision}.  Word intrusion performance benefits
+significantly from lemmatization on a filtered vocabulary.  On an
+unfiltered vocabulary with a prior designed to reduce topic pollution
+by stop words lemmatization renders no significant improvement.
+Additionally, on length-truncated documents, neither the filtered nor
+unfiltered models are benefitted by lemmatization.
+
+\begin{table}
+    \caption{\todo{model precision table}}
+    \label{fig:model-precision}
+\end{table}
+
+\section{Discussion}\label{sec:discussion}
 
 
 \section{Conclusion}\label{sec:conclusion}
