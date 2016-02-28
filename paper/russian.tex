@@ -365,7 +365,35 @@ when one expert is used instead of several non-experts.
 \chandler{topic model quality correlates with size (we should be
           able to measure this)} \cite{mimno2011}
 
-\todo{explain vocabulary filtering};
+We consider two preprocessing schemes to account for stop words and
+other high-frequency terms in the corpus.  First, we compute the
+vocabulary as the top ten thousand words by document frequency,
+separately for the lemmatized and non-lemmatized data, and
+specify a highly asymmetric prior on each document's topic proportions
+$\vtheta$:  we set $\alpha_1 = 2.5$ and $\alpha_k = 2.5/(K-1)$
+for $k = 2, 3, \ldots, K$.  This prior was informed by samples of
+document word usage and samples of document length; in particular, we
+believe approximately 50\% of the word tokens in the corpus are
+uninformative to a topic model.  We refer to this preprocessing scheme
+as the \emph{unfiltered vocabulary}.  The second modeling scheme we
+consider uses a vocabulary with high-frequency words filtered out and a
+uniform prior on the document-wise topic proportions.
+Specifically, a ten-thousand--word vocabulary was formed from the
+lemmatized data by removing the top 100 words by document frequency
+over the corpus and taking the next ten thousand.  To determine the
+non-lemmatized vocabulary, we mapped the filtered lemmatized
+vocabulary onto all word forms that produced one of those lemmas in
+the data.  Finally, we observed that some of the uninformative
+high-frequency words reappeared in this projection, so we removed any
+of the top 100 words from the lemmatized and non-lemmatized corpora
+from this list, producing a non-lemmatized vocabulary of 72,641 words.
+While the relatively large size of this vocabulary makes the model
+slower to learn, we do not believe it impacts the results negatively;
+our priority is on retaining the information captured by the lemmatized
+vocabulary in order to provide a fair comparison.
+In the filtered-vocabulary scheme we set $\alpha$ to be a uniform
+vector, again with sum 5.
+
 \todo{explain doc truncation}
 
 We learn all models by stochastic variational
