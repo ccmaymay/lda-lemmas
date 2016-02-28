@@ -89,6 +89,7 @@
 \definecolor{lightorange}{rgb}{1.0,0.9,0.8}
 \definecolor{lightgrey}{rgb}{0.96,0.97,0.98}
 \definecolor{brilliantlavender}{rgb}{0.96, 0.73, 1.0}
+\definecolor{deeppink}{rgb}{1.0,0.08,0.58}
 
 % define notes
 \usepackage[russian,english]{babel}
@@ -99,6 +100,7 @@
 
 \newcommand{\timv}[1]{\Note{timv}{brilliantlavender}{#1}}
 \newcommand{\ryan}[1]{\Note{ryan}{lightorange}{#1}}
+\newcommand{\chandler}[1]{\Note{chandler}{deeppink}{#1}}
 \newcommand{\todo}[1]{\Note{todo}{red}{#1}}
 
 
@@ -232,16 +234,60 @@ A lemmatizer maps each inflection of a word, to a canonicalized form.
 \section{Related Work}\label{sec:related-work}
 \ryan{I can probably do the non-topic-modeling part of this section.}
 
-Though informally discussed in many
+Though applied in many
 studies~\cite{deerwester1990,hofmann1999,mei2007,nallapati2008,lin2009},
-the role of morphology in topic modeling has not been directly
-explored.
+lemmatization has not been directly explored in the context of topic
+modeling.  An infinite-vocabulary LDA model containing a prior on words
+similar to an n-gram model has been developed~\cite{zhai2013}; this
+prior could be viewed as loosely encoding beliefs of a
+concatenative morphology, but its effect was not analyzed in
+isolation.
 
-authors' knowledge the only topic model that even implicitly addresses
-also the infinite-vocabulary LDA model~\cite{zhai2013}, in
-which a variant of a character n-gram model is used as a prior on
-words.
-restaurant process prior is
+
+\section{Experiments}\label{sec:experiments}
+
+To measure the effect of lemmatization on topic models we must first
+define a topic model.  In this study, for comparability with other
+work, we restrict our attention to latent Dirichlet allocation
+(LDA)~\cite{blei2003}, the canonical Bayesian graphical topic model.
+However, we want to measure the performance of a topic model by its
+interpretability, as topic models are surpassed by other models,
+including traditional vector space models, in tasks without a ``human
+in the loop''~\cite{may2015}.  Thus we note there are more modern but
+less widely-used topic models such as the sparse additive generative
+(SAGE) topic model, which explicitly models the background word
+distribution and encourages sparse topics~\cite{eisenstein2009}, or the
+nested hierarchical Dirichlet process (nHDP) topic model, which
+represents topics in a hierarchy and automatically infers its effective
+size~\cite{paisley2015}.  These models may render more interpretable
+results overall.  However, we are currently interested in the
+\emph{relative} impact of lemmatization on a topic model, we are
+unaware of any direct prior work, and we wish for our results to be
+widely applicable across research and industry.  Thus we leave these
+alternative topic models as considerations for future work.
+
+We must also determine how to measure the quality of a
+topic model.  In particular, in this study we require an evaluation
+metric that is comparable across different views of the same corpus.
+Additionally, we desire an evaluation metric that correlates with a
+human's ability to use the model to explore or filter a large dataset,
+hence, the interpretability of the model.  Thus we evaluate models in
+this study by \emph{word intrusion} performance.  In the word intrusion
+evaluation, a human judge is given one topic at a time, represented
+by its top $m$ words (for some small number $m$) in random order, as
+well as an additional word, called the \emph{intruder}, randomly placed
+among the $m$ topic words~\cite{chang2009}.
+The intruder is randomly selected from the set of high-probability
+words from other topics in the model.
+The judge is tasked with identifying the intruder in each list of
+$m + 1$ words (where each list corresponds to a topic from the model).
+If the model is interpretable, the $m$ words from a topic will be
+internally coherent whereas the intruder word is likely to stand out.
+Thus a model's interpretability can be quantified by the fraction
+of topics for which the judge correctly idenfies the intruder, called
+\emph{model precision}~\cite{chang2009}.
+
+\chandler{topic model quality correlates with size~\cite{mimno2011}}
 
 
 \section{Conclusion}\label{sec:conclusion}
