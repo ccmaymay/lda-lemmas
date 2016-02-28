@@ -158,9 +158,10 @@
 \end{abstract}
 
 \section{Introduction}\label{sec:introduction}
+
 Topic modeling is a standard tool for unsupervised analysis of large
 text corpora. At the core, almost all topic models pick up on
-cooccurrence signals between different words in the corpus, i.e.,
+co-occurrence signals between different words in the corpus, that is,
 words that occur often in the same sentence, are likely to belong to
 the same latent topic. In languages that exhibit rich inflection
 morphology, the signal becomes weaker given the proliferation of
@@ -191,7 +192,7 @@ the utterances {{\selectlanguage{russian}мы говорим о Путине} ({
     fitler these endings as well?}
   
 \section{Morphology and Lemmatization}\label{sec:inflectional}
-Morphology concerns itself with the iternal structure of individual
+Morphology concerns itself with the internal structure of individual
 words.  Specifically, we focus on {\em inflectional morphology}, word
 internal structure that marks syntactically relevant linguistic
 properties, e.g., person, number, case and gender on the word form
@@ -230,6 +231,17 @@ A lemmatizer maps each inflection of a word, to a canonicalized form.
 
 \section{Related Work}\label{sec:related-work}
 \ryan{I can probably do the non-topic-modeling part of this section.}
+
+Though informally discussed in many
+studies~\cite{deerwester1990,hofmann1999,mei2007,nallapati2008,lin2009},
+the role of morphology in topic modeling has not been directly
+explored.
+
+authors' knowledge the only topic model that even implicitly addresses
+also the infinite-vocabulary LDA model~\cite{zhai2013}, in
+which a variant of a character n-gram model is used as a prior on
+words.
+restaurant process prior is
 
 
 \section{Conclusion}\label{sec:conclusion}
