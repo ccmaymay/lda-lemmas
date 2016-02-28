@@ -57,6 +57,8 @@
 \newcommand{\vomega}{{\vec{\omega}}}
 \newcommand{\vpsi}{{\vec{\psi}}}
 
+\newcommand{\MP}{\ensuremath{\textrm{MP}}}
+
 % reduce space before \paragraph command -- http://tex.stackexchange.com/questions/219676/how-to-change-spacing-before-and-after-paragraph-command/219677#219677
 %\makeatletter
 %\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
@@ -228,7 +230,8 @@ A lemmatizer maps each inflection of a word, to a canonicalized form.
     of the 12 different entries in the table occurs in a distinct
     syntactic context. A lemmatizer canonicalizes these forms to
     single form, which is the nominative singular in the case of
-    Russian, greatly reducing the sparsity present in the corpus.  }
+    Russian, greatly reducing the sparsity present in the corpus.
+    \todo{reference this in text}}
 \end{table}
 
   
@@ -314,9 +317,12 @@ We specified $K = 100$ topics to all models.
 Uniform priors with \todo{hyperparameters} were given to models on
 filtered vocabularies; non-uniform priors with \todo{hyperparameters}
 were given to models on unfiltered vocabularies.
+\todo{give details of lemmatizer}
 
 The model precision for all four configurations and the
-p-values for the model precision differences are reported in
+p-values for one-sided model precision differences (testing our
+hypothesis that the lemmatized models are more interpretable than the
+unlemmatized models) are reported in
 Table~\ref{tab:model-precision}.  Word intrusion performance benefits
 significantly from lemmatization on a filtered vocabulary.  On an
 unfiltered vocabulary with a prior designed to reduce topic pollution
@@ -325,7 +331,18 @@ Additionally, on length-truncated documents, neither the filtered nor
 unfiltered models are benefitted by lemmatization.
 
 \begin{table}
-    \caption{\todo{model precision table}}
+    \begin{tabular}{l|rr|r}
+        experiment    &     raw $\MP$ &     lem $\MP$ &       p-value \\\hline
+        base          &          0.54 &          0.52 &          0.61 \\
+        \textbf{filt} & \textbf{0.50} & \textbf{0.65} & \textbf{0.02} \\
+        trunc         &          0.37 &          0.37 &          0.50 \\
+        trunc + filt  &          0.43 &          0.47 &          0.28 \\
+    \end{tabular}
+    \caption{Model precision ($\MP$) for the raw and lemmatized models
+        and p-values for the test that the lemmatized model precision
+        is greater than the unlemmatized (raw) model precision.
+        Model precision is significantly benefitted by lemmatization on
+        a filtered vocabulary, highlighted in bold.}
     \label{fig:model-precision}
 \end{table}
 
