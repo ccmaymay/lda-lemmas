@@ -57,7 +57,13 @@
 \newcommand{\vomega}{{\vec{\omega}}}
 \newcommand{\vpsi}{{\vec{\psi}}}
 
-\newcommand{\MP}{\ensuremath{\textrm{MP}}}
+\newcommand{\diracdelta}[2]{\delta_{#1}\left(#2\right)}
+
+\newcommand{\DR}{\ensuremath{\textrm{DR}}}
+\newcommand{\model}{\ensuremath{(model)}}
+\newcommand{\DRmodel}{\ensuremath{\DR^{\model}}}
+\newcommand{\DRlem}{\ensuremath{\DR^{(lem)}}}
+\newcommand{\DRnonlem}{\ensuremath{\DR^{(non-lem)}}}
 
 % reduce space before \paragraph command -- http://tex.stackexchange.com/questions/219676/how-to-change-spacing-before-and-after-paragraph-command/219677#219677
 %\makeatletter
@@ -280,17 +286,17 @@ Additionally, we desire an evaluation metric that correlates with a
 human's ability to use the model to explore or filter a large dataset,
 hence, the interpretability of the model.  Thus we evaluate models in
 this study by \emph{word intrusion} performance.  In the word intrusion
-evaluation, a human judge is given one topic at a time, represented
+evaluation, a human expert is given one topic at a time, represented
 by its top $m$ words (for some small number $m$) in random order, as
 well as an additional word, called the \emph{intruder}, randomly placed
 among the $m$ topic words~\cite{chang2009}.
 The intruder is randomly selected from the set of high-probability
 words from other topics in the model.
-The judge is tasked with identifying the intruder in each list of
+The expert is tasked with identifying the intruder in each list of
 $m + 1$ words (where each list corresponds to a topic from the model).
-As in prior work~\cite{chang2009}, we instruct the judge to ignore
+As in prior work~\cite{chang2009}, we instruct the expert to ignore
 syntactic and morphological patterns.  Examples from our word
-intrusion interface on both the lemmatized and unlemmatized data
+intrusion interface on both the lemmatized and non-lemmatized data
 are depicted in Figure~\ref{fig:word-intrusion}.
 
 \begin{figure}
@@ -301,12 +307,23 @@ are depicted in Figure~\ref{fig:word-intrusion}.
 If the model is interpretable, the $m$ words from a topic will be
 internally coherent whereas the intruder word is likely to stand out.
 Thus a model's interpretability can be quantified by the fraction
-of topics for which the judge correctly idenfies the intruder, called
-\emph{model precision}~\cite{chang2009}:
-\text{\todo{model precision eqn}}
+of topics for which the expert correctly idenfies the intruder.  We
+call this value the \emph{detection rate}:
+\begin{align*}
+    \DR = \frac{1}{K} \sum_{k=1}^K \diracdelta{i_k}{\omega_k}
+\end{align*}
+where $K$ is the number of topics in the model, $i_k$ is the index
+of the intruder in the randomized word list generated from topic $k$,
+and $\omega_k$ is the index of the word the expert identified as the
+intruder.  We note this is just the mean (over topics) of the
+\emph{model precision} metric from prior work~\cite{chang2009}
+when one expert is used instead of several non-experts.
 
 \chandler{topic model quality correlates with size (we should be
           able to measure this)} \cite{mimno2011}
+
+\todo{explain vocabulary filtering};
+\todo{explain doc truncation}
 
 We learn all models by stochastic variational
 inference~\cite{hoffman2013}, initializing the models randomly and
@@ -317,13 +334,14 @@ We specified $K = 100$ topics to all models.
 Uniform priors with \todo{hyperparameters} were given to models on
 filtered vocabularies; non-uniform priors with \todo{hyperparameters}
 were given to models on unfiltered vocabularies.
-\todo{give details of lemmatizer}
+\todo{give details of data collection, lemmatizer};
+\todo{explain unknown backoff, give num/frac unknown};
 
-The model precision for all four configurations and the
-p-values for one-sided model precision differences (testing our
+The detection rate for all four configurations and the
+p-values for one-sided detection rate differences (testing our
 hypothesis that the lemmatized models are more interpretable than the
-unlemmatized models) are reported in
-Table~\ref{tab:model-precision}.  Word intrusion performance benefits
+non-lemmatized models) are reported in
+Table~\ref{tab:detection-rate}.  Word intrusion performance benefits
 significantly from lemmatization on a filtered vocabulary.  On an
 unfiltered vocabulary with a prior designed to reduce topic pollution
 by stop words lemmatization renders no significant improvement.
@@ -332,18 +350,19 @@ unfiltered models are benefitted by lemmatization.
 
 \begin{table}
     \begin{tabular}{l|rr|r}
-        experiment    &     raw $\MP$ &     lem $\MP$ &       p-value \\\hline
-        base          &          0.54 &          0.52 &          0.61 \\
-        \textbf{filt} & \textbf{0.50} & \textbf{0.65} & \textbf{0.02} \\
-        trunc         &          0.37 &          0.37 &          0.50 \\
-        trunc + filt  &          0.43 &          0.47 &          0.28 \\
+        experiment            & non-lem $\DR$ &     lem $\DR$ &       p-value \\\hline
+        whole                 &          0.54 &          0.52 &          0.61 \\
+        \textbf{whole + filt} & \textbf{0.50} & \textbf{0.65} & \textbf{0.02} \\
+        trunc                 &          0.37 &          0.37 &          0.50 \\
+        trunc + filt          &          0.43 &          0.47 &          0.28 \\
     \end{tabular}
-    \caption{Model precision ($\MP$) for the raw and lemmatized models
-        and p-values for the test that the lemmatized model precision
-        is greater than the unlemmatized (raw) model precision.
-        Model precision is significantly benefitted by lemmatization on
+    \caption{Detection rate ($\DR$) for the non-lemmatized and
+        lemmatized models
+        and p-values for the test that the lemmatized detection rate
+        is greater than the non-lemmatized detection rate.
+        Detection rate is significantly benefitted by lemmatization on
         a filtered vocabulary, highlighted in bold.}
-    \label{fig:model-precision}
+    \label{tab:detection-rate}
 \end{table}
 
 \section{Discussion}\label{sec:discussion}
