@@ -165,11 +165,27 @@
 %\titlespacing\subsection{0pt}{1pt plus 0pt minus 0pt}{1pt plus 0pt minus 0pt}
 %\titlespacing\subsubsection{0pt}{1pt plus 0pt minus 0pt}{1pt plus 0pt minus 0pt}
 
-\title{Topic Modeling for Morphologically Rich Languages}
+\title{Analysis of Morphology in Topic Modeling}
 
 \begin{document}
 \maketitle
 \begin{abstract}
+    Topic models make strong assumptions about their data.  Explicitly,
+    each word token in a document is generally assumed to be equally
+    important.  Implicitly, different words are generally assumed to
+    have different meanings: topic models are often used as
+    human-interpretable dimensionality reductions and a proliferation
+    of words with identical meanings would undermine the utility of the
+    common top-$m$ word list representation of topics.  Though a number
+    of authors have added preprocessing steps such as lemmatization to
+    better accommodate these assumptions, the effects of such data
+    massaging have not been publicly studied.  We make first steps
+    toward elucidating the role of morphology in topic modeling by
+    testing the effect of lemmatization on the interpretability of a
+    latent Dirichlet allocation (LDA) model.  Using a word intrusion
+    evaluation, we quantitatively demonstrate that lemmatization
+    provides a significant benefit to the interpretability of a model
+    learned on Wikipedia articles in a morphologically rich language.
 \end{abstract}
 
 
@@ -394,6 +410,12 @@ unfiltered models are benefitted by lemmatization.
 
 
 \section{Discussion}\label{sec:discussion}
+
+The insignificance of the truncated-document
+results may be due to low baseline interpretability; if so, future work
+on less morphologically-rich languages like English should take care
+to design experiments that are sufficiently powerful and incisive to
+separate the impacts of morphology from other sources of variability.
 
 
 \section{Conclusion}\label{sec:conclusion}
