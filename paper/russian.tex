@@ -209,11 +209,12 @@ lemmatization on the performance of topic models.
 
 Syntactic information is not generally considered to exert a strong
 force on the thematic nature of a document.  Indeed, for this reason
-topic models often make a bag-of-words assumption, the whereby exact
-order of the words in a sentence is discard. In morphologically rich
-languages, however, syntactic information is often encoded in the word
-form itself. Nevertheless, most commonly employed approaches to topic
-modeling ignore the influence of morphology. Consider the Russian name
+topic models often make a bag-of-words assumption, discarding the order
+of words within a document.  In morphologically rich languages,
+however, syntactic information is often encoded in the word form
+itself.  This kind of syntactic information is a nuisance variable
+in topic modeling and is prone to polluting a topic representation
+learned from data.  For example, consider the Russian name
 {\em Putin}; in English, we have a single type that represents in the
 concept in all syntactic contexts, whereas in Russian
 {\selectlanguage{russian} Путин} appears with various inflections,
@@ -226,12 +227,23 @@ the utterances {{\selectlanguage{russian}мы говорим о Путине} ({
       говорим Путину} ({\em we are speaking to Putin})}, both sentence
   are thematically centered on Putin, but two different word forms
   are employed.
+English stop words like prepositions often end up as inflectional
+suffixes in Russian, so lemmatization on Russian performs some
+of the text normalization that stop word filtering performs on English.
+Topic models are generally sensitive to stop
+words in English~\cite{wallach2009,blei2010,eisenstein2011}, hence we
+expect them to be sensitive to morphological variation in languages
+like Russian.
 
   \ryan{Make connection here to stop words. We filter stop words (or try to) in topic models, so we should
     filter these endings as well?}
 \chandler{I don't understand, what is the connection to stop words?}
 \ryan{English stop words like prepositions are often inflectional suffixes in Russian. In a sense, lemmatization is analogus to filtering stop words. Consider
 the Putin example: ``to'' is a stop word, but that is fully expressed by a suffix in Russian.}
+\chandler{oooh, okay.  I modified this paragraph and in particular
+    repurposed your comment at the end of the
+    paragraph, change as desired.  I think this addresses your initial
+    question (for the sake of the paper).}
 
 \section{Morphology and Lemmatization}\label{sec:inflectional}
 
@@ -285,7 +297,6 @@ The parameters were estimated using the Russian corpus described in
     syntactic context. A lemmatizer canonicalizes these forms to
     single form, which is the nominative singular in the case of
     Russian, greatly reducing the sparsity present in the corpus.}
-  %  \todo{reference this in text}
     \label{tab:paradigm}
 \end{table}
 
@@ -405,44 +416,13 @@ syntactic and morphological patterns.
     \end{tabular}
     \caption{Manually-aligned topic pairs: the first topic in each pair
         is from the lemmatized model, the second pair is a semantically
-        similar topic in the non-lemmatized model. Note that the unlemmatized
+        similar topic in the non-lemmatized model. Note that the non-lemmatized
         version of the first topic contains three inflections of the Russian word {\selectlanguage{russian}деревня} ({\em village})---this is redundant since each inflectional form
     arguably carries the identical topic information. 
         \todo{reference in text}
     }
     \label{tab:topics}
 \end{table*}
-
-%\begin{figure}
-%    \centering
-%    \begin{subfigure}[b]{\columnwidth}
-%        \includegraphics[width=\columnwidth]{601.png}
-%        \caption{lemmatized, not detected}
-%        \label{fig:word-intrusion:lem:fail}
-%    \end{subfigure}
-%    \begin{subfigure}[b]{\columnwidth}
-%        \includegraphics[width=\columnwidth]{604.png}
-%        \caption{non-lemmatized, not detected}
-%        \label{fig:word-intrusion:nonlem:fail}
-%    \end{subfigure}
-%    \begin{subfigure}[b]{0.77\columnwidth}
-%        \includegraphics[width=\columnwidth]{608.png}
-%        \caption{lemmatized, detected}
-%        \label{fig:word-intrusion:lem:succ}
-%    \end{subfigure}
-%    \begin{subfigure}[b]{0.95\columnwidth}
-%        \includegraphics[width=\columnwidth]{610.png}
-%        \caption{non-lemmatized, detected}
-%        \label{fig:word-intrusion:nonlem:succ}
-%    \end{subfigure}
-%    \caption{Examples of word intrusion interface on
-%        filtered-vocabulary whole documents.  The intruders in the
-%        first two examples were not detected by the annotator whereas
-%        those in the last two examples were detected.
-%        \ryan{We should make these pdfs! Otherewise, they look rather ugly.}
-%    }
-%    \label{fig:word-intrusion}
-%\end{figure}
 
 \todo{explain all those Russian words in figure/table, or remove}
 
@@ -468,10 +448,9 @@ released on 11/02/2015.\footnote{The Wikipedia dump is available at
 We stripped the XML portion of the formatting and then ran the
 lemmatizater described in Section~\ref{sec:inflectional}.  When the
 lemmatizer does not recognize a word, we back off to the word form
-itself.  \todo{ryan: please give details of data collection,
-  lemmatizer}.  In constructing the lemmatized view of the corpus,
-when the lemmatizer does not recognize a word we back off to the word
-itself.  \todo{give num/frac unknown}; \ryan{How do we get this?}
+itself.
+\todo{give num/frac unknown}; \ryan{How do we get this?}
+\chandler{I'll do it (or remove this comment}
 
 We consider two preprocessing schemes to account for stop words and
 other high-frequency terms in the corpus.  First, we compute the
