@@ -283,11 +283,11 @@ To measure the effect of lemmatization on topic models we must first
 define ``topic model.''  In this study, for comparability with other
 work, we restrict our attention to latent Dirichlet allocation
 (LDA)~\cite{blei2003}, the canonical Bayesian graphical topic model.
-However, we want to measure the performance of a topic model by its
-interpretability, as topic models are surpassed by other models,
-including traditional vector space models, in tasks without a ``human
-in the loop''~\cite{may2015}.  Thus we note there are more modern but
-less widely-used topic models such as the sparse additive generative
+We want to measure the performance of a topic model by its
+interpretability, as topic models are best suited to discovering
+human-interpretable decompositions of the data~\cite{may2015}.
+We note there are more modern but less widely-used topic models than
+LDA such as the sparse additive generative
 (SAGE) topic model, which explicitly models the background word
 distribution and encourages sparse topics~\cite{eisenstein2011}, or the
 nested hierarchical Dirichlet process (nHDP) topic model, which
