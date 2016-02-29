@@ -394,9 +394,15 @@ are depicted in Figure~\ref{fig:word-intrusion}.
         \caption{non-lemmatized, detected}
         \label{fig:word-intrusion:nonlem:succ}
     \end{subfigure}
-    \caption{Examples of word intrusion interface.}
+    \caption{Examples of word intrusion interface on
+        filtered-vocabulary whole documents.  The intruders in the
+        first two examples were not detected by the annotator whereas
+        those in the last two examples were detected.
+    }
     \label{fig:word-intrusion}
 \end{figure}
+
+\todo{explain all those Russian words in figure/table, or remove}
 
 If the model is interpretable, the $m$ words from a topic will be
 internally coherent whereas the intruder word is likely to stand out.
@@ -478,10 +484,11 @@ document word usage and document length; in particular, we
 believe approximately 50\% of the word tokens in the corpus are
 uninformative to a topic model.
 
-The detection rate for all four configurations and the
+The detection rate for all four configurations (filtered or unfiltered
+vocabulary and whole or truncated documents), and the
 p-values for one-sided detection rate differences (testing our
-hypothesis that the lemmatized models are more interpretable than the
-non-lemmatized models) are reported in
+hypothesis that the lemmatized models yield higher detection rates than
+the non-lemmatized models), are reported in
 Table~\ref{tab:detection-rate}.  Word intrusion performance benefits
 significantly from lemmatization on a filtered vocabulary.  On an
 unfiltered vocabulary with a prior designed to reduce topic pollution
@@ -499,12 +506,17 @@ unfiltered models are benefitted by lemmatization.
     \end{tabular}
     \caption{Detection rate ($\DR$) for the non-lemmatized and
         lemmatized models
-        and p-values for the test that the lemmatized detection rate
-        is greater than the non-lemmatized detection rate.
+        and p-values for the one-sided detection rate difference tests.
+        (trunc denotes truncated documents; filt denotes a filtered
+        vocabulary.)
         The detection rate benefits significantly from lemmatization on
         a filtered vocabulary (highlighted in bold).}
     \label{tab:detection-rate}
 \end{table}
+
+\todo{explain results, in particular look at configurations other than
+    the significant one, and look at how a given document is
+    represented in various models}
 
 
 \section{Discussion}\label{sec:discussion}
