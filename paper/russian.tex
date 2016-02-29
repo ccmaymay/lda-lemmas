@@ -221,7 +221,7 @@ the utterances {{\selectlanguage{russian}мы говорим о Путине} ({
   are employed.
 
   \ryan{Make connection here to stop words. We filter stop words (or try to) in topic models, so we should
-    fitler these endings as well?}
+    filter these endings as well?}
 \chandler{I don't understand, what is the connection to stop words?}
 
 
@@ -239,9 +239,9 @@ the addition of a suffix, often reducing the number of words in a
 given sentence.  \ryan{Need to say more?}
 \chandler{Yes please!}
 
-In the context of NLP, heavily inflected inflected languages have an
+In the context of NLP, heavily inflected languages have an
 increased token to type ratio, greatly increasing the number of
-unknown owords. One method to combat is to {\em lemmatize} the sentence.
+unknown words. One method to combat is to {\em lemmatize} the sentence.
 A lemmatizer maps each inflection of a word, to a canonicalized form. 
 
 
@@ -304,7 +304,7 @@ alternative topic models as considerations for future work.
 
 To illustrate the impact of morphology in topic modeling we focus on
 LDA, a simple and well-studied Bayesian graphical topic model.
-For some prespecified
+For some pre-specified
 number of topics $K$ and Dirichlet concentration hyperparameters
 $\veta$ and $\valpha$, LDA represents a vocabulary as a set of $K$
 i.i.d.\ topics $\vbeta_k$, represents each document as a
@@ -398,7 +398,7 @@ are depicted in Figure~\ref{fig:word-intrusion}.
 If the model is interpretable, the $m$ words from a topic will be
 internally coherent whereas the intruder word is likely to stand out.
 Thus a model's interpretability can be quantified by the fraction
-of topics for which the expert correctly idenfies the intruder.  We
+of topics for which the expert correctly identifies the intruder.  We
 call this value the \emph{detection rate}:
 \begin{align*}
     \DR = \frac{1}{K} \sum_{k=1}^K \dirac{i_k}{\omega_k}
@@ -436,7 +436,7 @@ over the corpus and taking the next 10,000.  To determine the
 non-lemmatized vocabulary, we map the filtered lemmatized
 vocabulary onto all word forms that produce one of those lemmas in
 the data.  Finally, observing that some of the uninformative
-high-frequency words reappear in this projection, we remov any
+high-frequency words reappear in this projection, we remove any
 of the top 100 words from the lemmatized and non-lemmatized corpora
 from this list, producing a non-lemmatized vocabulary of 72,641 words.
 While the relatively large size of this vocabulary makes the model
