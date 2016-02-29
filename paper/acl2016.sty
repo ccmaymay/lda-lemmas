@@ -397,14 +397,17 @@
 }}
 
 % margins for abstract
-\renewenvironment{abstract}%
-		 {\centerline{\large\bf Abstract}%
-		  \begin{list}{}%
-		     {\setlength{\rightmargin}{0.6cm}%
-		      \setlength{\leftmargin}{0.6cm}}%
-		   \item[]\ignorespaces}%
-		 {\unskip\end{list}}
-		     
+%% \renewenvironment{abstract}%
+%% 		 {\centerline{\large\bf Abstract}%
+%% 		  \begin{list}{}%
+%% 		     {\setlength{\rightmargin}{0.6cm}%
+%% 		      \setlength{\leftmargin}{0.6cm}}%
+%% 		   \item[]\ignorespaces}%
+%% 		 {\unskip\end{list}}
+
+\renewenvironment{abstract}{\centerline{\large\bf  
+ Abstract}\vspace{0.5ex}\begin{quote} \small}{\par\end{quote}\vskip 1ex}
+
 %\renewenvironment{abstract}{\centerline{\large\bf  
 % Abstract}\vspace{0.5ex}\begin{quote}}{\par\end{quote}\vskip 1ex}
 

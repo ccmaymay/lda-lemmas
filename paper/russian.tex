@@ -242,8 +242,8 @@ forms.  See the sample paradigm in Table~\ref{tab:paradigm} for an
 example.\footnote{Note that Table~\ref{tab:paradigm} contains several
   entries that are identical, e.g., the singular genitive is the same
   as the singular accusative. This is a common phenenomon known as
-  syncretism, but it is non universal over all nouns. Plenty of other
-  Russian nouns, however, {\em do} make the distinction between
+  syncretism \cite{baerman2005syntax}, but it is not universal over all nouns---plenty of other
+  Russian nouns {\em do} make the distinction between
   genitive and accusative in the singular, e.g., virtually all
   feminine nouns.} The Russian verb is even more expressive with more
 than 30 unique forms \cite{wade2010comprehensive}.
@@ -315,6 +315,18 @@ unaware of any direct prior work, and we wish for our results to be
 widely applicable across research and industry.  Thus we leave these
 alternative topic models as considerations for future work.
 
+While not satisfactorily explored in the topic modeling community,
+morphology has been actively investigated in the context of
+word-embeddings.  The latent topic vectors that topic models discover
+have many parallels to continuous embeddings---both are a real-valued
+representations that stand proxy for (some notion of) lexical semantic
+information. Most notably, \newcite{BianGL14} learned
+embeddings for individual morphs jointly within the standard {\sc word2vec}
+model \cite{mikolov2013distributed} and \newcite{SoricutO15} used the embeddings
+themselves to induce morphological analyzers. Character-level embeddings approaches
+have also been explored with the express aim of capturing morphology \cite{santos2014learning,LingDBTFAML15}.
+
+\ryan{Add self citation to NAACL 2015 in camera ready. Keep out for anonymity.}
 \todo{mention word sense disambiguation applications of topic models?
     they rely more heavily on lemmatization but use topic models (to
     some degree) as substitutes for models of word sense...}
@@ -442,12 +454,10 @@ released on 11/02/2015. \footnote{Available at
 We stripped the XML portion of the formatting and then ran the
 lemmatizater described in Section~\ref{sec:inflectional}.  When the
 lemmatizer does not recognize a word, we back off to the word form
-itself.
-\todo{ryan: please give details of data collection, lemmatizer}.
-In constructing the lemmatized view of the corpus, when the lemmatizer
-does not recognize a word we back off to the word itself.
-\todo{give num/frac unknown};
-\ryan{How do we get this?}
+itself.  \todo{ryan: please give details of data collection,
+  lemmatizer}.  In constructing the lemmatized view of the corpus,
+when the lemmatizer does not recognize a word we back off to the word
+itself.  \todo{give num/frac unknown}; \ryan{How do we get this?}
 
 We consider two preprocessing schemes to account for stop words and
 other high-frequency terms in the corpus.  First, we compute the
