@@ -109,13 +109,16 @@
 \usepackage{soul}
 \usepackage{color}
 \newcommand{\Note}[3]{\sethlcolor{#2}\hl{[\textbf{#1}: #3]}}
-%\renewcommand{\Note}[3]{}
+\renewcommand{\Note}[3]{}
 
 \newcommand{\timv}[1]{\Note{timv}{brilliantlavender}{#1}}
 \newcommand{\ryan}[1]{\Note{ryan}{lightorange}{#1}}
 \newcommand{\chandler}[1]{\Note{chandler}{pink}{#1}}
 \newcommand{\todo}[1]{\Note{todo}{red}{#1}}
 
+% space hacks
+%\setlength\belowcaptionskip{-15pt}
+%\setlength\titlebox{2cm}
 
 
 \newcommand{\defn}[1]{{\bf #1}}%
