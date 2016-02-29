@@ -395,7 +395,9 @@ are depicted in Figure~\ref{fig:word-intrusion}.
     \end{tabular}
     \caption{Manually-aligned topic pairs: the first topic in each pair
         is from the lemmatized model, the second pair is a semantically
-        similar topic in the non-lemmatized model.
+        similar topic in the non-lemmatized model. Note that the unlemmatized
+        version of the first topic contains three inflections of the Russian word {\selectlanguage{russian}деревня} ({\em village})---this is redundant since each inflectional form
+    arguably carries the identical topic information. 
         \todo{reference in text}
     }
     \label{tab:topics}
@@ -427,6 +429,7 @@ are depicted in Figure~\ref{fig:word-intrusion}.
         filtered-vocabulary whole documents.  The intruders in the
         first two examples were not detected by the annotator whereas
         those in the last two examples were detected.
+        \ryan{We should make these pdfs! Otherewise, they look rather ugly.}
     }
     \label{fig:word-intrusion}
 \end{figure}
