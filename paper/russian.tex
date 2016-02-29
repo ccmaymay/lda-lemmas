@@ -2,7 +2,12 @@
 \usepackage{rotating}
 \usepackage{acl2016}
 \usepackage{times}
-\usepackage{url}
+%\usepackage{url}                                                       
+\makeatletter                                                           
+\newcommand{\@BIBLABEL}{\@emptybiblabel}                                
+\newcommand{\@emptybiblabel}[1]{}                                       
+\makeatother                                                            
+\usepackage[hidelinks]{hyperref}
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{amsfonts}
@@ -258,8 +263,9 @@ inflection (an element of the paradigm) to a canonical form known as
 the lemma, which is typically the form found in dictionaries written
 in the target language. In this work, we employ the TreeTagger
 lemmatizer \cite{schmid1994probabilistic}.\footnote{The tool is
-  open-source and can be downloaded at {\small\tt
-    http://www.cis.uni-muenchen.de/$\sim$schmid/\\tools/TreeTagger/}.}
+    open-source and can be downloaded at
+    \url{http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/}.
+}
 The parameters were estimated using the Russian corpus described in
 \newcite{sharov2011proper}.
 
@@ -455,8 +461,9 @@ intruder.  We note this is just the mean (over topics) of the
 when one expert is used instead of several non-experts.
 
 Our corpus consists of Russian Wikipedia articles from the dump
-released on 11/02/2015. \footnote{Available at
-  https://dumps.wikimedia.org/ruwiki/20151102/ruwiki-20151102-pages-articles-multistream.xml.bz2.}
+released on 11/02/2015.\footnote{The Wikipedia dump is available at
+    \url{https://dumps.wikimedia.org/ruwiki/20151102/ruwiki-20151102-pages-articles-multistream.xml.bz2}.
+}
 We stripped the XML portion of the formatting and then ran the
 lemmatizater described in Section~\ref{sec:inflectional}.  When the
 lemmatizer does not recognize a word, we back off to the word form
