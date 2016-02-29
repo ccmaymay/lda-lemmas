@@ -371,9 +371,9 @@ does not recognize a word we back off to the word itself.
 We consider two preprocessing schemes to account for stop words and
 other high-frequency terms in the corpus.  First, we compute the
 vocabulary as the top 10,000 words by document frequency,\footnote{
-    Due to implementation details the lemmatized and unlemmatized
-    vocabularies consist of the top 9387 and 9531 words by
-    document frequency, respectively.
+    Due to minor implementation concerns the lemmatized and
+    non-lemmatized vocabularies consist of the top 9387 and 9531 words
+    (respectively) by document frequency.
 }
 separately for the lemmatized and non-lemmatized data, and
 specify an asymmetric prior on each document's topic proportions
@@ -450,8 +450,8 @@ unfiltered models are benefitted by lemmatization.
         lemmatized models
         and p-values for the test that the lemmatized detection rate
         is greater than the non-lemmatized detection rate.
-        Detection rate is significantly benefitted by lemmatization on
-        a filtered vocabulary, highlighted in bold.}
+        The detection rate benefits significantly from lemmatization on
+        a filtered vocabulary (highlighted in bold).}
     \label{tab:detection-rate}
 \end{table}
 
