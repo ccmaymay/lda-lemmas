@@ -114,7 +114,7 @@
 \newcommand{\timv}[1]{\Note{timv}{brilliantlavender}{#1}}
 \newcommand{\ryan}[1]{\Note{ryan}{lightorange}{#1}}
 \newcommand{\chandler}[1]{\Note{chandler}{pink}{#1}}
-\newcommand{\todo}[1]{\Note{todo}{red}{#1}}
+\newcommand{\todo}[1]{\Note{todo}{lightred}{#1}}
 
 
 
@@ -219,9 +219,7 @@ the utterances {{\selectlanguage{russian}мы говорим о Путине} ({
   are thematically centered on Putin, but two different word forms
   are employed.
 
-  \ryan{Make connection here to stop words. We filter stop words (or try to) in topic models, so we should
-    filter these endings as well?}
-\chandler{I don't understand, what is the connection to stop words?}
+  \todo{Make connection here to stop words?}
 
 
 \section{Morphology and Lemmatization}\label{sec:inflectional}
@@ -235,8 +233,7 @@ virtually non-existent in Chinese, it occupies a prevalent position in
 many languages' grammars, e.g., Russian. In fact, Russian will often
 express relations marked in English with prepositions, simply through
 the addition of a suffix, often reducing the number of words in a
-given sentence.  \ryan{Need to say more?}
-\chandler{Yes please!}
+given sentence.  \todo{say more here}
 
 In the context of NLP, heavily inflected languages have an
 increased token to type ratio, greatly increasing the number of
@@ -266,8 +263,8 @@ A lemmatizer maps each inflection of a word, to a canonicalized form.
 
 
 \section{Related Work}\label{sec:related-work}
-\ryan{I can probably do the non-topic-modeling part of this section.}
-\chandler{Please do, and make this a priority, after the ingest/lemmatizer details---the related work in topic modeling is non-existent.}
+
+\todo{non-topic-modeling related work}
 
 Though applied in many
 studies~\cite{deerwester1990,hofmann1999,mei2007,nallapati2008,lin2009},
@@ -420,7 +417,7 @@ intruder.  We note this is just the mean (over topics) of the
 when one expert is used instead of several non-experts.
 
 Our corpus consists of Russian Wikipedia pages
-\todo{ryan: please give details of data collection, lemmatizer}.
+\todo{give details of data collection, lemmatizer}.
 In constructing the lemmatized view of the corpus, when the lemmatizer
 does not recognize a word we back off to the word itself.
 \todo{give num/frac unknown};
