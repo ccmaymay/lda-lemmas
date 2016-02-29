@@ -222,7 +222,8 @@ the utterances {{\selectlanguage{russian}мы говорим о Путине} ({
   \ryan{Make connection here to stop words. We filter stop words (or try to) in topic models, so we should
     filter these endings as well?}
 \chandler{I don't understand, what is the connection to stop words?}
-
+\ryan{English stop words like prepositions are often inflectional suffixes in Russian. In a sense, lemmatization is analogus to filtering stop words. Consider
+the Putin example: ``to'' is a stop word, but that is fully expressed by a suffix in Russian.}
 
 \section{Morphology and Lemmatization}\label{sec:inflectional}
 
@@ -235,14 +236,29 @@ virtually non-existent in Chinese, it occupies a prevalent position in
 many languages' grammars, e.g., Russian. In fact, Russian will often
 express relations marked in English with prepositions, simply through
 the addition of a suffix, often reducing the number of words in a
-given sentence.  \ryan{Need to say more?}
-\chandler{Yes please!}
+given sentence. The collection of inflections of the same stem is prefered to as a
+paradigm.  The Russian noun, for example, forms a paradigm with 12
+forms.  See the sample paradigm in Table~\ref{tab:paradigm} for an
+example.\footnote{Note that Table~\ref{tab:paradigm} contains several
+  entries that are identical, e.g., the singular genitive is the same
+  as the singular accusative. This is a common phenenomon known as
+  syncretism, but it is non universal over all nouns. Plenty of other
+  Russian nouns, however, {\em do} make the distinction between
+  genitive and accusative in the singular, e.g., virtually all
+  feminine nouns.} The Russian verb is even more expressive with more
+than 30 unique forms \cite{wade2010comprehensive}.
 
-In the context of NLP, heavily inflected languages have an
-increased token to type ratio, greatly increasing the number of
-unknown words. One method to combat is to {\em lemmatize} the sentence.
-A lemmatizer maps each inflection of a word, to a canonicalized form. 
-
+In the context of NLP, large paradigms imply an increased token to type
+ratio, greatly increasing the number of unknown words. One method to
+combat is to {\em lemmatize} the sentence.  A lemmatizer maps each
+inflection (an element of the paradigm) to a canonical form known as
+the lemma, which is typically the form found in dictionaries written
+in the target language. In this work, we employ the TreeTagger
+lemmatizer \cite{schmid1994probabilistic}.\footnote{The tool is
+  open-source and can be downloaded at {\small\tt
+    http://www.cis.uni-muenchen.de/$\sim$schmid/\\tools/TreeTagger/}.}
+The parameters were estimated using the Russian corpus described in
+\newcite{sharov2011proper}.
 
 \begin{table}
   \begin{tabular}{l | l l }
@@ -254,13 +270,14 @@ A lemmatizer maps each inflection of a word, to a canonicalized form.
     {\bf Locative} &  {\selectlanguage{russian}псе} ({\em psye}) & {\selectlanguage{russian}псах}   ({\em psax})  \\
     {\bf Instrumental} &  {\selectlanguage{russian}псом} ({\em psom}) & {\selectlanguage{russian}псами}  ({\em psami}) \\
   \end{tabular}
-  \caption{A declension table for the Russian word
+  \caption{A inflectional paradigm for the Russian word
     {\selectlanguage{russian}пес} ({\em pyos}), meaning ``dog''.  Each
     of the 12 different entries in the table occurs in a distinct
     syntactic context. A lemmatizer canonicalizes these forms to
     single form, which is the nominative singular in the case of
-    Russian, greatly reducing the sparsity present in the corpus.
-    \todo{reference this in text}}
+    Russian, greatly reducing the sparsity present in the corpus.}
+  %  \todo{reference this in text}
+    \label{tab:paradigm}
 \end{table}
 
 
@@ -273,7 +290,7 @@ Though applied in many
 studies~\cite{deerwester1990,hofmann1999,mei2007,nallapati2008,lin2009},
 lemmatization has not been directly explored in the context of topic
 modeling.  An infinite-vocabulary LDA model containing a prior on words
-similar to an n-gram model has been developed~\cite{zhai2013}; this
+similar to an $n$-gram model has been developed~\cite{zhai2013}; this
 prior could be viewed as loosely encoding beliefs of a
 concatenative morphology, but its effect was not analyzed in
 isolation.
@@ -419,11 +436,18 @@ intruder.  We note this is just the mean (over topics) of the
 \emph{model precision} metric from prior work~\cite{chang2009}
 when one expert is used instead of several non-experts.
 
-Our corpus consists of Russian Wikipedia pages
+Our corpus consists of Russian Wikipedia articles from the dump
+released on 11/02/2015. \footnote{Available at
+  https://dumps.wikimedia.org/ruwiki/20151102/ruwiki-20151102-pages-articles-multistream.xml.bz2.}
+We stripped the XML portion of the formatting and then ran the
+lemmatizater described in Section~\ref{sec:inflectional}.  When the
+lemmatizer does not recognize a word, we back off to the word form
+itself.
 \todo{ryan: please give details of data collection, lemmatizer}.
 In constructing the lemmatized view of the corpus, when the lemmatizer
 does not recognize a word we back off to the word itself.
 \todo{give num/frac unknown};
+\ryan{How do we get this?}
 
 We consider two preprocessing schemes to account for stop words and
 other high-frequency terms in the corpus.  First, we compute the
