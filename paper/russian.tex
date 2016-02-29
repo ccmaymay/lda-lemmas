@@ -367,7 +367,11 @@ when one expert is used instead of several non-experts.
 
 We consider two preprocessing schemes to account for stop words and
 other high-frequency terms in the corpus.  First, we compute the
-vocabulary as the top ten thousand words by document frequency,
+vocabulary as the top 10,000 words by document frequency,\footnote{
+    Due to implementation details the lemmatized and unlemmatized
+    vocabularies consist of the top 9387 and 9531 words by
+    document frequency, respectively.
+}
 separately for the lemmatized and non-lemmatized data, and
 specify a highly asymmetric prior on each document's topic proportions
 $\vtheta$:  we set $\alpha_1 = 2.5$ and $\alpha_k = 2.5/(K-1)$
@@ -378,9 +382,9 @@ uninformative to a topic model.  We refer to this preprocessing scheme
 as the \emph{unfiltered vocabulary}.  The second modeling scheme we
 consider uses a vocabulary with high-frequency words filtered out and a
 uniform prior on the document-wise topic proportions.
-Specifically, a ten-thousand--word vocabulary was formed from the
+Specifically, a 10,000 word vocabulary was formed from the
 lemmatized data by removing the top 100 words by document frequency
-over the corpus and taking the next ten thousand.  To determine the
+over the corpus and taking the next 10,000.  To determine the
 non-lemmatized vocabulary, we mapped the filtered lemmatized
 vocabulary onto all word forms that produced one of those lemmas in
 the data.  Finally, we observed that some of the uninformative
@@ -394,13 +398,23 @@ vocabulary in order to provide a fair comparison.
 In the filtered-vocabulary scheme we set $\alpha$ to be a uniform
 vector, again with sum 5.
 
-\todo{explain doc truncation}
+In addition to exploring different choices of vocabulary, we also
+consider truncating the documents to their first 50 tokens.\footnote{
+    Because the vocabulary does not contain rare words, the number of
+    tokens in a document seen by the model is generally less than 50.
+}
+This augmentation simulates data sparsity by reducing the amount of
+content-bearing signal in each document, so we might expect the
+truncated documents to more greatly benefit from lemmatization (which
+can be cast as a dimensionality reduction method).
 
 We learn all models by stochastic variational
 inference~\cite{hoffman2013}, initializing the models randomly and
-using fixed priors.\footnote{In preliminary experiments Gibbs
-sampling with hyper-parameter optimization was not found to improve
-interpretability.}
+using fixed priors.\footnote{
+    In preliminary experiments Gibbs
+    sampling with hyper-parameter optimization was not found to improve
+    interpretability.
+}
 We specified $K = 100$ topics to all models.
 Uniform priors with \todo{hyperparameters} were given to models on
 filtered vocabularies; non-uniform priors with \todo{hyperparameters}
