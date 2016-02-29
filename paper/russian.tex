@@ -144,6 +144,9 @@
 %\newcommand{\funcw}{\mathcal{E}(t, s, u)}
 %\newcommand{\gradw}{\nabla_{\vtheta}\,\funcw}
 
+\newcommand{\wfa}{\textsuperscript{$\star$}\xspace}
+\newcommand{\wfb}{\textsuperscript{$\dagger$}\xspace}
+
 \def\figref#1{Figure~\ref{fig:#1}}
 \def\figlabel#1{\label{fig:#1}\label{p:#1}}
 \def\Tabref#1{Table~\ref{tab:#1}}
@@ -157,7 +160,6 @@
 \def\eqsref#1#2{Eqs.~\ref{eqn:#1}-\ref{eqn:#2}}
 \def\eqlabel#1{\label{eqn:#1}}
 \def\subsp#1{P_{\mbox{{\scriptsize\rm #1}}}}
-
 
 
 % space hacks
@@ -397,29 +399,31 @@ syntactic and morphological patterns.
 
 \begin{table*}
     \centering
-    \begin{tabular}{l}
-        \hline
-        {\selectlanguage{russian}деревня сельский поселение пункт сельсовет} \\
-        {\selectlanguage{russian}деревня деревни деревне жителей волости} \\\hline
+    \begin{tabular}{r|l}
+        view & topic \\\hline
 
-        {\selectlanguage{russian}клетка лечение заболевание препарат действие} \\
-        {\selectlanguage{russian}лечения течение лечение крови заболевания} \\\hline
+        lem & {\selectlanguage{russian}деревня\wfa сельский поселение пункт сельсовет} \\
+        non-lem & {\selectlanguage{russian}деревня\wfa деревни\wfa деревне\wfa жителей волости} \\\hline
 
-        {\selectlanguage{russian}сельский поселение муниципальный образование сельсовет} \\
-        {\selectlanguage{russian}село переписи села сельского данным} \\\hline
+        lem & {\selectlanguage{russian}клетка лечение\wfa заболевание\wfb препарат действие} \\
+        non-lem & {\selectlanguage{russian}лечения\wfa течение лечение\wfa крови заболевания\wfb} \\\hline
 
-        {\selectlanguage{russian}японский япония корея префектура смотреть} \\
-        {\selectlanguage{russian}считается японии японский посёлок японской} \\\hline
+        lem & {\selectlanguage{russian}японский\wfa япония\wfb корея префектура смотреть} \\
+        non-lem & {\selectlanguage{russian}считается японии\wfb японский\wfa посёлок японской\wfa} \\\hline
 
-        {\selectlanguage{russian}музей памятник коллекция библиотека выставка} \\
-        {\selectlanguage{russian}искусства музея картины выставки выставка} \\\hline
+        lem & {\selectlanguage{russian}музей\wfa памятник коллекция библиотека выставка\wfb} \\
+        non-lem & {\selectlanguage{russian}искусства музея\wfa картины выставки\wfb выставка\wfb} \\\hline
     \end{tabular}
     \caption{Manually-aligned topic pairs: the first topic in each pair
         is from the lemmatized model, the second pair is a semantically
-        similar topic in the non-lemmatized model. Note that the non-lemmatized
+        similar topic in the non-lemmatized model.  Within each pair,
+        \wfa denotes word forms derived from the same lemma and \wfb
+        denotes word forms derived from the same lemma (but different
+        from \wfa).  Note that the non-lemmatized
         version of the first topic contains three inflections of the Russian word {\selectlanguage{russian}деревня} ({\em village})---this is redundant since each inflectional form
-    arguably carries the identical topic information. 
+    arguably carries the identical topic information.
         \todo{reference in text}
+        \todo{more explanation}
     }
     \label{tab:topics}
 \end{table*}
