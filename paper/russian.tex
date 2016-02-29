@@ -450,9 +450,10 @@ released on 11/02/2015.\footnote{The Wikipedia dump is available at
 We stripped the XML portion of the formatting and then ran the
 lemmatizater described in Section~\ref{sec:inflectional}.  When the
 lemmatizer does not recognize a word, we back off to the word form
-itself.
-\todo{give num/frac unknown}; \ryan{How do we get this?}
-\chandler{I'll do it (or remove this comment}
+itself.\footnote{
+    11\% of the 378 million tokens in the raw corpus were
+    unrecognized by the lemmatizer.
+}
 
 We consider two preprocessing schemes to account for stop words and
 other high-frequency terms in the corpus.  First, we compute the
