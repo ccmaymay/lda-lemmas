@@ -417,11 +417,13 @@ syntactic and morphological patterns.
         similar topic in the non-lemmatized model.  Within each pair,
         \wfa denotes word forms derived from the same lemma and \wfb
         denotes word forms derived from the same lemma (but different
-        from \wfa).  Note that the non-lemmatized
-        version of the first topic contains three inflections of the Russian word {\selectlanguage{russian}деревня} ({\em village})---this is redundant since each inflectional form
-    arguably carries the identical topic information.
-        \todo{reference in text}
-        \todo{more explanation}
+        from \wfa).  The lemmatized topic representations are more
+        diverse than those of the non-lemmatized topic representations.
+        For example, the non-lemmatized version of the first topic
+        contains three inflections of the Russian word
+        {\selectlanguage{russian}деревня} ({\em village})---successive
+        inflectional forms add little or no information to the topic.
+        \todo{more explanations}
     }
     \label{tab:topics}
 \end{table*}
@@ -523,6 +525,13 @@ unfiltered vocabulary with a prior designed to reduce topic pollution
 by stop words lemmatization renders no significant improvement.
 Additionally, on length-truncated documents, neither the filtered nor
 unfiltered models are benefitted by lemmatization.
+
+Hand-aligned topics from the two models learned on a filtered
+vocabulary on whole documents are displayed in Table~\ref{tab:topics}.
+There is significant redundancy (multiple inflected word forms of the
+same lemma) in the top five words of the non-lemmatized topics; on the
+other hand, the diversity of words in the lemmatized topics lends
+to human interpretation.
 
 \begin{table}
     \begin{tabular}{l|rr|r}
