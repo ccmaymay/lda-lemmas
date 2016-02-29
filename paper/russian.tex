@@ -298,6 +298,10 @@ unaware of any direct prior work, and we wish for our results to be
 widely applicable across research and industry.  Thus we leave these
 alternative topic models as considerations for future work.
 
+\todo{mention word sense disambiguation applications of topic models?
+    they rely more heavily on lemmatization but use topic models (to
+    some degree) as substitutes for models of word sense...}
+
 
 \section{Experiments}\label{sec:experiments}
 
@@ -505,6 +509,17 @@ unfiltered models are benefitted by lemmatization.
 
 \section{Discussion}\label{sec:discussion}
 
+\todo{flesh out discussion}
+
+Our results illustrate not only the importance of morphological
+variation in topic models on Russian language data, but also the
+dependence of conclusions derived from topic models on specific
+preprocessing choices such as the handling of stop words.  One
+interesting direction for future work would be the application of more
+flexible models like SAGE~\cite{eisenstein2011} or the
+nHDP~\cite{paisley2015} to explicitly account for such nuisance
+variables in the model.
+
 The insignificance of the truncated-document
 results may be due to low baseline interpretability; if so, future work
 on less morphologically-rich languages like English should take care
@@ -513,6 +528,15 @@ separate the impacts of morphology from other sources of variability.
 
 
 \section{Conclusion}\label{sec:conclusion}
+
+We have demonstrated the impact of lemmatization as a preprocessing
+step to LDA on Wikipedia articles in Russian.  In particular, we have
+shown that lemmatization significantly improves interpretability, as
+measured by word intrusion performance, under certain other
+preprocessing conditions.  This constitutes a first step toward a full
+understanding of the role of morphology in topic modeling, an issue
+that has long been hinted in the applications of topic models but
+never studied itself.
 
 
 \bibliographystyle{acl2016}
