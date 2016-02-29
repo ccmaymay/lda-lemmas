@@ -365,6 +365,12 @@ when one expert is used instead of several non-experts.
 \chandler{topic model quality correlates with size (we should be
           able to measure this)} \cite{mimno2011}
 
+Our corpus consists of Russian Wikipedia pages
+\todo{ryan: please give details of data collection, lemmatizer}.
+In constructing the lemmatized view of the corpus, when the lemmatizer
+does not recognize a word we back off to the word itself.
+\todo{give num/frac unknown};
+
 We consider two preprocessing schemes to account for stop words and
 other high-frequency terms in the corpus.  First, we compute the
 vocabulary as the top 10,000 words by document frequency,\footnote{
@@ -408,7 +414,7 @@ content-bearing signal in each document, so we might expect the
 truncated documents to more greatly benefit from lemmatization (which
 can be cast as a dimensionality reduction method).
 
-We learn all models by stochastic variational
+We learn LDA by stochastic variational
 inference~\cite{hoffman2013}, initializing the models randomly and
 using fixed priors.\footnote{
     In preliminary experiments Gibbs
@@ -419,8 +425,6 @@ We specified $K = 100$ topics to all models.
 Uniform priors with \todo{hyperparameters} were given to models on
 filtered vocabularies; non-uniform priors with \todo{hyperparameters}
 were given to models on unfiltered vocabularies.
-\todo{ryan: please give details of data collection, lemmatizer};
-\todo{explain unknown backoff, give num/frac unknown};
 
 The detection rate for all four configurations and the
 p-values for one-sided detection rate differences (testing our
