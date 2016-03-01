@@ -146,6 +146,8 @@
 
 \newcommand{\wfa}{\textsuperscript{$\star$}\xspace}
 \newcommand{\wfb}{\textsuperscript{$\dagger$}\xspace}
+\newcommand{\wfc}{\textsuperscript{$\ddagger$}\xspace}
+\newcommand{\wfd}{\textsuperscript{$\star\star$}\xspace}
 
 \def\figref#1{Figure~\ref{fig:#1}}
 \def\figlabel#1{\label{fig:#1}\label{p:#1}}
@@ -412,8 +414,8 @@ syntactic and morphological patterns.
         lem & {\selectlanguage{russian}японский\wfa япония\wfb корея префектура смотреть} \\
         non-lem & {\selectlanguage{russian}считается японии\wfb японский\wfa посёлок японской\wfa} \\\hline
 
-        lem & {\selectlanguage{russian}музей\wfa памятник коллекция библиотека выставка\wfb} \\
-        non-lem & {\selectlanguage{russian}искусства музея\wfa картины выставки\wfb выставка\wfb} \\\hline
+        lem & {\selectlanguage{russian}художник\wfa искусство\wfb художественный\wfa картина\wfc выставка\wfd} \\
+        non-lem & {\selectlanguage{russian}искусства\wfb музея картины\wfc выставки\wfd выставка\wfd} \\\hline
     \end{tabular}
     \caption{Manually-aligned topic pairs: the first topic in each pair
         is from the lemmatized model, the second pair is a semantically
