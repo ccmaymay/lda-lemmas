@@ -446,13 +446,13 @@ syntactic and morphological patterns.
 %        trunc + filt & {\selectlanguage{russian}современный художник жить греческий искусство} \\
 %        trunc + filt & {\selectlanguage{russian}край районный сельсовет поселение сельский} \\\hline
 %
-%        whole & {\selectlanguage{russian}остров японский япония корея префектура} \\
-%        whole & {\selectlanguage{russian}группа альбом песня the год} \\
-%        whole & {\selectlanguage{russian}театр музыкальный музыка и роль} \\
-%        whole & {\selectlanguage{russian}деревня район сельский состав поселение} \\
-%        whole & of and a in i \\
-%        whole & {\selectlanguage{russian}и в при с у} \\
-%        whole & {\selectlanguage{russian}он и она фильм её} \\\hline
+%        full & {\selectlanguage{russian}остров японский япония корея префектура} \\
+%        full & {\selectlanguage{russian}группа альбом песня the год} \\
+%        full & {\selectlanguage{russian}театр музыкальный музыка и роль} \\
+%        full & {\selectlanguage{russian}деревня район сельский состав поселение} \\
+%        full & of and a in i \\
+%        full & {\selectlanguage{russian}и в при с у} \\
+%        full & {\selectlanguage{russian}он и она фильм её} \\\hline
 %    \end{tabular}
 %    \caption{\todo}
 %    \label{tab:topics-insignif}
@@ -544,7 +544,7 @@ believe approximately 50\% of the word tokens in the corpus are
 uninformative to a topic model.
 
 The detection rate for all four configurations (filtered-symmetric or unfiltered-asymmetric
-vocabulary and whole or truncated documents), and the
+vocabulary and full-length or truncated documents), and the
 p-values for one-sided detection rate differences (testing our
 hypothesis that the lemmatized models yield higher detection rates than
 the non-lemmatized models), are reported in
@@ -559,7 +559,7 @@ filtered-symmetric nor
 unfiltered-asymmetric models are benefitted by lemmatization.
 
 Hand-aligned topics from the filtered-symmetric models learned on
-whole documents are displayed in Table~\ref{tab:topics}.
+full-length documents are displayed in Table~\ref{tab:topics}.
 There is significant redundancy (multiple inflected word forms of the
 same lemma) in the top five words of the non-lemmatized topics; on the
 other hand, the diversity of words in the lemmatized topics lends
@@ -569,8 +569,8 @@ to human interpretation.
     \begin{tabular}{rrr|rr|r}
               &              &                & \multicolumn{2}{|c|}{$\DR$} &       p-val   \\\hline
         vocab & prior        & docs           & non         & lem         &         $\Delta$ \\\hline
-        unfilt & sym         & whole          &          0.54 &          0.52 &          0.61 \\
-        \textbf{filt} & \textbf{asym} & \textbf{whole} & \textbf{0.50} & \textbf{0.65} & \textbf{0.02} \\
+        unfilt & sym         & full           &          0.54 &          0.52 &          0.61 \\
+        \textbf{filt} & \textbf{asym} & \textbf{full} & \textbf{0.50} & \textbf{0.65} & \textbf{0.02} \\
         unfilt & sym         & trunc          &          0.37 &          0.37 &          0.50 \\
         filt & asym          & trunc          &          0.43 &          0.47 &          0.28 \\
     \end{tabular}
@@ -579,7 +579,7 @@ to human interpretation.
         and p-values for the one-sided detection rate difference tests.
         (filt and unfilt indicate whether or not the vocabulary is
         filtered; sym and asym indicate whether the prior is symmetric,
-        trunc and whole indicate whether the documents are truncated.)
+        trunc and full indicate whether the documents are truncated.)
         The detection rate benefits significantly from lemmatization on
         a filtered vocabulary (highlighted in bold).}
     \label{tab:detection-rate}
@@ -592,22 +592,18 @@ to human interpretation.
 
 \section{Discussion}\label{sec:discussion}
 
-\todo{flesh out discussion}
+We find that lemmatization yields a significant boost to the
+interpretability of a topic model.  Specifically, in the configurations
+studied, word intrusion performance is best when LDA is given a
+symmetric prior and learned with a filtered vocabulary on full-length,
+lemmatized documents.
+Further, on lemmatized data in particular, we observe differences
+between use of an asymmetric prior on an unfiltered vocabulary and
+use of a symmetric prior on a vocabulary with stop words filtered out.
 
-Our results illustrate not only the importance of morphological
-variation in topic models on Russian language data, but also the
-dependence of conclusions derived from topic models on specific
-preprocessing choices such as the handling of stop words.  One
-interesting direction for future work would be the application of more
-flexible models like SAGE~\cite{eisenstein2011} or the
-nHDP~\cite{paisley2015} to explicitly account for such nuisance
-variables in the model.
-
-The insignificance of the truncated-document
-results may be due to low baseline interpretability; if so, future work
-on less morphologically-rich languages like English should take care
-to design experiments that are sufficiently powerful and incisive to
-separate the impacts of morphology from other sources of variability.
+We also note that interpretability is hindered by short
+documents.  Our results thus confirm the intuition that topic modeling
+in social media requires careful filtering and normalization of the text.
 
 
 \section{Conclusion}\label{sec:conclusion}
