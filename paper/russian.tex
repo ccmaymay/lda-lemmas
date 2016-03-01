@@ -564,6 +564,10 @@ Overall, the best performance is achieved when LDA is given a
 symmetric prior and learned with a filtered vocabulary on full-length,
 lemmatized documents.
 
+We find that topics from the unfiltered-asymmetric models often contain
+stop words despite the first topic receiving half of the probability
+mass under the prior.  Indeed, many topics consist primarily of stop
+words, such as the topic {\selectlanguage{russian}и в при с у}.
 Hand-aligned topics from the filtered-symmetric models learned on
 full-length documents are displayed in Table~\ref{tab:topics}.
 There is significant redundancy (multiple inflected word forms of the
