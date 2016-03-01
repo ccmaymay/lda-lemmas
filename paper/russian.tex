@@ -550,23 +550,19 @@ hypothesis that the lemmatized models yield higher detection rates than
 the non-lemmatized models), are reported in
 Table~\ref{tab:detection-rate}.  Word intrusion performance benefits
 significantly from lemmatization on a filtered vocabulary and a
-symmetric prior.  On an
-unfiltered vocabulary with an asymmetric prior designed to reduce
-topic pollution
-by stop words, lemmatization renders no significant improvement.
-Additionally, on length-truncated documents, neither the
-filtered-symmetric nor
-unfiltered-asymmetric models are benefitted by lemmatization.
-
+symmetric prior.
+We also find that short (length-truncated documents) exhibit lower
+performance overall and are benefitted less by lemmatization.
+%This
+%result confirms the intuition that successful topic modeling on
+%short documents such as those found in social media requires close
+%attention to text normalization and filtering.
+Further, we observe differences
+between use of an asymmetric prior on an unfiltered vocabulary and
+use of a symmetric prior on a vocabulary with stop words filtered out.
 Overall, the best performance is achieved when LDA is given a
 symmetric prior and learned with a filtered vocabulary on full-length,
 lemmatized documents.
-Further, on lemmatized data in particular, we observe differences
-between use of an asymmetric prior on an unfiltered vocabulary and
-use of a symmetric prior on a vocabulary with stop words filtered out.
-Because interpretability is hindered by short documents, our results
-confirm the intuition that topic modeling
-in social media requires careful filtering and normalization of the text.
 
 Hand-aligned topics from the filtered-symmetric models learned on
 full-length documents are displayed in Table~\ref{tab:topics}.
@@ -584,7 +580,7 @@ to human interpretation.
         unfilt & sym         & trunc          &          0.37 &          0.37 &          0.50 \\
         filt & asym          & trunc          &          0.43 &          0.47 &          0.28 \\
     \end{tabular}
-    \caption{Detection rate ($\DR$) for the non-lemmatized (non) and
+    \caption{Detection rate for the non-lemmatized (non) and
         lemmatized (lem) models
         and p-values for the one-sided detection rate difference tests.
         (filt and unfilt indicate whether or not the vocabulary is
