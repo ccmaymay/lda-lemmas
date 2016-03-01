@@ -435,29 +435,28 @@ syntactic and morphological patterns.
 
 \todo{explain all those Russian words in figure/table, or remove}
 
-\begin{table*}
-    \centering
-    \begin{tabular}{l|l}
-        experiment & topic \\\hline
-
-        trunc + filt & {\selectlanguage{russian}организация основать университет японский деятельность} \\
-        trunc + filt & {\selectlanguage{russian}деревня сельский поселение примерно московский} \\
-        trunc + filt & {\selectlanguage{russian}посёлок тип положение географический япония} \\
-        trunc + filt & {\selectlanguage{russian}современный художник жить греческий искусство} \\
-        trunc + filt & {\selectlanguage{russian}край районный сельсовет поселение сельский} \\\hline
-
-        whole & {\selectlanguage{russian}остров японский япония корея префектура} \\
-        whole & {\selectlanguage{russian}группа альбом песня the год} \\
-        whole & {\selectlanguage{russian}театр музыкальный музыка и роль} \\
-        whole & {\selectlanguage{russian}село район география сесть берег} \\
-        whole & {\selectlanguage{russian}деревня район сельский состав поселение} \\
-        whole & of and a in i \\
-        whole & {\selectlanguage{russian}и в при с у} \\
-        whole & {\selectlanguage{russian}он и она фильм её} \\\hline
-    \end{tabular}
-    \caption{\todo}
-    \label{tab:topics-insignif}
-\end{table*}
+%\begin{table*}
+%    \centering
+%    \begin{tabular}{l|l}
+%        experiment & topic \\\hline
+%
+%        trunc + filt & {\selectlanguage{russian}организация основать университет японский деятельность} \\
+%        trunc + filt & {\selectlanguage{russian}деревня сельский поселение примерно московский} \\
+%        trunc + filt & {\selectlanguage{russian}посёлок тип положение географический япония} \\
+%        trunc + filt & {\selectlanguage{russian}современный художник жить греческий искусство} \\
+%        trunc + filt & {\selectlanguage{russian}край районный сельсовет поселение сельский} \\\hline
+%
+%        whole & {\selectlanguage{russian}остров японский япония корея префектура} \\
+%        whole & {\selectlanguage{russian}группа альбом песня the год} \\
+%        whole & {\selectlanguage{russian}театр музыкальный музыка и роль} \\
+%        whole & {\selectlanguage{russian}деревня район сельский состав поселение} \\
+%        whole & of and a in i \\
+%        whole & {\selectlanguage{russian}и в при с у} \\
+%        whole & {\selectlanguage{russian}он и она фильм её} \\\hline
+%    \end{tabular}
+%    \caption{\todo}
+%    \label{tab:topics-insignif}
+%\end{table*}
 
 If the model is interpretable, the $m$ words from a topic will be
 internally coherent whereas the intruder word is likely to stand out.
@@ -497,9 +496,10 @@ separately for the lemmatized and non-lemmatized data, and
 specify an asymmetric prior on each document's topic proportions
 $\vtheta$.
 We refer to this preprocessing scheme
-as the \emph{unfiltered vocabulary}.  The second modeling scheme we
+as the \emph{unfiltered-asymmetric} setting.  The second modeling scheme we
 consider uses a vocabulary with high-frequency words filtered out and a
 uniform prior on the document-wise topic proportions.
+(We refer to this setting as \emph{filtered-symmetric}.)
 Specifically, a 10,000 word vocabulary is formed from the
 lemmatized data by removing the top 100 words by document frequency
 over the corpus and taking the next 10,000.  To determine the
@@ -533,48 +533,53 @@ using fixed priors.\footnote{
 }
 We specify $K = 100$ topics to all models.
 Uniform priors with $\eta_v = 0.1$ and
-$\alpha_k = 5 / K$ were given to models on
-filtered vocabularies; non-uniform priors with
+$\alpha_k = 5 / K$ were given to
+filtered-symmetric models; non-uniform priors with
 $\eta_v = 0.1$, $\alpha_1 = 5$, and $\alpha_k = 5 / (K-1)$
 for $k > 1$
-were given to models on unfiltered vocabularies.
+were given to unfiltered-asymmetric models.
 The local prior parameters $\valpha$ are informed by mean
 document word usage and document length; in particular, we
 believe approximately 50\% of the word tokens in the corpus are
 uninformative to a topic model.
 
-The detection rate for all four configurations (filtered or unfiltered
+The detection rate for all four configurations (filtered-symmetric or unfiltered-asymmetric
 vocabulary and whole or truncated documents), and the
 p-values for one-sided detection rate differences (testing our
 hypothesis that the lemmatized models yield higher detection rates than
 the non-lemmatized models), are reported in
 Table~\ref{tab:detection-rate}.  Word intrusion performance benefits
-significantly from lemmatization on a filtered vocabulary.  On an
-unfiltered vocabulary with a prior designed to reduce topic pollution
+significantly from lemmatization on a filtered vocabulary and a
+symmetric prior.  On an
+unfiltered vocabulary with an asymmetric prior designed to reduce
+topic pollution
 by stop words lemmatization renders no significant improvement.
-Additionally, on length-truncated documents, neither the filtered nor
-unfiltered models are benefitted by lemmatization.
+Additionally, on length-truncated documents, neither the
+filtered-symmetric nor
+unfiltered-asymmetric models are benefitted by lemmatization.
 
-Hand-aligned topics from the two models learned on a filtered
-vocabulary on whole documents are displayed in Table~\ref{tab:topics}.
+Hand-aligned topics from the filtered-symmetric models learned on
+whole documents are displayed in Table~\ref{tab:topics}.
 There is significant redundancy (multiple inflected word forms of the
 same lemma) in the top five words of the non-lemmatized topics; on the
 other hand, the diversity of words in the lemmatized topics lends
 to human interpretation.
 
 \begin{table}
-    \begin{tabular}{l|rr|r}
-        experiment            & non-lem $\DR$ &     lem $\DR$ &       p-value \\\hline
-        whole                 &          0.54 &          0.52 &          0.61 \\
-        \textbf{whole + filt} & \textbf{0.50} & \textbf{0.65} & \textbf{0.02} \\
-        trunc                 &          0.37 &          0.37 &          0.50 \\
-        trunc + filt          &          0.43 &          0.47 &          0.28 \\
+    \begin{tabular}{rrr|rr|r}
+              &              &                & \multicolumn{2}{|c|}{$\DR$} &       p-val   \\\hline
+        vocab & prior        & docs           & non         & lem         &         $\Delta$ \\\hline
+        unfilt & sym         & whole          &          0.54 &          0.52 &          0.61 \\
+        \textbf{filt} & \textbf{asym} & \textbf{whole} & \textbf{0.50} & \textbf{0.65} & \textbf{0.02} \\
+        unfilt & sym         & trunc          &          0.37 &          0.37 &          0.50 \\
+        filt & asym          & trunc          &          0.43 &          0.47 &          0.28 \\
     \end{tabular}
-    \caption{Detection rate ($\DR$) for the non-lemmatized and
-        lemmatized models
+    \caption{Detection rate ($\DR$) for the non-lemmatized (non) and
+        lemmatized (lem) models
         and p-values for the one-sided detection rate difference tests.
-        (trunc denotes truncated documents; filt denotes a filtered
-        vocabulary.)
+        (filt and unfilt indicate whether or not the vocabulary is
+        filtered; sym and asym indicate whether the prior is symmetric,
+        trunc and whole indicate whether the documents are truncated.)
         The detection rate benefits significantly from lemmatization on
         a filtered vocabulary (highlighted in bold).}
     \label{tab:detection-rate}
