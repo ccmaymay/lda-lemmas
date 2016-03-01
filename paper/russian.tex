@@ -553,10 +553,20 @@ significantly from lemmatization on a filtered vocabulary and a
 symmetric prior.  On an
 unfiltered vocabulary with an asymmetric prior designed to reduce
 topic pollution
-by stop words lemmatization renders no significant improvement.
+by stop words, lemmatization renders no significant improvement.
 Additionally, on length-truncated documents, neither the
 filtered-symmetric nor
 unfiltered-asymmetric models are benefitted by lemmatization.
+
+Overall, the best performance is achieved when LDA is given a
+symmetric prior and learned with a filtered vocabulary on full-length,
+lemmatized documents.
+Further, on lemmatized data in particular, we observe differences
+between use of an asymmetric prior on an unfiltered vocabulary and
+use of a symmetric prior on a vocabulary with stop words filtered out.
+Because interpretability is hindered by short documents, our results
+confirm the intuition that topic modeling
+in social media requires careful filtering and normalization of the text.
 
 Hand-aligned topics from the filtered-symmetric models learned on
 full-length documents are displayed in Table~\ref{tab:topics}.
@@ -588,22 +598,6 @@ to human interpretation.
 \todo{explain results, in particular look at configurations other than
     the significant one, and look at how a given document is
     represented in various models}
-
-
-\section{Discussion}\label{sec:discussion}
-
-We find that lemmatization yields a significant boost to the
-interpretability of a topic model.  Specifically, in the configurations
-studied, word intrusion performance is best when LDA is given a
-symmetric prior and learned with a filtered vocabulary on full-length,
-lemmatized documents.
-Further, on lemmatized data in particular, we observe differences
-between use of an asymmetric prior on an unfiltered vocabulary and
-use of a symmetric prior on a vocabulary with stop words filtered out.
-
-We also note that interpretability is hindered by short
-documents.  Our results thus confirm the intuition that topic modeling
-in social media requires careful filtering and normalization of the text.
 
 
 \section{Conclusion}\label{sec:conclusion}
