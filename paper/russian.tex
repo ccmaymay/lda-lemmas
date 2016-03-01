@@ -249,7 +249,8 @@ the Putin example: ``to'' is a stop word, but that is fully expressed by a suffi
 
 In this study, we show that
 \begin{itemize}
-    \item truncated documents reduce interpretability;
+    \item truncated documents, imitating the sparsity seen in social
+        media, reduce interpretability;
     \item if lemmatization is used, a filtered vocabulary yields more
         interpretable topics than an informative prior; and
     \item overall, interpretability is best when the corpus consists
@@ -558,8 +559,9 @@ the non-lemmatized models), are reported in
 Table~\ref{tab:detection-rate}.  Word intrusion performance benefits
 significantly from lemmatization on a filtered vocabulary and a
 symmetric prior.
-We also find that short (length-truncated documents) exhibit lower
-performance overall and are benefitted less by lemmatization.
+Truncated documents exhibit lower
+performance overall and are helped less by lemmatization (posing
+challenges for social media applications).
 %This
 %result confirms the intuition that successful topic modeling on
 %short documents such as those found in social media requires close
