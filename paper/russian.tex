@@ -202,7 +202,7 @@ Topic modeling is a standard tool for unsupervised analysis of large
 text corpora. At the core, almost all topic models pick up on
 co-occurrence signals between different words in the corpus, that is,
 words that occur often in the same sentence, are likely to belong to
-the same latent topic. In languages that exhibit rich inflection
+the same latent topic. In languages that exhibit rich inflectional
 morphology, the signal becomes weaker given the proliferation of
 unique tokens. In this work, we explore the effect of token-based
 lemmatization on the performance of topic models.
@@ -225,7 +225,7 @@ and {\selectlanguage{russian}Путином}. Which form of the name one uses
 is fully dependent on the syntactic structure of the sentence. Compare
 the utterances {{\selectlanguage{russian}мы говорим о Путине} ({\em we
     are speaking about Putin}) and {{\selectlanguage{russian}мы
-      говорим Путину} ({\em we are speaking to Putin})}, both sentence
+      говорим Путину} ({\em we are speaking to Putin})}: both sentences
   are thematically centered on Putin, but two different word forms
   are employed.
 English stop words like prepositions often end up as inflectional
@@ -282,7 +282,7 @@ than 30 unique forms \cite{wade2010comprehensive}.
 
 In the context of NLP, large paradigms imply an increased token to type
 ratio, greatly increasing the number of unknown words. One method to
-combat is to {\em lemmatize} the sentence.  A lemmatizer maps each
+combat this issue is to {\em lemmatize} the sentence.  A lemmatizer maps each
 inflection (an element of the paradigm) to a canonical form known as
 the lemma, which is typically the form found in dictionaries written
 in the target language.
@@ -352,12 +352,12 @@ alternative topic models as considerations for future work.
 While not satisfactorily explored in the topic modeling community,
 morphology has been actively investigated in the context of
 word-embeddings.  The latent topic vectors that topic models discover
-have many parallels to continuous embeddings---both are a real-valued
+have many parallels to continuous embeddings---both are real-valued
 representations that stand proxy for (some notion of) lexical semantic
 information. Most notably, \newcite{BianGL14} learned
-embeddings for individual morphs jointly within the standard {\sc word2vec}
+embeddings for individual morphemes jointly within the standard {\sc word2vec}
 model \cite{mikolov2013distributed} and \newcite{SoricutO15} used the embeddings
-themselves to induce morphological analyzers. Character-level embeddings approaches
+themselves to induce morphological analyzers. Character-level embedding approaches
 have also been explored with the express aim of capturing morphology \cite{santos2014learning,LingDBTFAML15}.
 
 \ryan{Add self citation to NAACL 2015 in camera ready. Keep out for anonymity.}
