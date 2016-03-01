@@ -146,6 +146,8 @@
 
 \newcommand{\wfa}{\textsuperscript{$\star$}\xspace}
 \newcommand{\wfb}{\textsuperscript{$\dagger$}\xspace}
+\newcommand{\wfc}{\textsuperscript{$\ddagger$}\xspace}
+\newcommand{\wfd}{\textsuperscript{$\star\star$}\xspace}
 
 \def\figref#1{Figure~\ref{fig:#1}}
 \def\figlabel#1{\label{fig:#1}\label{p:#1}}
@@ -216,7 +218,8 @@ of words within a document.  In morphologically rich languages,
 however, syntactic information is often encoded in the word form
 itself.  This kind of syntactic information is a nuisance variable
 in topic modeling and is prone to polluting a topic representation
-learned from data.  For example, consider the Russian name
+learned from data~\cite{boydgraber2014}.
+For example, consider the Russian name
 {\em Putin}; in English, we have a single type that represents in the
 concept in all syntactic contexts, whereas in Russian
 {\selectlanguage{russian} Путин} appears with various inflections,
@@ -275,7 +278,9 @@ ratio, greatly increasing the number of unknown words. One method to
 combat is to {\em lemmatize} the sentence.  A lemmatizer maps each
 inflection (an element of the paradigm) to a canonical form known as
 the lemma, which is typically the form found in dictionaries written
-in the target language. In this work, we employ the TreeTagger
+in the target language.
+\todo{example of lemma mapping here}
+In this work, we employ the TreeTagger
 lemmatizer \cite{schmid1994probabilistic}.\footnote{The tool is
     open-source and can be downloaded at
     \url{http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/}.
@@ -409,19 +414,21 @@ syntactic and morphological patterns.
         lem & {\selectlanguage{russian}японский\wfa япония\wfb корея префектура смотреть} \\
         non-lem & {\selectlanguage{russian}считается японии\wfb японский\wfa посёлок японской\wfa} \\\hline
 
-        lem & {\selectlanguage{russian}музей\wfa памятник коллекция библиотека выставка\wfb} \\
-        non-lem & {\selectlanguage{russian}искусства музея\wfa картины выставки\wfb выставка\wfb} \\\hline
+        lem & {\selectlanguage{russian}художник\wfa искусство\wfb художественный\wfa картина\wfc выставка\wfd} \\
+        non-lem & {\selectlanguage{russian}искусства\wfb музея картины\wfc выставки\wfd выставка\wfd} \\\hline
     \end{tabular}
     \caption{Manually-aligned topic pairs: the first topic in each pair
         is from the lemmatized model, the second pair is a semantically
         similar topic in the non-lemmatized model.  Within each pair,
-        \wfa denotes word forms derived from the same lemma and \wfb
-        denotes word forms derived from the same lemma (but different
-        from \wfa).  Note that the non-lemmatized
-        version of the first topic contains three inflections of the Russian word {\selectlanguage{russian}деревня} ({\em village})---this is redundant since each inflectional form
-    arguably carries the identical topic information.
-        \todo{reference in text}
-        \todo{more explanation}
+        each of the symbols \wfa, \wfb, \wfc, and \wfd (separately)
+        denotes word forms of a shared lemma.
+        The lemmatized topic representations are more
+        diverse than those of the non-lemmatized topic representations.
+        For example, the non-lemmatized version of the first topic
+        contains three inflections of the Russian word
+        {\selectlanguage{russian}деревня} ({\em village})---successive
+        inflectional forms add little or no information to the topic.
+        \todo{more explanations}
     }
     \label{tab:topics}
 \end{table*}
@@ -450,9 +457,10 @@ released on 11/02/2015.\footnote{The Wikipedia dump is available at
 We stripped the XML portion of the formatting and then ran the
 lemmatizater described in Section~\ref{sec:inflectional}.  When the
 lemmatizer does not recognize a word, we back off to the word form
-itself.
-\todo{give num/frac unknown}; \ryan{How do we get this?}
-\chandler{I'll do it (or remove this comment}
+itself.\footnote{
+    11\% of the 378 million tokens in the raw corpus were
+    unrecognized by the lemmatizer.
+}
 
 We consider two preprocessing schemes to account for stop words and
 other high-frequency terms in the corpus.  First, we compute the
@@ -522,6 +530,13 @@ unfiltered vocabulary with a prior designed to reduce topic pollution
 by stop words lemmatization renders no significant improvement.
 Additionally, on length-truncated documents, neither the filtered nor
 unfiltered models are benefitted by lemmatization.
+
+Hand-aligned topics from the two models learned on a filtered
+vocabulary on whole documents are displayed in Table~\ref{tab:topics}.
+There is significant redundancy (multiple inflected word forms of the
+same lemma) in the top five words of the non-lemmatized topics; on the
+other hand, the diversity of words in the lemmatized topics lends
+to human interpretation.
 
 \begin{table}
     \begin{tabular}{l|rr|r}
