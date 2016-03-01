@@ -250,6 +250,17 @@ the Putin example: ``to'' is a stop word, but that is fully expressed by a suffi
     paragraph, change as desired.  I think this addresses your initial
     question (for the sake of the paper).}
 \ryan{I love it!}
+
+In this study, we show that
+\begin{itemize}
+    \item truncated documents reduce interpretability;
+    \item if lemmatization is used, a filtered vocabulary yields more
+        interpretable topics than an informative prior; and
+    \item overall, interpretability is best when the corpus consists
+        of long documents, the vocabulary is filtered, and lemmatization
+        is applied.
+\end{itemize}
+
 \section{Morphology and Lemmatization}\label{sec:inflectional}
 
 Morphology concerns itself with the internal structure of individual
@@ -560,20 +571,6 @@ performance overall and are benefitted less by lemmatization.
 Further, we observe differences
 between use of an asymmetric prior on an unfiltered vocabulary and
 use of a symmetric prior on a vocabulary with stop words filtered out.
-Overall, the best performance is achieved when LDA is given a
-symmetric prior and learned with a filtered vocabulary on full-length,
-lemmatized documents.
-
-We find that topics from the unfiltered-asymmetric models often contain
-stop words despite the first topic receiving half of the probability
-mass under the prior.  Indeed, many topics consist primarily of stop
-words, such as the topic {\selectlanguage{russian}и в при с у}.
-Hand-aligned topics from the filtered-symmetric models learned on
-full-length documents are displayed in Table~\ref{tab:topics}.
-There is significant redundancy (multiple inflected word forms of the
-same lemma) in the top five words of the non-lemmatized topics; on the
-other hand, the diversity of words in the lemmatized topics lends
-to human interpretation.
 
 \begin{table}
     \begin{tabular}{rrr|rr|r}
@@ -595,9 +592,20 @@ to human interpretation.
     \label{tab:detection-rate}
 \end{table}
 
-\todo{explain results, in particular look at configurations other than
-    the significant one, and look at how a given document is
-    represented in various models}
+We find that topics from the unfiltered-asymmetric models often contain
+stop words despite the first topic receiving half of the probability
+mass under the prior.  Indeed, many topics consist primarily of stop
+words, such as the topic {\selectlanguage{russian}и в при с у}.
+Hand-aligned topics from the filtered-symmetric models learned on
+full-length documents are displayed in Table~\ref{tab:topics}.
+There is significant redundancy (multiple inflected word forms of the
+same lemma) in the top five words of the non-lemmatized topics; on the
+other hand, the diversity of words in the lemmatized topics lends
+to human interpretation.
+
+\todo{look at how a given document is represented in various models}
+
+
 
 
 \section{Conclusion}\label{sec:conclusion}
