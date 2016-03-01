@@ -216,7 +216,8 @@ of words within a document.  In morphologically rich languages,
 however, syntactic information is often encoded in the word form
 itself.  This kind of syntactic information is a nuisance variable
 in topic modeling and is prone to polluting a topic representation
-learned from data.  For example, consider the Russian name
+learned from data~\cite{boydgraber2014}.
+For example, consider the Russian name
 {\em Putin}; in English, we have a single type that represents in the
 concept in all syntactic contexts, whereas in Russian
 {\selectlanguage{russian} Путин} appears with various inflections,
@@ -275,7 +276,9 @@ ratio, greatly increasing the number of unknown words. One method to
 combat is to {\em lemmatize} the sentence.  A lemmatizer maps each
 inflection (an element of the paradigm) to a canonical form known as
 the lemma, which is typically the form found in dictionaries written
-in the target language. In this work, we employ the TreeTagger
+in the target language.
+\todo{example of lemma mapping here}
+In this work, we employ the TreeTagger
 lemmatizer \cite{schmid1994probabilistic}.\footnote{The tool is
     open-source and can be downloaded at
     \url{http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/}.
@@ -309,7 +312,7 @@ The parameters were estimated using the Russian corpus described in
 \chandler{Please do, and make this a priority, after the ingest/lemmatizer details---the related work in topic modeling is non-existent.}
 
 Though applied in many
-studies~\cite{deerwester1990,hofmann1999,mei2007,nallapati2008,lin2009},
+studies~\cite{deerwester1990,hofmann1999,mei2007,nallapati2008,lin2009,boydgraber2014},
 lemmatization has not been directly explored in the context of topic
 modeling.  An infinite-vocabulary LDA model containing a prior on words
 similar to an $n$-gram model has been developed~\cite{zhai2013}; this
