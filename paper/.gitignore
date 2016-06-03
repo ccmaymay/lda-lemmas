@@ -1,0 +1,7 @@
+*.out
+*.log
+*.blg
+*.dvi
+*.aux
+*.bbl
+/russian.pdf
