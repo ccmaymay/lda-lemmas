@@ -42,8 +42,8 @@
 \usepackage{latexsym}
 \usepackage{appendix}
 \usepackage{booktabs}
-\usepackage[small]{caption}
-\usepackage{subcaption}
+%\usepackage[small]{caption}
+%\usepackage{subcaption}
 \usepackage{multirow}
 \usepackage{rotating}
 
@@ -144,8 +144,9 @@
 \newcommand{\todo}[1]{\Note{todo}{red}{#1}}
 
 % space hacks
-%\setlength\belowcaptionskip{-15pt}
-%\setlength\titlebox{2cm}
+\setlength\belowcaptionskip{-15pt}
+\setlength\titlebox{2cm}
+\usepackage[hang,flushmargin]{footmisc} 
 
 
 \newcommand{\defn}[1]{{\bf #1}}%
@@ -303,8 +304,7 @@ example.\footnote{Note that Table~\ref{tab:paradigm} contains several
   as the singular accusative. This is a common phenomenon known as
   syncretism \cite{baerman2005syntax}, but it is not universal over all nouns---plenty of other
   Russian nouns {\em do} make the distinction between
-  genitive and accusative in the singular, e.g., virtually all
-  feminine nouns.} The Russian verb is even more expressive with more
+  genitive and accusative in the singular.} The Russian verb is even more expressive with more
 than 30 unique forms \cite{wade2010comprehensive}.
 
 In the context of NLP, large paradigms imply an increased token to type
@@ -315,10 +315,9 @@ the lemma, which is typically the form found in dictionaries written
 in the target language.
 \todo{example of lemma mapping here}
 In this work, we employ the TreeTagger
-lemmatizer \cite{schmid1994probabilistic}.\footnote{The tool is
-    open-source and can be downloaded at
-    \url{http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/}.
-}
+lemmatizer \cite{schmid1994probabilistic}.\footnote{
+   {\tiny  \url{http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/}.
+}}
 The parameters were estimated using the Russian corpus described in
 \newcite{sharov2011proper}.
 
@@ -336,8 +335,7 @@ The parameters were estimated using the Russian corpus described in
     {\selectlanguage{russian}пес} ({\em pyos}), meaning ``dog''.  Each
     of the 12 different entries in the table occurs in a distinct
     syntactic context. A lemmatizer canonicalizes these forms to
-    single form, which is the nominative singular in the case of
-    Russian, greatly reducing the sparsity present in the corpus.}
+    single form, which is the nominative singular in, reducing the sparsity present in the corpus.}
     \label{tab:paradigm}
 \end{table}
 
@@ -393,6 +391,39 @@ have also been explored with the express aim of capturing morphology \cite{santo
     some degree) as substitutes for models of word sense...}
 \ryan{So do WSD people use lemmatization before they apply LDA to the task?}
 
+\begin{table*}
+    \centering
+    \begin{tabular}{l|l}
+        view & topic \\\hline
+
+        lem & {\selectlanguage{russian}деревня\wfa сельский поселение пункт сельсовет} \\
+        non & {\selectlanguage{russian}деревня\wfa деревни\wfa деревне\wfa жителей волости} \\\hline
+
+        lem & {\selectlanguage{russian}клетка лечение\wfa заболевание\wfb препарат действие} \\
+        non & {\selectlanguage{russian}лечения\wfa течение лечение\wfa крови заболевания\wfb} \\\hline
+
+        lem & {\selectlanguage{russian}японский\wfa япония\wfb корея префектура смотреть} \\
+        non & {\selectlanguage{russian}считается японии\wfb японский\wfa посёлок японской\wfa} \\\hline
+
+        lem & {\selectlanguage{russian}художник\wfa искусство\wfb художественный\wfa картина\wfc выставка\wfd} \\
+        non & {\selectlanguage{russian}искусства\wfb музея картины\wfc выставки\wfd выставка\wfd} \\\hline
+    \end{tabular}
+    \caption{Manually-aligned topic pairs: the first topic in each pair
+        is from the lemmatized model, the second pair is a semantically
+        similar topic in the non-lemmatized model.  Within each pair,
+        each of the symbols \wfa, \wfb, \wfc, and \wfd (separately)
+        denotes word forms of a shared lemma.
+        The lemmatized topic representations are more
+        diverse than those of the non-lemmatized topic representations.
+        For example, the non-lemmatized version of the first topic
+        contains three inflections of the Russian word
+        {\selectlanguage{russian}деревня} ({\em village})---successive
+        inflectional forms add little or no information to the topic.
+        \todo{more explanations}
+    }
+    \label{tab:topics}
+\end{table*}
+
 \section{Experiments}\label{sec:experiments}
 
 For some pre-specified
@@ -434,38 +465,6 @@ syntactic and morphological patterns.
 %intrusion interface on both the lemmatized and non-lemmatized data
 %are depicted in Figure~\ref{fig:word-intrusion}.
 
-\begin{table*}
-    \centering
-    \begin{tabular}{l|l}
-        view & topic \\\hline
-
-        lem & {\selectlanguage{russian}деревня\wfa сельский поселение пункт сельсовет} \\
-        non & {\selectlanguage{russian}деревня\wfa деревни\wfa деревне\wfa жителей волости} \\\hline
-
-        lem & {\selectlanguage{russian}клетка лечение\wfa заболевание\wfb препарат действие} \\
-        non & {\selectlanguage{russian}лечения\wfa течение лечение\wfa крови заболевания\wfb} \\\hline
-
-        lem & {\selectlanguage{russian}японский\wfa япония\wfb корея префектура смотреть} \\
-        non & {\selectlanguage{russian}считается японии\wfb японский\wfa посёлок японской\wfa} \\\hline
-
-        lem & {\selectlanguage{russian}художник\wfa искусство\wfb художественный\wfa картина\wfc выставка\wfd} \\
-        non & {\selectlanguage{russian}искусства\wfb музея картины\wfc выставки\wfd выставка\wfd} \\\hline
-    \end{tabular}
-    \caption{Manually-aligned topic pairs: the first topic in each pair
-        is from the lemmatized model, the second pair is a semantically
-        similar topic in the non-lemmatized model.  Within each pair,
-        each of the symbols \wfa, \wfb, \wfc, and \wfd (separately)
-        denotes word forms of a shared lemma.
-        The lemmatized topic representations are more
-        diverse than those of the non-lemmatized topic representations.
-        For example, the non-lemmatized version of the first topic
-        contains three inflections of the Russian word
-        {\selectlanguage{russian}деревня} ({\em village})---successive
-        inflectional forms add little or no information to the topic.
-        \todo{more explanations}
-    }
-    \label{tab:topics}
-\end{table*}
 
 \todo{explain all those Russian words in figure/table, or remove}
 
@@ -508,8 +507,8 @@ intruder.  We note this is just the mean (over topics) of the
 when one expert is used instead of several non-experts.
 
 Our corpus consists of Russian Wikipedia articles from the dump
-released on 11/02/2015.\footnote{The Wikipedia dump is available at
-    \url{https://dumps.wikimedia.org/ruwiki/20151102/ruwiki-20151102-pages-articles-multistream.xml.bz2}.
+released on 11/02/2015.\footnote{The Wikipedia dump is from November 11, 2015.}
+
 }
 We stripped the XML portion of the formatting and then ran the
 lemmatizer described in Section~\ref{sec:inflectional}.  When the
@@ -546,12 +545,12 @@ from this list, producing a non-lemmatized vocabulary of 72,641 words.
 While the large size of this vocabulary slows learning,
 we do not believe it impacts the results negatively;
 our priority is retaining the information captured by the lemmatized
-vocabulary in order to provide a fair comparison.
+vocabulary to provide a fair comparison.
 
 In addition to exploring different choices of vocabulary, we also
 consider truncating the documents to their first 50 tokens.\footnote{
-    Because the vocabulary does not contain rare words, the number of
-    tokens in a document seen by the model is generally less than 50.
+    As the vocabulary does not contain rare words, the number of
+    tokens per document seen by the model is less than 50.
 }
 This augmentation simulates data sparsity by reducing the amount of
 content-bearing signal in each document, so we might expect the
@@ -562,7 +561,7 @@ We learn LDA by stochastic variational
 inference~\cite{hoffman2013}, initializing the models randomly and
 using fixed priors.\footnote{
     In preliminary experiments Gibbs
-    sampling with hyper-parameter optimization was not found to improve
+    sampling with hyper-parameter optimization did not improve
     interpretability.
 }
 We specify $K = 100$ topics to all models.
@@ -597,6 +596,7 @@ between use of an asymmetric prior on an unfiltered vocabulary and
 use of a symmetric prior on a vocabulary with stop words filtered out.
 
 \begin{table}
+  \centering
     \begin{tabular}{rrr|rr|r}
               &              &                & \multicolumn{2}{|c|}{$\DR$} &       p-val   \\\hline
         vocab & prior        & docs           & non         & lem         &         $\Delta$ \\\hline
