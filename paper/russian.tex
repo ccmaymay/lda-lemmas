@@ -496,9 +496,9 @@ internally coherent whereas the intruder word is likely to stand out.
 Thus a model's interpretability can be quantified by the fraction
 of topics for which the expert correctly identifies the intruder.  We
 call this value the \emph{detection rate}:
-\begin{align*}
+\begin{equation*}
     \DR = \frac{1}{K} \sum_{k=1}^K \dirac{i_k}{\omega_k}
-\end{align*}
+\end{equation*}
 where $K$ is the number of topics in the model, $i_k$ is the index
 of the intruder in the randomized word list generated from topic $k$,
 and $\omega_k$ is the index of the word the expert identified as the
