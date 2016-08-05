@@ -1,51 +1,19 @@
-\documentclass[11pt,letterpaper]{article}
-\usepackage{emnlp2016}
-\usepackage{times}
-\usepackage{latexsym}
-
-% Uncomment this line for the final submission:
-%\emnlpfinalcopy
-
-%  Enter the EMNLP Paper ID here:
-\def\emnlppaperid{835}
-
-% To expand the titlebox for more authors, uncomment
-% below and set accordingly.
-% \addtolength\titlebox{.5in}
-
-%\usepackage[utf8]{inputenc} % allow utf-8 input
-%\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
-%\usepackage{hyperref}       % hyperlinks
-%\usepackage{url}            % simple URL typesetting
-%\usepackage{booktabs}       % professional-quality tables
-%\usepackage{amsfonts}       % blackboard math symbols
-%\usepackage{nicefrac}       % compact symbols for 1/2, etc.
-%\usepackage{microtype}      % microtypography
-
-%\usepackage{natbib}
-\usepackage[ruled]{algorithm2e}
+\documentclass{clv2}
+\pdfoutput=1
 
 \usepackage[fleqn]{amsmath}
 \usepackage{amsfonts}
+\usepackage{amssymb}
 \usepackage{amsbsy}
 \usepackage{xspace}
-\usepackage{graphicx}
 
-\usepackage{rotating}
-\usepackage{times}
-%\usepackage{url}                                                       
 \makeatletter                                                           
 \newcommand{\@BIBLABEL}{\@emptybiblabel}                                
 \newcommand{\@emptybiblabel}[1]{}                                       
 \makeatother                                                            
 \usepackage[hidelinks]{hyperref}
 \usepackage{latexsym}
-\usepackage{appendix}
 \usepackage{booktabs}
-%\usepackage[small]{caption}
-%\usepackage{subcaption}
-\usepackage{multirow}
-\usepackage{rotating}
 
 \usepackage[inline,shortlabels]{enumitem}
 \setlist*[enumerate,1]{label=$(\arabic*)$}
@@ -53,18 +21,7 @@
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{amsmath,amssymb}
 \usepackage[russian,english]{babel}
-
-\usepackage{cleveref}
-\crefname{section}{§}{§§}
-\Crefname{section}{§}{§§}
-\crefname{figure}{Fig}{}
-\crefname{algorithm}{Alg.}{}
-\crefformat{section}{§#2#1#3}  % remove space between section symbol and the number
-
-
-\long\def\devour#1{\ignorespaces}
 
 \renewcommand{\vec}{\boldsymbol}   % optional
 \newcommand{\vf}{{\vec{f}}}
@@ -95,78 +52,6 @@
 
 \newcommand{\DR}{\ensuremath{\textrm{DR}}}
 
-% reduce space before \paragraph command -- http://tex.stackexchange.com/questions/219676/how-to-change-spacing-before-and-after-paragraph-command/219677#219677
-%\makeatletter
-%\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
-%                                    {3.25ex \@plus1ex \@minus.2ex}%
-%                                    {-1em}%
-%                                    {\normalfont\normalsize\bfseries}}
-%\makeatother
-
-\usepackage{amssymb}
-\DeclareMathOperator*{\Expect}{\mathop{\mathbb{E}}}
-\DeclareMathOperator*{\argmax}{\mathop{\text{argmax}}}
-
-
-% new math commands
-
-\usepackage{color}
-\usepackage{xcolor}
-\definecolor{darkgrey}{rgb}{0.2,0.2,0.2}
-\definecolor{grey}{rgb}{0.9,0.9,0.9}
-\definecolor{darkblue}{rgb}{0.0,0.0,0.5}
-\definecolor{darkpurple}{rgb}{0.4,0.0,0.4}
-\definecolor{darkred}{rgb}{0.5,0.0,0.0}
-\definecolor{darkorange}{rgb}{0.5,0.45,0.4}
-\definecolor{darkgreen}{rgb}{0.0,0.5,0.0}
-\definecolor{darkergreen}{rgb}{0.0,0.4,0.0}
-\definecolor{lightblue}{rgb}{0.8,0.8,1.0}
-\definecolor{lightgreen}{rgb}{0.8,1.0,0.8}
-\definecolor{lightred}{rgb}{1.0,0.8,0.8}
-\definecolor{lightyellow}{rgb}{1.0,1.0,0.8}
-\definecolor{lightorange}{rgb}{1.0,0.9,0.8}
-\definecolor{lightgrey}{rgb}{0.96,0.97,0.98}
-\definecolor{brilliantlavender}{rgb}{0.96, 0.73, 1.0}
-\definecolor{deeppink}{rgb}{1.0,0.08,0.58}
-\definecolor{hotpink}{rgb}{1.0,0.41,0.71}
-\definecolor{pink}{rgb}{1.0,0.75,0.80}
-
-% define notes
-\usepackage[russian,english]{babel}
-\usepackage{soul}
-\usepackage{color}
-\newcommand{\Note}[3]{\sethlcolor{#2}\hl{[\textbf{#1}: #3]}}
-\renewcommand{\Note}[3]{}
-
-\newcommand{\timv}[1]{\Note{timv}{brilliantlavender}{#1}}
-\newcommand{\ryan}[1]{\Note{ryan}{lightorange}{#1}}
-\newcommand{\chandler}[1]{\Note{chandler}{pink}{#1}}
-\newcommand{\todo}[1]{\Note{todo}{red}{#1}}
-
-% space hacks
-\setlength\belowcaptionskip{-15pt}
-\setlength\titlebox{2cm}
-\usepackage[hang,flushmargin]{footmisc} 
-
-
-\newcommand{\defn}[1]{{\bf #1}}%
-
-%i commented this out because i cannot compile this option
-%what's the easiest way to install this on my mac?
-%\usepackage[subtle]{savetrees}
-
-\newcommand{\software}[1]{\textsc{#1}}
-\newcommand{\word}[1]{{\em #1}}
-\newcommand{\lemma}[1]{\textsc{#1}}
-\newcommand{\att}[2]{{\small \texttt{#1}}=\textsc{#2}}
-\newcommand{\gloss}[1]{``#1''}
-\newcommand{\UNK}{\textsc{unk}\xspace}
-
-%\newcommand{\func}{\mathcal{E}(t, s, u, w)}
-%\newcommand{\grad}{\nabla_{\vtheta}\,\func}
-%\newcommand{\funcw}{\mathcal{E}(t, s, u)}
-%\newcommand{\gradw}{\nabla_{\vtheta}\,\funcw}
-
 \newcommand{\wfa}{\textsuperscript{$\star$}\xspace}
 \newcommand{\wfb}{\textsuperscript{$\dagger$}\xspace}
 \newcommand{\wfc}{\textsuperscript{$\ddagger$}\xspace}
@@ -186,24 +71,25 @@
 \def\eqlabel#1{\label{eqn:#1}}
 \def\subsp#1{P_{\mbox{{\scriptsize\rm #1}}}}
 
+\runningtitle{Analysis of Morphology in Topic Modeling}
 
-% space hacks
-%\setlength\belowcaptionskip{-4pt}
-%\setlength\titlebox{2cm}
+\runningauthor{Chandler May, Ryan Cotterell, and Benjamin Van Durme}
 
-% You can expand the titlebox if you need extra space
-% to show all the authors. Please do not make the titlebox
-% smaller than 5cm (the original size); we will check this
-% in the camera-ready version and ask you to change it back.
-
-%\titlespacing\section{0pt}{1pt plus 4pt minus 4pt}{12pt plus 4pt minus 4pt}
-%\titlespacing\subsection{0pt}{1pt plus 0pt minus 0pt}{1pt plus 0pt minus 0pt}
-%\titlespacing\subsubsection{0pt}{1pt plus 0pt minus 0pt}{1pt plus 0pt minus 0pt}
+\begin{document}
 
 \title{Analysis of Morphology in Topic Modeling}
 
-\begin{document}
+\author{Chandler May}
+\affil{Johns Hopkins University}
+
+\author{Ryan Cotterell}
+\affil{Johns Hopkins University}
+
+\author{Benjamin Van Durme}
+\affil{Johns Hopkins University}
+
 \maketitle
+
 \begin{abstract}
     Topic models make strong assumptions about their data.  In
     particular, different words are implicitly assumed to
@@ -263,17 +149,6 @@ words in English~\cite{wallach2009,blei2010,eisenstein2011}, hence we
 expect them to be sensitive to morphological variation in languages
 like Russian.
 
-  \ryan{Make connection here to stop words. We filter stop words (or try to) in topic models, so we should
-    filter these endings as well?}
-\chandler{I don't understand, what is the connection to stop words?}
-\ryan{English stop words like prepositions are often inflectional suffixes in Russian. In a sense, lemmatization is analogous to filtering stop words. Consider
-the Putin example: ``to'' is a stop word, but that is fully expressed by a suffix in Russian.}
-\chandler{oooh, okay.  I modified this paragraph and in particular
-    repurposed your comment at the end of the
-    paragraph, change as desired.  I think this addresses your initial
-    question (for the sake of the paper).}
-\ryan{I love it!}
-
 In this study, we show that
 \begin{itemize}
     \item truncated documents, imitating the sparsity seen in social
@@ -284,6 +159,7 @@ In this study, we show that
         of long documents, the vocabulary is filtered, and lemmatization
         is applied.
 \end{itemize}
+
 
 \section{Morphology and Lemmatization}\label{sec:inflectional}
 
@@ -313,13 +189,12 @@ combat this issue is to {\em lemmatize} the sentence.  A lemmatizer maps each
 inflection (an element of the paradigm) to a canonical form known as
 the lemma, which is typically the form found in dictionaries written
 in the target language.
-\todo{example of lemma mapping here}
 In this work, we employ the TreeTagger
 lemmatizer \cite{schmid1994probabilistic}.\footnote{
    {\tiny  \url{http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/}.
 }}
 The parameters were estimated using the Russian corpus described in
-\newcite{sharov2011proper}.
+\namecite{sharov2011proper}.
 
 \begin{table}
   \begin{tabular}{l | l l }
@@ -340,10 +215,7 @@ The parameters were estimated using the Russian corpus described in
 \end{table}
 
 
-
 \section{Related Work}\label{sec:related-work}
-%\ryan{I can probably do the non-topic-modeling part of this section.}
-%\chandler{Please do, and make this a priority, after the ingest/lemmatizer details---the related work in topic modeling is non-existent.}
 
 Though applied in many
 studies~\cite{deerwester1990,hofmann1999,mei2007,nallapati2008,lin2009},
@@ -379,17 +251,11 @@ morphology has been actively investigated in the context of
 word-embeddings.  The latent topic vectors that topic models discover
 have many parallels to continuous embeddings---both are real-valued
 representations that stand proxy for (some notion of) lexical semantic
-information. Most notably, \newcite{BianGL14} learned
+information. Most notably, \namecite{BianGL14} learned
 embeddings for individual morphemes jointly within the standard {\sc word2vec}
-model \cite{mikolov2013distributed} and \newcite{SoricutO15} used the embeddings
+model \cite{mikolov2013distributed} and \namecite{SoricutO15} used the embeddings
 themselves to induce morphological analyzers. Character-level embedding approaches
 have also been explored with the express aim of capturing morphology \cite{santos2014learning,LingDBTFAML15}.
-
-\ryan{Add self citation to NAACL 2015 in camera ready. Keep out for anonymity.}
-\todo{mention word sense disambiguation applications of topic models?
-    they rely more heavily on lemmatization but use topic models (to
-    some degree) as substitutes for models of word sense...}
-\ryan{So do WSD people use lemmatization before they apply LDA to the task?}
 
 \begin{table*}
     \centering
@@ -419,10 +285,10 @@ have also been explored with the express aim of capturing morphology \cite{santo
         contains three inflections of the Russian word
         {\selectlanguage{russian}деревня} ({\em village})---successive
         inflectional forms add little or no information to the topic.
-        \todo{more explanations}
     }
     \label{tab:topics}
 \end{table*}
+
 
 \section{Experiments}\label{sec:experiments}
 
@@ -461,35 +327,6 @@ The expert is tasked with identifying the intruder in each list of
 $m + 1$ words.
 As in prior work~\cite{chang2009}, we instruct the expert to ignore
 syntactic and morphological patterns.
-%Examples from our word
-%intrusion interface on both the lemmatized and non-lemmatized data
-%are depicted in Figure~\ref{fig:word-intrusion}.
-
-
-\todo{explain all those Russian words in figure/table, or remove}
-
-%\begin{table*}
-%    \centering
-%    \begin{tabular}{l|l}
-%        experiment & topic \\\hline
-%
-%        trunc + filt & {\selectlanguage{russian}организация основать университет японский деятельность} \\
-%        trunc + filt & {\selectlanguage{russian}деревня сельский поселение примерно московский} \\
-%        trunc + filt & {\selectlanguage{russian}посёлок тип положение географический япония} \\
-%        trunc + filt & {\selectlanguage{russian}современный художник жить греческий искусство} \\
-%        trunc + filt & {\selectlanguage{russian}край районный сельсовет поселение сельский} \\\hline
-%
-%        full & {\selectlanguage{russian}остров японский япония корея префектура} \\
-%        full & {\selectlanguage{russian}группа альбом песня the год} \\
-%        full & {\selectlanguage{russian}театр музыкальный музыка и роль} \\
-%        full & {\selectlanguage{russian}деревня район сельский состав поселение} \\
-%        full & of and a in i \\
-%        full & {\selectlanguage{russian}и в при с у} \\
-%        full & {\selectlanguage{russian}он и она фильм её} \\\hline
-%    \end{tabular}
-%    \caption{\todo}
-%    \label{tab:topics-insignif}
-%\end{table*}
 
 If the model is interpretable, the $m$ words from a topic will be
 internally coherent whereas the intruder word is likely to stand out.
@@ -587,10 +424,6 @@ symmetric prior.
 Truncated documents exhibit lower
 performance overall and are helped less by lemmatization (posing
 challenges for social media applications).
-%This
-%result confirms the intuition that successful topic modeling on
-%short documents such as those found in social media requires close
-%attention to text normalization and filtering.
 Further, we observe differences
 between use of an asymmetric prior on an unfiltered vocabulary and
 use of a symmetric prior on a vocabulary with stop words filtered out.
@@ -627,10 +460,6 @@ same lemma) in the top five words of the non-lemmatized topics; on the
 other hand, the diversity of words in the lemmatized topics lends
 to human interpretation.
 
-\todo{look at how a given document is represented in various models}
-
-
-
 
 \section{Conclusion}\label{sec:conclusion}
 
@@ -640,7 +469,7 @@ verified the intuition that lemmatization can significantly improve the
 interpretability of a topic model.
 
 
-\bibliographystyle{emnlp2016}
+\bibliographystyle{fullname}
 \bibliography{russian}
 
 \end{document}

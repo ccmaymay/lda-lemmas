@@ -7,7 +7,7 @@ RUN apt-get update -y && \
         texlive-latex-extra \
         texlive-science
 RUN apt-get install -y make
-ENV uid 500
+ENV uid 501
 RUN useradd -m -u $uid -s /bin/bash russian && \
     passwd -l russian
 USER russian

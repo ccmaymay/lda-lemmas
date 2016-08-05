@@ -5,6 +5,7 @@ russian.pdf:	russian.tex russian.bib
 	bibtex russian
 	pdflatex russian
 	pdflatex russian
+	pdflatex russian
 
 clean:
 	rm -f *.lot *.lof *.toc *.aux *.bbl *.log *.dvi *.blg *.out *~
