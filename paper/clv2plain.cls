@@ -130,7 +130,7 @@
 \setlength\typeheight{56pc}
 %
 \setlength\headheight{6.5\p@}%
-\setlength\headsep   {31pt}%
+\setlength\headsep   {0pt}%31pt}%
 \setlength\topskip   {7\p@}%
 %
 \setlength\textheight{49.61pc}%
