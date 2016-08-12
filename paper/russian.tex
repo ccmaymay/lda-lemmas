@@ -1,4 +1,4 @@
-\documentclass{clv2}
+\documentclass{clv2plain}
 \pdfoutput=1
 
 \usepackage[fleqn]{amsmath}
@@ -72,10 +72,11 @@
 \def\subsp#1{P_{\mbox{{\scriptsize\rm #1}}}}
 
 \runningtitle{Analysis of Morphology in Topic Modeling}
-
 \runningauthor{Chandler May, Ryan Cotterell, and Benjamin Van Durme}
 
 \begin{document}
+
+\pagestyle{plain}
 
 \title{Analysis of Morphology in Topic Modeling}
 
@@ -191,12 +192,13 @@ the lemma, which is typically the form found in dictionaries written
 in the target language.
 In this work, we employ the TreeTagger
 lemmatizer \cite{schmid1994probabilistic}.\footnote{
-   {\tiny  \url{http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/}.
-}}
+   \url{http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/}
+}
 The parameters were estimated using the Russian corpus described in
 \namecite{sharov2011proper}.
 
 \begin{table}
+    \centering
   \begin{tabular}{l | l l }
     & {\bf Singular} & {\bf Plural} \\ \hline
     {\bf Nominative} &  {\selectlanguage{russian}пес} ({\em pyos}) & {\selectlanguage{russian}псы}    ({\em psy})   \\
@@ -272,7 +274,7 @@ have also been explored with the express aim of capturing morphology \cite{santo
         non & {\selectlanguage{russian}считается японии\wfb японский\wfa посёлок японской\wfa} \\\hline
 
         lem & {\selectlanguage{russian}художник\wfa искусство\wfb художественный\wfa картина\wfc выставка\wfd} \\
-        non & {\selectlanguage{russian}искусства\wfb музея картины\wfc выставки\wfd выставка\wfd} \\\hline
+        non & {\selectlanguage{russian}искусства\wfb музея картины\wfc выставки\wfd выставка\wfd} \\
     \end{tabular}
     \caption{Manually-aligned topic pairs: the first topic in each pair
         is from the lemmatized model, the second pair is a semantically

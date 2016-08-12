@@ -1533,13 +1533,11 @@
 \newcommand{\footmark}{\copyright\ \@jyear\ Association for Computational Linguistics}
 %
 \def\ps@titlepage{\let\@mkboth\@gobbletwo%
-  \def\@oddfoot{\footnotesize\footmark\hfill}
-  \def\@evenfoot{\footnotesize\hfill\footmark}
+    \def\@oddfoot{}\let\@evenfoot\@oddfoot
   \def\@oddhead{}\let\@evenhead\@oddhead}
 %
 \def\ps@pageonly{\let\@mkboth\@gobbletwo%
-    \def\@oddfoot{\hfill{\folio}}
-    \def\@evenfoot{{\folio}\hfill}
+    \def\@oddfoot{}\let\@evenfoot\@oddfoot
   \def\@oddhead{}\let\@evenhead\@oddhead}
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  End Page styles  %%%%%%%%%%%%%%%%%%%%%%%%
