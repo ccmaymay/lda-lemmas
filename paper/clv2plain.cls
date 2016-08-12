@@ -143,10 +143,11 @@
 %
 \setlength\topmargin{26.7pt}%25.35pt}
 \setlength\oddsidemargin{54pt}
+\setlength\evensidemargin{54pt}
 %
-\setlength\evensidemargin\trimwidth
-\addtolength\evensidemargin{-\textwidth}
-\addtolength\evensidemargin{-\oddsidemargin}
+%\setlength\evensidemargin\trimwidth
+%\addtolength\evensidemargin{-\textwidth}
+%\addtolength\evensidemargin{-\oddsidemargin}
 %\addtolength\oddsidemargin{4.5pc}
 \setlength\footskip{36pt}
 \setlength\maxdepth{4\p@}
