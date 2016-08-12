@@ -1,8 +1,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%       This File               : clv2.cls
-%       Version         : 2
+%       This File               : clv2plain.cls
+%       Version         : 3
 %
 %       Developed By    : Krishan Gopal Goswami
 %       Date                    : 21-Oct-2005
@@ -55,14 +55,14 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{clv2}[2005/02/08 v2 LaTeX document class for MIT - Computational Linguistics Journals]
+\ProvidesClass{clv2plain}[2016/08/12 v3 simplified LaTeX document class for MIT - Computational Linguistics Journals]
 %
 %\xdef\jobtag{MIT --- Computational Linguistics\qquad (Typeset by spi publisher services, Delhi)}%
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Job Options %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 \newdimen\draftrule\draftrule0pt
-\newdimen\trimrule\trimrule.1pt
+\newdimen\trimrule\trimrule0pt
 %
 \newif\ifindex
 \newif\ifdiscussion
@@ -124,8 +124,8 @@
 \gdef\TRUE{true}
 %
 %%
-\setlength\trimheight{10in}
-\setlength\trimwidth{6.75in}
+\setlength\trimheight{0in}
+\setlength\trimwidth{0in}
 %
 \setlength\typeheight{56pc}
 %
