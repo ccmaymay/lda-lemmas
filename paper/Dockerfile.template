@@ -1,16 +1,16 @@
 FROM ubuntu:latest
 RUN apt-get update -y && \
-    apt-get install -y \
+    apt-get install -y --no-install-recommends \
         make \
         texlive \
         texlive-lang-cyrillic \
         texlive-latex-extra \
         texlive-science
 RUN apt-get install -y make
-ENV uid 501
-RUN useradd -m -u $uid -s /bin/bash russian && \
-    passwd -l russian
-USER russian
-VOLUME /home/russian/paper
-WORKDIR /home/russian/paper
+ENV uid UID-REPLACE
+RUN useradd -m -u $uid -s /bin/bash paper && \
+    passwd -l paper
+USER paper
+VOLUME /tmp/paper
+WORKDIR /tmp/paper
 CMD ["bash", "-lc", "make"]
