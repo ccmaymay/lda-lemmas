@@ -228,16 +228,25 @@ Specifically,
 several rule-based and context-based stemmers were compared over four
 English corpora as preprocessing treatments to a topic
 model~\cite{schofield2016}.  Models subject to each treatment were
-evaluated using automated measures of model fit, topic quality, and
-(induced) token cluster quality, as well as two heuristics designed to
-identify the predictive words that were most affected by stemming.
-TODO
+evaluated using automated measures of model fit, topic coherence, and
+(induced) token cluster consistency, as well as two heuristics designed
+to identify the predictive words that were most affected by stemming.
+Stemming was found to reduce model fit, have negligible effect on topic
+coherence, have negligible or negative effects on (induced) token
+cluster consistency, and conflate unrelated words.
+Truncation stemmers in particular reduced the effect of typos, but
+while that treatment could be used to better satisfy some modeling
+assumptions, it could also mask important dialectal
+variation~\cite{schofield2016}.  In light of these results, it is
+recommended to refrain from stemming the corpus as a preprocessing
+step and instead to stem the top-$m$ word lists (as a postprocessing
+step) as needed~\cite{schofield2016}.
 Separately, the infinite-vocabulary LDA model has a prior
 similar to an $n$-gram model~\cite{zhai2013}, which could be viewed as
 loosely encoding beliefs of a concatenative morphology, but the effect
 of that prior has not been analyzed in isolation.
 
-To measure the effect of lemmatization on topic models we must first
+To measure the effect of lemmatization on topic models we must
 define ``topic model.''  In this study, for comparability with other
 work, we restrict our attention to latent Dirichlet allocation
 (LDA)~\cite{blei2003}, the canonical Bayesian graphical topic model.
