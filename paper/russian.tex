@@ -101,7 +101,7 @@
     top-$m$ word list representation of a topic.  Though a number
     of authors have added preprocessing steps such as lemmatization to
     better accommodate these assumptions, the effects of such
-    preprocessing procedures are not well understood.  We test the
+    preprocessing procedures are rarely measured.  We test the
     effect of lemmatization on the interpretability of a
     latent Dirichlet allocation (LDA) model on Russian Wikipedia
     articles.  Using a word intrusion evaluation, we quantitatively
@@ -251,7 +251,7 @@ Specifically,
 several rule-based and context-based stemmers were compared over four
 English corpora as preprocessing treatments to a topic
 model~\cite{schofield2016}.  Models subject to each treatment were
-evaluated using automated measures of model fit, topic coherence, and
+evaluated using automated metrics of model fit, topic coherence, and
 (induced) token cluster consistency, as well as two heuristics designed
 to identify the predictive words that were most affected by stemming.
 Stemming was found to reduce model fit, have negligible effect on topic
@@ -264,10 +264,14 @@ variation~\cite{schofield2016}.  In light of these results, it is
 recommended to refrain from stemming the corpus as a preprocessing
 step and instead to stem the top-$m$ word lists (as a postprocessing
 step) as needed~\cite{schofield2016}.
+In contrast to that study, we measure the effect of
+lemmatization (effectively a weak form of stemming) on a single corpus
+of a more morphologically rich language, evaluating using word
+intrusion judgments from a human expert.
 
-While not satisfactorily explored in the topic modeling community,
-morphology has been actively investigated in the context of
-word-embeddings.  The latent topic vectors that topic models discover
+While it has only recently begun to be analyzed in the context of topic
+modeling, morphology has been actively investigated in the context of
+word embeddings.  The latent topic vectors that topic models discover
 have many parallels to continuous embeddings---both are real-valued
 representations that stand proxy for (some notion of) lexical semantic
 information. Most notably, \namecite{BianGL14} learned
