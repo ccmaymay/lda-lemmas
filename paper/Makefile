@@ -1,4 +1,9 @@
-PDF_FILES := russian.pdf
+NAMES := russian
+
+TEX_FILES := $(wildcard *.tex)
+BIB_FILES := $(wildcard *.bib)
+PDF_FILES := $(patsubst %,%.pdf,$(NAMES))
+IMAGE_FILES := $(filter-out $(PDF_FILES),$(wildcard *.pdf))
 UID := $(shell id -u)
 
 all: $(PDF_FILES)
