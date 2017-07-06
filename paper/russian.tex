@@ -100,14 +100,14 @@
     of words with identical meanings would undermine the utility of the
     top-$m$ word list representation of a topic.  Though a number
     of authors have added preprocessing steps such as lemmatization to
-    better accommodate these assumptions, the effects of such data
-    massaging have not been publicly studied.  We make first steps
-    toward elucidating the role of morphology in topic modeling by
-    testing the effect of lemmatization on the interpretability of a
-    latent Dirichlet allocation (LDA) model.  Using a word intrusion
-    evaluation, we quantitatively demonstrate that lemmatization
-    provides a significant benefit to the interpretability of a model
-    learned on Wikipedia articles in a morphologically rich language.
+    better accommodate these assumptions, the effects of such
+    preprocessing procedures are not well understood.  We test the
+    effect of lemmatization on the interpretability of a
+    latent Dirichlet allocation (LDA) model on Russian Wikipedia
+    articles.  Using a word intrusion evaluation, we quantitatively
+    demonstrate that lemmatization provides a significant benefit to
+    the interpretability of a model in this corpus of morphologically
+    rich text.
 \end{abstract}
 
 
@@ -234,10 +234,13 @@ distribution and encourages sparse topics~\cite{eisenstein2011}, or the
 nested hierarchical Dirichlet process (nHDP) topic model, which
 represents topics in a hierarchy and automatically infers its effective
 size~\cite{paisley2015}.  These models may render more interpretable
-results overall.  However, we are currently interested in the
-\emph{relative} impact of lemmatization on a topic model, we are
-unaware of any direct prior work, and we wish for our results to be
-widely applicable across research and industry.  Thus we leave these
+results overall.  Separately, the infinite-vocabulary LDA model has a
+prior similar to an $n$-gram model~\cite{zhai2013}, which could be
+viewed as loosely encoding beliefs of a concatenative morphology, but
+the effect of that prior has not been analyzed in isolation.  However,
+we are currently interested in the \emph{relative} impact of
+lemmatization on a topic model and we wish for our results to be
+applicable across research and industry.  Thus we leave these
 alternative topic models as considerations for future work.
 
 Though lemmatization has been applied in many topic modeling studies,
@@ -261,10 +264,6 @@ variation~\cite{schofield2016}.  In light of these results, it is
 recommended to refrain from stemming the corpus as a preprocessing
 step and instead to stem the top-$m$ word lists (as a postprocessing
 step) as needed~\cite{schofield2016}.
-Separately, the infinite-vocabulary LDA model has a prior
-similar to an $n$-gram model~\cite{zhai2013}, which could be viewed as
-loosely encoding beliefs of a concatenative morphology, but the effect
-of that prior has not been analyzed in isolation.
 
 While not satisfactorily explored in the topic modeling community,
 morphology has been actively investigated in the context of
