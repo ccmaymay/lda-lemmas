@@ -243,31 +243,29 @@ lemmatization on a topic model and we wish for our results to be
 applicable across research and industry.  Thus we leave these
 alternative topic models as considerations for future work.
 
-Though lemmatization has been applied in many topic modeling studies,
+Though lemmatization has been applied in many topic modeling studies
 starting in 1990 or
 earlier~\cite{deerwester1990,hofmann1999,mei2007,nallapati2008,lin2009},
-its impact in topic modeling was only measured recently.
-Specifically,
-several rule-based and context-based stemmers were compared over four
-English corpora as preprocessing treatments to a topic
-model~\cite{schofield2016}.  Models subject to each treatment were
-evaluated using automated metrics of model fit, topic coherence, and
-(induced) token cluster consistency, as well as two heuristics designed
-to identify the predictive words that were most affected by stemming.
-Stemming was found to reduce model fit, have negligible effect on topic
-coherence, have negligible or negative effects on token
-cluster consistency, and conflate unrelated words.
-Truncation stemmers in particular reduced the effect of typos, but
-while that treatment could be used to better satisfy some modeling
-assumptions, it could also mask important dialectal
-variation~\cite{schofield2016}.  In light of these results, it is
-recommended to refrain from stemming the corpus as a preprocessing
-step and instead to stem the top-$m$ word lists (as a postprocessing
-step) as needed~\cite{schofield2016}.
-In contrast to that study, we measure the effect of
-lemmatization (effectively a weak form of stemming) on a single corpus
-of a more morphologically rich language, evaluating using word
-intrusion judgments from a human expert.
+its effect on a topic model was first measured recently, in a
+comparison of several rule-based and context-based stemmers over four
+English corpora~\cite{schofield2016}.  Models subject to each treatment
+were evaluated using automated metrics of model fit, topic coherence,
+and (induced) token cluster consistency, as well as two heuristics
+designed to identify the predictive words that were most affected by
+stemming.  Stemming was found to reduce model fit, have negligible
+effect on topic coherence, have negligible or negative effects on token
+cluster consistency, and conflate unrelated words.  Truncation stemmers
+were found to reduce the effect of typos, but while that treatment
+could be used to better satisfy some modeling assumptions it could
+also mask important dialectal variation~\cite{schofield2016}.  In light
+of these results, it was recommended to refrain from stemming the
+corpus as a preprocessing step and instead to stem the top-$m$ word
+lists (as a postprocessing step) as
+needed~\cite{schofield2016}.  In contrast to that study, we measure the
+effect of lemmatization (effectively a weak form of stemming) on a
+single corpus of a more morphologically rich language, evaluating using
+word intrusion judgments from a human expert.  Our results are thus
+complementary and not directly comparable.
 
 While it has only recently begun to be analyzed in the context of topic
 modeling, morphology has been actively investigated in the context of
@@ -490,6 +488,10 @@ We have demonstrated the impact of lemmatization as a preprocessing
 step to LDA on Wikipedia articles in Russian.  In particular, we have
 verified the intuition that lemmatization can significantly improve the
 interpretability of a topic model.
+However, we recommend measuring rather than assuming the effect of
+lemmatization (or stemming) in a new topic modeling application
+context, otherwise stemming as a \emph{postprocessing} step as
+needed~\cite{schofield2016}.
 
 \begin{acknowledgments}
     We would like to thank the Johns Hopkins Human Language Technology
