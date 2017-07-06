@@ -127,8 +127,8 @@ force on the thematic nature of a document.  Indeed, for this reason
 topic models often make a bag-of-words assumption, discarding the order
 of words within a document.  In morphologically rich languages,
 however, syntactic information is often encoded in the word form
-itself.  This kind of syntactic information is a nuisance variable
-in topic modeling and is prone to polluting a topic representation
+itself.  This kind of syntactic information may be a nuisance variable
+in topic modeling, polluting a topic representation
 learned from data~\cite{boydgraber2014}.
 For example, consider the Russian name
 {\em Putin}; in English, we have a single type that represents in the
@@ -220,14 +220,22 @@ The parameters were estimated using the Russian corpus described in
 
 \section{Related Work}\label{sec:related-work}
 
-Though applied in many
-studies~\cite{deerwester1990,hofmann1999,mei2007,nallapati2008,lin2009},
-lemmatization has not been directly explored in the context of topic
-modeling.  An infinite-vocabulary LDA model containing a prior on words
-similar to an $n$-gram model has been developed~\cite{zhai2013}; this
-prior could be viewed as loosely encoding beliefs of a
-concatenative morphology, but its effect was not analyzed in
-isolation.
+Though lemmatization has been applied in many topic modeling studies,
+starting in 1990 or
+earlier~\cite{deerwester1990,hofmann1999,mei2007,nallapati2008,lin2009},
+its impact in topic modeling was only measured recently.
+Specifically,
+several rule-based and context-based stemmers were compared over four
+English corpora as preprocessing treatments to a topic
+model~\cite{schofield2016}.  Models subject to each treatment were
+evaluated using automated measures of model fit, topic quality, and
+(induced) token cluster quality, as well as two heuristics designed to
+identify the predictive words that were most affected by stemming.
+TODO
+Separately, the infinite-vocabulary LDA model has a prior
+similar to an $n$-gram model~\cite{zhai2013}, which could be viewed as
+loosely encoding beliefs of a concatenative morphology, but the effect
+of that prior has not been analyzed in isolation.
 
 To measure the effect of lemmatization on topic models we must first
 define ``topic model.''  In this study, for comparability with other
