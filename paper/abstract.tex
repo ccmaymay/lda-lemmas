@@ -1,11 +1,11 @@
-Topic models are often represented by top-$m$ word lists for human
-interpretation.  The corpus is often lemmatized
+Topic models are typically represented by top-$m$ word lists for human
+interpretation.  The corpus is often pre-processed with lemmatization
 so that those representations are not undermined by a proliferation of
-words with similar meanings; however, the effect of that pre-processing
-on interpretability is generally unmeasured.
-We measure the effect of lemmatization on the interpretability of a
-latent Dirichlet allocation (LDA) model on Russian Wikipedia
-articles.  Using a word intrusion evaluation, we
-demonstrate that lemmatization significantly benefits
-the interpretability of a topic model on this corpus of morphologically
-rich text.
+words with similar meanings, but the effects of that pre-processing are
+assumed rather than measured.  Recent work studied the effect of
+stemming (similar to lemmatization) on topic models of English texts
+and found no supporting evidence for this practice.  We study the
+effect of lemmatization on topic models on Russian Wikipedia articles,
+finding in one configuration that it significantly improves a measure
+of interpretability.  We conclude that lemmatization may benefit
+topic models on morphologically rich languages.
