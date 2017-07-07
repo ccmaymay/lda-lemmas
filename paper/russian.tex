@@ -223,26 +223,24 @@ estimating its parameters on the Russian corpus described in
 \section{Related Work}\label{sec:related-work}
 
 To measure the effect of lemmatization on topic models we must first
-define ``topic model.''  In this study, for comparability with other
-work, we restrict our attention to latent Dirichlet allocation
+define ``topic model.''  For comparability with other
+work we restrict our attention to latent Dirichlet allocation
 (LDA)~\cite{blei2003}, the canonical Bayesian graphical topic model.
-We want to measure the performance of a topic model by its
-interpretability, as topic models are best suited to discovering
-human-interpretable decompositions of the data~\cite{may2015}.
-We note there are more modern but less widely-used topic models than
-LDA such as the sparse additive generative
+There are more modern but less widely-used topic models than
+LDA, such as the sparse additive generative
 (SAGE) topic model, which explicitly models the background word
 distribution and encourages sparse topics~\cite{eisenstein2011}, or the
 nested hierarchical Dirichlet process (nHDP) topic model, which
 represents topics in a hierarchy and automatically infers its effective
-size~\cite{paisley2015}.  These models may render more interpretable
-results overall.  Separately, the infinite-vocabulary LDA model has a
+size~\cite{paisley2015}.  These models may be more interpretable by
+some measures but are less widely-used and accessible.
+Separately, the infinite-vocabulary LDA model has a
 prior similar to an $n$-gram model~\cite{zhai2013}, which could be
 viewed as loosely encoding beliefs of a concatenative morphology, but
-the effect of that prior has not been analyzed in isolation.  However,
-we are currently interested in the \emph{relative} impact of
-lemmatization on a topic model and we wish for our results to be
-applicable across research and industry.  Thus we leave these
+the effect of that prior has not been analyzed in isolation.
+We seek to measure the impact of
+lemmatization on a topic model and would like our results to be
+applicable to research and industry, so we leave these
 alternative topic models as considerations for future work.
 
 Though stemming and lemmatization (a weak form of stemming) have long
@@ -250,24 +248,32 @@ been applied in topic modeling
 studies~\cite{deerwester1990,hofmann1999,mei2007,nallapati2008,lin2009},
 their effect on a topic model was first measured recently, in a
 comparison of rule-based and context-based stemmers over four
-English corpora~\cite{schofield2016}.
+English corpora.
 Stemming was found to reduce model fit, negligibly
 affect topic coherence, negligibly or negatively affect induced token
 cluster consistency, and conflate unrelated words.
-Our analysis is complementary: we measure higher-level
-interpretability of topics using human judgments on a corpus of
-morphologically rich language.
+In light of these results it was
+recommended to refrain from stemming the corpus as a preprocessing
+step and instead to stem the top-$m$ word lists (as a postprocessing
+step) as needed~\cite{schofield2016}.
+Our analysis is complementary: we measure the
+interpretability of topics using human judgments of word intrusion on a
+different corpus of morphologically richer language; we also used fixed
+hyperparameters, stochastic variational inference rather than Gibbs
+sampling, and 100 rather than 10, 50, or 200 topics.  Thus, while the
+difference in morphological variation is an intuitive explanation of
+our dissimilar results, it is by no means the only one.
 
-While it has only recently begun to be analyzed in the context of topic
+Though its analysis is nascent in the context of topic
 modeling, morphology has been actively investigated in the context of
-word embeddings.  The latent topic vectors that topic models discover
-have many parallels to continuous embeddings---both are real-valued
-representations that stand proxy for (some notion of) lexical semantic
+word embeddings.  Topic proportions parallel continuous embeddings:
+both are real-valued representations of lexical semantic
 information. Most notably, \newcite{BianGL14} learned
 embeddings for individual morphemes jointly within the standard {\sc word2vec}
-model \cite{mikolov2013distributed} and \newcite{SoricutO15} used the embeddings
-themselves to induce morphological analyzers. Character-level embedding approaches
-have also been explored with the express aim of capturing morphology \cite{santos2014learning,LingDBTFAML15}.
+model~\cite{mikolov2013distributed} and \newcite{SoricutO15} used the embeddings
+themselves to induce morphological analyzers. Character-level
+embeddings with the express aim of capturing morphology have also been
+explored~\cite{santos2014learning,LingDBTFAML15}.
 
 \begin{table*}
     \centering
@@ -308,7 +314,7 @@ have also been explored with the express aim of capturing morphology \cite{santo
 
 For some pre-specified
 number of topics $K$ and Dirichlet concentration hyperparameters
-$\veta$ and $\valpha$, the LDA topic model represents a vocabulary as a
+$\veta$ and $\valpha$, LDA represents a vocabulary as a
 set of $K$ i.i.d.\ topics $\vbeta_k$, represents each document as a
 an i.i.d.\ mixture over those topics (with mixture weights
 $\vtheta_d$), and specifies that each token in a document is
