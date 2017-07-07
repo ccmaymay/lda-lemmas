@@ -203,14 +203,16 @@ The parameters were estimated using the Russian corpus described in
 
 \begin{table}
     \centering
-  \begin{tabular}{l | l l }
-    & {\bf Singular} & {\bf Plural} \\ \hline
+  \begin{tabular}{l l l }
+      \toprule
+                     & {\bf Singular} & {\bf Plural} \\ \midrule
     {\bf Nominative} &  {\selectlanguage{russian}пес} ({\em pyos}) & {\selectlanguage{russian}псы}    ({\em psy})   \\
     {\bf Genitive} &  {\selectlanguage{russian}пса} ({\em psa}) & {\selectlanguage{russian}псов}    ({\em psov})  \\
     {\bf Accusative} &  {\selectlanguage{russian}пса} ({\em psa}) & {\selectlanguage{russian}псов}    ({\em psov})  \\
     {\bf Dative} &  {\selectlanguage{russian}псу} ({\em psu}) & {\selectlanguage{russian}псам}    ({\em psam})  \\
     {\bf Locative} &  {\selectlanguage{russian}псе} ({\em psye}) & {\selectlanguage{russian}псах}   ({\em psax})  \\
     {\bf Instrumental} &  {\selectlanguage{russian}псом} ({\em psom}) & {\selectlanguage{russian}псами}  ({\em psami}) \\
+      \bottomrule
   \end{tabular}
   \caption{A inflectional paradigm for the Russian word
     {\selectlanguage{russian}пес} ({\em pyos}), meaning ``dog''.  Each
@@ -262,8 +264,8 @@ were found to reduce the effect of typos, but while that treatment
 could be used to better satisfy some modeling assumptions it could
 also mask important dialectal variation~\cite{schofield2016}.  In light
 of these results, it was recommended to refrain from stemming the
-corpus as a preprocessing step and instead to stem the top-$m$ word
-lists (as a postprocessing step) as
+corpus as a pre-processing step and instead to stem the top-$m$ word
+lists (as a post-processing step) as
 needed~\cite{schofield2016}.  In contrast to that study, we measure the
 effect of lemmatization (effectively a weak form of stemming) on a
 single corpus of a more morphologically rich language, evaluating using
@@ -283,20 +285,22 @@ have also been explored with the express aim of capturing morphology \cite{santo
 
 \begin{table*}
     \centering
-    \begin{tabular}{l|l}
-        view & topic \\\hline
+    \begin{tabular}{ll}
+        \toprule
+        view & topic \\\midrule
 
         lem & {\selectlanguage{russian}деревня\wfa сельский поселение пункт сельсовет} \\
-        non & {\selectlanguage{russian}деревня\wfa деревни\wfa деревне\wfa жителей волости} \\\hline
+        non & {\selectlanguage{russian}деревня\wfa деревни\wfa деревне\wfa жителей волости} \\\midrule
 
         lem & {\selectlanguage{russian}клетка лечение\wfa заболевание\wfb препарат действие} \\
-        non & {\selectlanguage{russian}лечения\wfa течение лечение\wfa крови заболевания\wfb} \\\hline
+        non & {\selectlanguage{russian}лечения\wfa течение лечение\wfa крови заболевания\wfb} \\\midrule
 
         lem & {\selectlanguage{russian}японский\wfa япония\wfb корея префектура смотреть} \\
-        non & {\selectlanguage{russian}считается японии\wfb японский\wfa посёлок японской\wfa} \\\hline
+        non & {\selectlanguage{russian}считается японии\wfb японский\wfa посёлок японской\wfa} \\\midrule
 
         lem & {\selectlanguage{russian}художник\wfa искусство\wfb художественный\wfa картина\wfc выставка\wfd} \\
         non & {\selectlanguage{russian}искусства\wfb музея картины\wfc выставки\wfd выставка\wfd} \\
+        \bottomrule
     \end{tabular}
     \caption{Manually-aligned topic pairs: the first topic in each pair
         is from the lemmatized model, the second pair is a semantically
@@ -334,7 +338,7 @@ Meaningful evaluation of topic models is notoriously
 difficult and has received considerable attention in the
 literature~\cite{chang2009,wallach2009a,newman2010,mimno2011}.
 In general we desire an evaluation metric that correlates with a
-human's ability to use the model to explore or filter a large dataset,
+human's ability to use the model to explore or filter a large data set,
 hence, the interpretability of the model.  In this study we moreover
 require an evaluation metric that is comparable across different views
 of the same corpus.
@@ -379,7 +383,7 @@ itself.\footnote{
     unrecognized by the lemmatizer.
 }
 
-We consider two preprocessing schemes to account for stop words and
+We consider two pre-processing schemes to account for stop words and
 other high-frequency terms in the corpus.  First, we compute the
 vocabulary as the top 10,000 words by document frequency,\footnote{
     Due to minor implementation concerns the lemmatized and
@@ -389,7 +393,7 @@ vocabulary as the top 10,000 words by document frequency,\footnote{
 separately for the lemmatized and non-lemmatized data, and
 specify an asymmetric prior on each document's topic proportions
 $\vtheta$.
-We refer to this preprocessing scheme
+We refer to this pre-processing scheme
 as the \emph{unfiltered-asymmetric} setting.  The second modeling scheme we
 consider uses a vocabulary with high-frequency words filtered out and a
 uniform prior on the document-wise topic proportions.
@@ -454,13 +458,15 @@ use of a symmetric prior on a vocabulary with stop words filtered out.
 
 \begin{table}
   \centering
-    \begin{tabular}{rrr|rr|r}
-              &              &                & \multicolumn{2}{|c|}{$\DR$} &       p-val   \\\hline
-        vocab & prior        & docs           & non         & lem         &         $\Delta$ \\\hline
+    \begin{tabular}{rrrrrr}
+        \toprule
+              &              &                & \multicolumn{2}{c}{$\DR$} &       p-val   \\
+        vocab & prior        & docs           & non         & lem &         $\Delta$ \\\midrule
         unfilt & sym         & full           &          0.54 &          0.52 &          0.61 \\
         \textbf{filt} & \textbf{asym} & \textbf{full} & \textbf{0.50} & \textbf{0.65} & \textbf{0.02} \\
         unfilt & sym         & trunc          &          0.37 &          0.37 &          0.50 \\
         filt & asym          & trunc          &          0.43 &          0.47 &          0.28 \\
+        \bottomrule
     \end{tabular}
     \caption{Detection rate for the non-lemmatized (non) and
         lemmatized (lem) models
@@ -487,13 +493,13 @@ to human interpretation.
 
 \section{Conclusion}\label{sec:conclusion}
 
-We have demonstrated the impact of lemmatization as a preprocessing
+We have demonstrated the impact of lemmatization as a pre-processing
 step to LDA on Wikipedia articles in Russian.  In particular, we have
 verified the intuition that lemmatization can significantly improve the
 interpretability of a topic model.
 However, we recommend measuring rather than assuming the effect of
 lemmatization (or stemming) in a new topic modeling application
-context, otherwise stemming as a \emph{postprocessing} step as
+context, otherwise stemming as a \emph{post-processing} step as
 needed~\cite{schofield2016}.
 
 \section*{Acknowledgments}\label{sec:ack}
