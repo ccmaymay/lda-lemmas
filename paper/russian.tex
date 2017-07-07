@@ -156,8 +156,6 @@ like Russian.
 
 In this study, we show that
 \begin{itemize}
-    \item truncated documents, imitating the sparsity seen in social
-        media, reduce interpretability;
     \item if lemmatization is used, a filtered vocabulary yields more
         interpretable topics than an informative prior; and
     \item overall, interpretability is best when the corpus consists
@@ -180,12 +178,15 @@ the addition of a suffix, often reducing the number of words in a
 given sentence. The collection of inflections of the same stem is preferred to as a
 paradigm.  The Russian noun, for example, forms a paradigm with 12
 forms.  See the sample paradigm in Table~\ref{tab:paradigm} for an
-example.\footnote{Note that Table~\ref{tab:paradigm} contains several
+example.\footnote{
+    Note that Table~\ref{tab:paradigm} contains several
   entries that are identical, e.g., the singular genitive is the same
   as the singular accusative. This is a common phenomenon known as
   syncretism \cite{baerman2005syntax}, but it is not universal over all nouns---plenty of other
   Russian nouns {\em do} make the distinction between
-  genitive and accusative in the singular.} The Russian verb is even more expressive with more
+  genitive and accusative in the singular.
+}
+The Russian verb is even more expressive with more
 than 30 unique forms \cite{wade2010comprehensive}.
 
 In the context of NLP, large paradigms imply an increased token to type
@@ -205,13 +206,13 @@ The parameters were estimated using the Russian corpus described in
     \centering
   \begin{tabular}{l l l }
       \toprule
-                     & {\bf Singular} & {\bf Plural} \\ \midrule
-    {\bf Nominative} &  {\selectlanguage{russian}пес} ({\em pyos}) & {\selectlanguage{russian}псы}    ({\em psy})   \\
-    {\bf Genitive} &  {\selectlanguage{russian}пса} ({\em psa}) & {\selectlanguage{russian}псов}    ({\em psov})  \\
-    {\bf Accusative} &  {\selectlanguage{russian}пса} ({\em psa}) & {\selectlanguage{russian}псов}    ({\em psov})  \\
-    {\bf Dative} &  {\selectlanguage{russian}псу} ({\em psu}) & {\selectlanguage{russian}псам}    ({\em psam})  \\
-    {\bf Locative} &  {\selectlanguage{russian}псе} ({\em psye}) & {\selectlanguage{russian}псах}   ({\em psax})  \\
-    {\bf Instrumental} &  {\selectlanguage{russian}псом} ({\em psom}) & {\selectlanguage{russian}псами}  ({\em psami}) \\
+                     & Singular & Plural \\ \midrule
+    Nominative &  {\selectlanguage{russian}пес} ({\em pyos}) & {\selectlanguage{russian}псы}    ({\em psy})   \\
+    Genitive &  {\selectlanguage{russian}пса} ({\em psa}) & {\selectlanguage{russian}псов}    ({\em psov})  \\
+    Accusative &  {\selectlanguage{russian}пса} ({\em psa}) & {\selectlanguage{russian}псов}    ({\em psov})  \\
+    Dative &  {\selectlanguage{russian}псу} ({\em psu}) & {\selectlanguage{russian}псам}    ({\em psam})  \\
+    Locative &  {\selectlanguage{russian}псе} ({\em psye}) & {\selectlanguage{russian}псах}   ({\em psax})  \\
+    Instrumental &  {\selectlanguage{russian}псом} ({\em psom}) & {\selectlanguage{russian}псами}  ({\em psami}) \\
       \bottomrule
   \end{tabular}
   \caption{A inflectional paradigm for the Russian word
@@ -372,7 +373,9 @@ intruder.  We note this is just the mean (over topics) of the
 when one expert is used instead of several non-experts.
 
 Our corpus consists of Russian Wikipedia articles from the dump
-released on 11/02/2015.\footnote{The Wikipedia dump is from November 11, 2015.}
+released on 11/02/2015.\footnote{
+    The Wikipedia dump is from November 11, 2015.
+}
 
 }
 We stripped the XML portion of the formatting and then ran the
@@ -412,16 +415,6 @@ we do not believe it impacts the results negatively;
 our priority is retaining the information captured by the lemmatized
 vocabulary to provide a fair comparison.
 
-In addition to exploring different choices of vocabulary, we also
-consider truncating the documents to their first 50 tokens.\footnote{
-    As the vocabulary does not contain rare words, the number of
-    tokens per document seen by the model is less than 50.
-}
-This augmentation simulates data sparsity by reducing the amount of
-content-bearing signal in each document, so we might expect the
-truncated documents to more greatly benefit from lemmatization (which
-can be cast as a dimensionality reduction method).
-
 We learn LDA by stochastic variational
 inference~\cite{hoffman2013}, initializing the models randomly and
 using fixed priors.\footnote{
@@ -441,41 +434,36 @@ document word usage and document length; in particular, we
 believe approximately 50\% of the word tokens in the corpus are
 uninformative.
 
-The detection rate for all four configurations (filtered-symmetric or unfiltered-asymmetric
-vocabulary and full-length or truncated documents), and the
+The detection rate for both configurations (filtered-symmetric or unfiltered-asymmetric
+vocabulary), and the
 p-values for one-sided detection rate differences (testing our
 hypothesis that the lemmatized models yield higher detection rates than
 the non-lemmatized models), are reported in
 Table~\ref{tab:detection-rate}.  Word intrusion performance benefits
 significantly from lemmatization on a filtered vocabulary and a
 symmetric prior.
-Truncated documents exhibit lower
-performance overall and are helped less by lemmatization (posing
-challenges for social media applications).
 Further, we observe differences
 between use of an asymmetric prior on an unfiltered vocabulary and
 use of a symmetric prior on a vocabulary with stop words filtered out.
 
 \begin{table}
   \centering
-    \begin{tabular}{rrrrrr}
+    \begin{tabular}{rrrrr}
         \toprule
-              &              &                & \multicolumn{2}{c}{$\DR$} &       p-val   \\
-        vocab & prior        & docs           & non         & lem &         $\Delta$ \\\midrule
-        unfilt & sym         & full           &          0.54 &          0.52 &          0.61 \\
-        \textbf{filt} & \textbf{asym} & \textbf{full} & \textbf{0.50} & \textbf{0.65} & \textbf{0.02} \\
-        unfilt & sym         & trunc          &          0.37 &          0.37 &          0.50 \\
-        filt & asym          & trunc          &          0.43 &          0.47 &          0.28 \\
+              &              & \multicolumn{2}{c}{$\DR$} &       p-val   \\
+        vocab & prior        & non         & lem &         $\Delta$ \\\midrule
+        unfilt & sym         &          0.54 &          0.52 &          0.61 \\
+        filt & asym & 0.50 & 0.65 & 0.02 \\
         \bottomrule
     \end{tabular}
     \caption{Detection rate for the non-lemmatized (non) and
         lemmatized (lem) models
         and p-values for the one-sided detection rate difference tests.
         (filt and unfilt indicate whether or not the vocabulary is
-        filtered; sym and asym indicate whether the prior is symmetric,
-        trunc and full indicate whether the documents are truncated.)
+        filtered; sym and asym indicate whether the prior is
+        symmetric.)
         The detection rate benefits significantly from lemmatization on
-        a filtered vocabulary (highlighted in bold).}
+        a filtered vocabulary.}
     \label{tab:detection-rate}
 \end{table}
 
