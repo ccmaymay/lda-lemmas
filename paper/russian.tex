@@ -137,7 +137,7 @@ For example, consider the Russian name
 {\em Putin}; in English, we have a single type that represents in the
 concept in all syntactic contexts, whereas in Russian
 {\selectlanguage{russian} Путин} appears with various inflections,
-e.g., {\selectlanguage{russian}Путина},
+for example, {\selectlanguage{russian}Путина},
 {\selectlanguage{russian}Путину}, {\selectlanguage{russian}Путине},
 and {\selectlanguage{russian}Путином}. Which form of the name one uses
 is fully dependent on the syntactic structure of the sentence. Compare
@@ -169,10 +169,10 @@ In this study, we show that
 Morphology concerns itself with the internal structure of individual
 words.  Specifically, we focus on {\em inflectional morphology}, word
 internal structure that marks syntactically relevant linguistic
-properties, e.g., person, number, case and gender on the word form
+properties, for example, person, number, case and gender on the word form
 itself. While inflectional morphology is minimal in English and
 virtually non-existent in Chinese, it occupies a prevalent position in
-many languages' grammars, e.g., Russian. In fact, Russian will often
+the grammars of many languages, including Russian. In fact, Russian will often
 express relations marked in English with prepositions, simply through
 the addition of a suffix, often reducing the number of words in a
 given sentence. The collection of inflections of the same stem is preferred to as a
@@ -180,7 +180,7 @@ paradigm.  The Russian noun, for example, forms a paradigm with 12
 forms.  See the sample paradigm in Table~\ref{tab:paradigm} for an
 example.\footnote{
     Note that Table~\ref{tab:paradigm} contains several
-  entries that are identical, e.g., the singular genitive is the same
+  entries that are identical, for example, the singular genitive is the same
   as the singular accusative. This is a common phenomenon known as
   syncretism \cite{baerman2005syntax}, but it is not universal over all nouns---plenty of other
   Russian nouns {\em do} make the distinction between
@@ -372,13 +372,10 @@ intruder.  We note this is just the mean (over topics) of the
 \emph{model precision} metric from prior work~\cite{chang2009}
 when one expert is used instead of several non-experts.
 
-Our corpus consists of a dump of Russian Wikipedia articles.\footnote{
-    The Wikipedia dump is from November 11, 2015.
-}
-We stripped the XML portion of the formatting and then ran the
-lemmatizer described in Section~\ref{sec:inflectional}.  When the
-lemmatizer did not recognize a word we backed off to the word form
-itself.\footnote{
+Our corpus consists of a dump of Russian Wikipedia articles, dated
+November 11, 2015, stripped of their XML markup.
+When the lemmatizer did not recognize a word form
+its output was replaced with the input word form.\footnote{
     11\% of the 378 million tokens in the raw corpus were
     unrecognized by the lemmatizer.
 }
@@ -468,8 +465,8 @@ We find that topics from the unfiltered-asymmetric models often contain
 stop words despite the first topic receiving half of the prior
 probability mass.  Indeed, many topics consist primarily of stop
 words, such as the topic {\selectlanguage{russian}и в при с у}.
-Hand-aligned topics from the filtered-symmetric models learned on
-full-length documents are shown in Table~\ref{tab:topics}.
+Hand-aligned topics from the filtered-symmetric models
+are shown in Table~\ref{tab:topics}.
 There is significant redundancy (multiple inflected word forms of the
 same lemma) in the top five words of the non-lemmatized topics; on the
 other hand, the diversity of words in the lemmatized topics lends
