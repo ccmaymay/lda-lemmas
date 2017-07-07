@@ -455,14 +455,16 @@ interpretation.
 
 \section{Conclusion}\label{sec:conclusion}
 
-We have demonstrated the impact of lemmatization as a pre-processing
-step to LDA on Wikipedia articles in Russian.  In particular, we have
-verified the intuition that lemmatization can significantly improve the
-interpretability of a topic model.
-However, we recommend measuring rather than assuming the effect of
+We have measured the effect of pre-processing by lemmatization
+on the interpretability of topic models in a morphologically rich
+language.  Unlike a prior study on English, we found empirical
+justification for this intuitive but unexamined practice.  Our approach
+is however distinct; more work must be done to determine what factors
+contribute to our different conclusions.  In the meantime
+we recommend measuring rather than assuming the effects of
 lemmatization (or stemming) in a new topic modeling application
 context, otherwise stemming as a \emph{post-processing} step as
-needed~\cite{schofield2016}.
+needed, following prior work~\cite{schofield2016}.
 
 %\section*{Acknowledgments}\label{sec:ack}
 %    We thank the Johns Hopkins Human Language Technology
