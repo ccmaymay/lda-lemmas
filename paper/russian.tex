@@ -112,14 +112,16 @@
 \section{Introduction}\label{sec:introduction}
 
 Topic modeling is a standard tool in the analysis of large
-text corpora. Almost all topic models pick up on
-co-occurrence signals between different words in the corpus;
-words that occur often in the same sentence are likely to belong to
+text corpora. Topic models learn
+co-occurrence information about words in the corpus;
+words that occur often in the same document are likely to belong to
 the same latent topic. In languages with rich inflectional
-morphology, this signal may be weaker because of the proliferation of
-unique tokens. In this study we measure the effect of token-based
-lemmatization on topic models in a morphologically
-rich language.
+morphology this information may be masked by the proliferation of
+unique tokens with similar meanings.  While lemmatization (or stemming)
+is often used to preempt this problem, its effects on a topic model are
+generally assumed, not measured.  In this study we establish the first
+measurements of the effect of token-based lemmatization on topic models
+on a corpus of morphologically rich language.
 
 Syntactic information is not generally considered to exert a strong
 force on the thematic nature of a document.  Indeed, for this reason
@@ -130,69 +132,67 @@ itself.  This kind of syntactic information may be a nuisance variable
 in topic modeling, polluting a topic representation
 learned from data~\cite{boydgraber2014}.
 For example, consider the Russian name
-{\em Putin}; in English, we have a single type that represents in the
+{\em Putin}: In English, we have a single type that represents in the
 concept in all syntactic contexts, whereas in Russian
-{\selectlanguage{russian} Путин} appears with various inflections,
-for example, {\selectlanguage{russian}Путина},
+{\selectlanguage{russian} Путин} appears with various inflections
+such as {\selectlanguage{russian}Путина},
 {\selectlanguage{russian}Путину}, {\selectlanguage{russian}Путине},
 and {\selectlanguage{russian}Путином}. Which form of the name one uses
-is fully dependent on the syntactic structure of the sentence. Compare
+depends on the syntactic structure of the sentence. Compare
 the utterances {{\selectlanguage{russian}мы говорим о Путине} ({\em we
-    are speaking about Putin}) and {{\selectlanguage{russian}мы
-      говорим Путину} ({\em we are speaking to Putin})}: both sentences
-  are thematically centered on Putin, but two different word forms
-  are employed.
+are speaking about Putin}) and {{\selectlanguage{russian}мы
+  говорим Путину} ({\em we are speaking to Putin})}: Both sentences
+are thematically centered on Putin but two different word forms
+are employed.  In particular,
 English stop words like prepositions often end up as inflectional
-suffixes in Russian, so lemmatization on Russian performs some
-of the text normalization that stop word filtering performs on English.
-Topic models are generally sensitive to stop
-words in English~\cite{wallach2009,blei2010,eisenstein2011}, hence we
-expect them to be sensitive to morphological variation in languages
-like Russian.
+suffixes in Russian, so ``stop words'' may have a greater effect on
+topic models on Russian text than they do on topic models on English
+text.\footnote{
+	Topic models on English are sensitive to stop
+	words~\cite{wallach2009,blei2010,eisenstein2011},
+	although the degree of sensitivity and prescribed
+    resolution are contested~\cite{schofield2017}.
+}
 
-In this study, we show that
-\begin{itemize}
-    \item if lemmatization is used, a filtered vocabulary yields more
-        interpretable topics than an informative prior; and
-    \item interpretability is best when the
-        the vocabulary is filtered and lemmatization
-        is applied.
-\end{itemize}
+In this study, we show that a measure of the interpretability of a
+topic model on a morphologically rich text is significantly
+improved by lemmatization when a stop-word--filtered vocabulary and
+asymmetric prior are used.  In contrast, under an unfiltered vocabulary
+and symmetric prior, we find lemmatization has no significant effect.
 
 
 \section{Morphology and Lemmatization}\label{sec:inflectional}
 
-Morphology concerns itself with the internal structure of individual
-words.  Specifically, we focus on {\em inflectional morphology}, word
-internal structure that marks syntactically relevant linguistic
-properties, for example, person, number, case and gender on the word form
-itself. While inflectional morphology is minimal in English and
-virtually non-existent in Chinese, it occupies a prevalent position in
-the grammars of many languages, including Russian. In fact, Russian will often
-express relations marked in English with prepositions, simply through
-the addition of a suffix, often reducing the number of words in a
-given sentence. The collection of inflections of the same stem is preferred to as a
-paradigm.  The Russian noun, for example, forms a paradigm with 12
-forms.  See the sample paradigm in Table~\ref{tab:paradigm} for an
+We study the sensitivity of topic models to variation in the structure
+of individual words, specifically
+{\em inflectional morphology}, the word-internal
+structure that marks syntactically relevant linguistic
+properties like person, number, case, and gender.
+While inflectional morphology is minimal in English and
+virtually non-existent in Chinese, it is prevalent in
+the grammars of languages like Russian. In fact, relations that are marked with prepositions in English are often expressed as suffixes in Russian, reducing the number of words in the
+sentence. The collection of inflections of the same stem is referred to as a
+paradigm.  The Russian noun forms a paradigm with twelve
+forms; see the sample paradigm in Table~\ref{tab:paradigm} for an
 example.\footnote{
-    Note that Table~\ref{tab:paradigm} contains several
-  entries that are identical, for example, the singular genitive is the same
+  Note that Table~\ref{tab:paradigm} contains several
+  entries that are identical; for example, the singular genitive is the same
   as the singular accusative. This is a common phenomenon known as
-  syncretism \cite{baerman2005syntax}, but it is not universal over all nouns---plenty of other
-  Russian nouns {\em do} make the distinction between
+  syncretism~\cite{baerman2005syntax}, but it is not universal across
+  nouns---many Russian nouns {\em do} make the distinction between
   genitive and accusative in the singular.
 }
-The Russian verb is even more expressive with more
-than 30 unique forms \cite{wade2010comprehensive}.
+The Russian verb is even more expressive, having more
+than thirty unique forms~\cite{wade2010comprehensive}.
 
-In the context of NLP, large paradigms imply an increased token to type
-ratio, greatly increasing the number of unknown words. One method to
+In the tasks of NLP, large paradigms imply an increased token to type
+ratio, greatly increasing the number of unknown words. One way to
 combat this issue is to {\em lemmatize} the sentence.  A lemmatizer maps each
 inflection (an element of the paradigm) to a canonical form known as
-the lemma, which is typically the form found in dictionaries written
-in the target language.
+the \emph{lemma}, typically the form found in dictionaries
+written in the target language.
 In this study we use the TreeTagger
-lemmatizer \cite{schmid1994probabilistic},\footnote{
+lemmatizer~\cite{schmid1994probabilistic},\footnote{
    \url{http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/}
 }
 estimating its parameters on the Russian corpus described in
@@ -430,8 +430,8 @@ use of a symmetric prior on a vocabulary with stop words filtered out.
         \toprule
               &              & \multicolumn{2}{c}{$\DR$} &       p-val   \\
         vocab & prior        & non         & lem &         $\Delta$ \\\midrule
-        unfilt & sym         &          0.54 &          0.52 &          0.61 \\
-        filt & asym & 0.50 & 0.65 & 0.02 \\
+        unfilt & asym         &          0.54 &          0.52 &          0.61 \\
+        filt & sym & 0.50 & 0.65 & 0.02 \\
         \bottomrule
     \end{tabular}
     \caption{Detection rate for the non-lemmatized (non) and
