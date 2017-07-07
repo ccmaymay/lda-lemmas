@@ -130,7 +130,7 @@ itself.  This kind of syntactic information may be a nuisance variable
 in topic modeling, polluting a topic representation
 learned from data~\cite{boydgraber2014}.
 For example, consider the Russian name
-{\em Putin}: In English, we have a single type that represents in the
+{\em Putin}: In English a single type represents the
 concept in all syntactic contexts, whereas in Russian
 {\selectlanguage{russian} Путин} appears with various inflections
 such as {\selectlanguage{russian}Путина},
@@ -154,8 +154,8 @@ topic models in Russian than on topic models in English.\footnote{
 In this study, we show that a measure of the interpretability of a
 topic model on a morphologically rich text is significantly
 improved by lemmatization when a stop-word--filtered vocabulary and
-asymmetric prior are used.  In contrast, under an unfiltered vocabulary
-and symmetric prior, we find lemmatization has no significant effect.
+symmetric prior are used.  In contrast, under an unfiltered vocabulary
+and asymmetric prior, we find lemmatization has no significant effect.
 
 
 \section{Morphology and Lemmatization}\label{sec:inflectional}
@@ -167,8 +167,11 @@ structure that marks syntactically relevant linguistic
 properties like person, number, case, and gender.
 While inflectional morphology is minimal in English and
 virtually non-existent in Chinese, it is prevalent in
-the grammars of languages like Russian. In fact, relations that are marked with prepositions in English are often expressed as suffixes in Russian, reducing the number of words in the
-sentence. The collection of inflections of the same stem is referred to as a
+the grammars of languages like Russian. Relations marked with
+prepositions in English are often expressed as suffixes in Russian,
+reducing the number of words in the sentence.
+
+The collection of inflections of the same stem is referred to as a
 paradigm.  The Russian noun forms a paradigm with twelve
 forms; see the sample paradigm in Table~\ref{tab:paradigm} for an
 example.\footnote{
@@ -181,10 +184,9 @@ example.\footnote{
 }
 The Russian verb is even more expressive, having more
 than thirty unique forms~\cite{wade2010comprehensive}.
-
 In the tasks of NLP, large paradigms imply an increased token to type
 ratio, greatly increasing the number of unknown words. One way to
-combat this issue is to {\em lemmatize} the sentence.  A lemmatizer maps each
+mitigate this issue is to {\em lemmatize} the sentence.  A lemmatizer maps each
 inflection (an element of the paradigm) to a canonical form known as
 the \emph{lemma}, typically the form found in dictionaries
 written in the target language.
@@ -223,14 +225,14 @@ To measure the effect of lemmatization on topic models we must first
 define ``topic model.''  For comparability with other
 work we restrict our attention to latent Dirichlet allocation
 (LDA)~\cite{blei2003}, the canonical Bayesian graphical topic model.
-There are more modern but less widely-used topic models than
+There are more modern but less widely used topic models than
 LDA, such as the sparse additive generative
 (SAGE) topic model, which explicitly models the background word
 distribution and encourages sparse topics~\cite{eisenstein2011}, or the
 nested hierarchical Dirichlet process (nHDP) topic model, which
 represents topics in a hierarchy and automatically infers its effective
 size~\cite{paisley2015}.  These models may be more interpretable by
-some measures but are less widely-used and accessible.
+some measures but are less widely used and accessible.
 Separately, the infinite-vocabulary LDA model has a
 prior similar to an $n$-gram model~\cite{zhai2013}, which could be
 viewed as loosely encoding beliefs of a concatenative morphology, but
@@ -240,26 +242,26 @@ lemmatization on a topic model and would like our results to be
 applicable to research and industry, so we leave these
 alternative topic models as considerations for future work.
 
-Though stemming and lemmatization (a weak form of stemming) have long
+Though stemming and lemmatization have long
 been applied in topic modeling
 studies~\cite{deerwester1990,hofmann1999,mei2007,nallapati2008,lin2009},
 their effect on a topic model was first measured recently, in a
 comparison of rule-based and context-based stemmers over four
 English corpora.
 Stemming was found to reduce model fit, negligibly
-affect topic coherence, negligibly or negatively affect induced token
-cluster consistency, and conflate unrelated words.
+affect an automated metric of topic coherence, negligibly or negatively
+affect induced token cluster consistency, and conflate unrelated words.
 In light of these results it was
-recommended to refrain from stemming the corpus as a preprocessing
-step and instead to stem the top-$m$ word lists (as a postprocessing
+recommended to refrain from stemming the corpus as a pre-processing
+step and instead to stem the top-$m$ word lists (as a post-processing
 step) as needed~\cite{schofield2016}.
 Our analysis is complementary: we measure the
 interpretability of topics using human judgments of word intrusion on a
-different corpus of morphologically richer language; we also used fixed
+different corpus of morphologically richer language; we also use fixed
 hyper-parameters, stochastic variational inference rather than Gibbs
 sampling, and 100 rather than 10, 50, or 200 topics.  Thus, while the
 difference in morphological variation is an intuitive explanation of
-our dissimilar results, it is by no means the only one.
+our discordant results, it is by no means the only one.
 
 Though its analysis is nascent in the context of topic
 modeling, morphology has been actively investigated in the context of
@@ -276,7 +278,7 @@ explored~\cite{santos2014learning,LingDBTFAML15}.
     \centering
     \begin{tabular}{rl}
         \toprule
-        view & topic \\\midrule
+        Corpus view & Topic \\\midrule
 
         lemm & {\selectlanguage{russian}деревня\wfa сельский поселение пункт сельсовет} \\
         non-lemm & {\selectlanguage{russian}деревня\wfa деревни\wfa деревне\wfa жителей волости} \\\midrule
@@ -291,7 +293,7 @@ explored~\cite{santos2014learning,LingDBTFAML15}.
         non-lemm & {\selectlanguage{russian}искусства\wfb музея картины\wfc выставки\wfd выставка\wfd} \\
         \bottomrule
     \end{tabular}
-    \caption{Manually-paired topics from filtered-symmetric models: the
+    \caption{Manually paired topics from filtered-symmetric models: the
         first topic in each pair
         is from the lemmatized model, the second pair is a semantically
         similar topic in the non-lemmatized model.  Within each pair,
@@ -315,7 +317,7 @@ number of topics $K$ and Dirichlet concentration hyper-parameters
 $\veta$ and $\valpha$, the LDA topic model represents a vocabulary as a
 set of $K$ i.i.d.\ topics $\vbeta_k$, represents each document as a
 an i.i.d.\ mixture over those topics (with mixture weights
-$\vtheta_d$), and specifies that each token in a document is
+$\vtheta_d$), and specifies that each token $w_{d,n}$ in a document is
 generated by sampling a word type from the document's topic mixture:
 \begin{align*}
     \vbeta_k  & \sim \Dirichlet\left(\veta\right) \\
@@ -355,13 +357,14 @@ call this value the \emph{detection rate}:
 \end{equation*}
 where $K$ is the number of topics in the model, $i_k$ is the index
 of the intruder in the randomized word list generated from topic $k$,
+$\dirac{i_k}{\cdot}$ is the point mass at $i_k$,
 and $\omega_k$ is the index of the word the expert identified as the
 intruder.  This metric is the mean of the
 \emph{model precision} metric from prior work~\cite{chang2009}
 when one expert is used instead of several non-experts.
 
 We use a corpus of Russian Wikipedia articles, stripped of their XML
-markup, from a dump dated November 11, 2015.
+markup, from a dump dated 11 November 2015.
 When the lemmatizer did not recognize a word form
 its output was replaced with the input word form.\footnote{
     11\% of the 378 million tokens in the raw corpus were
@@ -378,15 +381,16 @@ separately for the lemmatized and non-lemmatized data, and
 specify an asymmetric prior on each document's topic proportions
 $\vtheta$.  We refer to this pre-processing scheme as the
 \emph{unfiltered-asymmetric} setting.  The second modeling scheme we
-consider uses a vocabulary with high-frequency words filtered out and a
-uniform prior on the document-wise topic proportions.
-(We refer to this setting as \emph{filtered-symmetric}.)
+consider has a vocabulary with high-frequency words filtered out and a
+uniform prior on the document-wise topic proportions;
+we refer to this setting as \emph{filtered-symmetric}.
 Specifically, a 10,000 word vocabulary is formed from the
 lemmatized data by removing the top 100 words by document frequency
 over the corpus and taking the next 10,000.  To determine the
-non-lemmatized vocabulary, we map the filtered lemmatized
-vocabulary onto all word forms that produce one of those lemmas in
-the data.  Finally, observing that some of the uninformative
+non-lemmatized vocabulary, we map the filtered and lemmatized
+vocabulary back to all word forms in the data that produced one of
+those lemmas.
+Finally, observing that some of the uninformative
 high-frequency words reappear in this projection, we remove any
 of the top 100 words from the lemmatized and non-lemmatized corpora
 from this list, producing a large non-lemmatized vocabulary of 72,641
@@ -425,7 +429,7 @@ unfiltered vocabulary and asymmetric prior.
   \centering
     \begin{tabular}{rrrr}
         \toprule
-        configuration & \multicolumn{2}{r}{detection rate} &  p          \\
+        Configuration & \multicolumn{2}{r}{Detection rate} &  p-value    \\
                       &                   non-lemm &  lemm &             \\\midrule
         unfilt-asymm  &                   0.54     &  0.52 &        0.61 \\
         filt-symm     &                   0.50     &  0.65 &        0.02 \\
@@ -444,7 +448,7 @@ stop words despite the first topic receiving half of the prior
 probability mass;  indeed, many topics consist primarily of stop
 words, such as the topic {\selectlanguage{russian}и в при с у}.
 The filtered-symmetric models are not pervaded by stop words;
-manually-paired topics from those two models
+manually paired topics from those two models
 are shown in Table~\ref{tab:topics} for illustration.
 There are multiple inflected word forms of the same lemma in the top
 five words of the non-lemmatized topics, whereas
