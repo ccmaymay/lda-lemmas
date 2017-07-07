@@ -6,4 +6,5 @@
 *.bbl
 *.qry
 /russian.pdf
+/title.pdf
 /Dockerfile

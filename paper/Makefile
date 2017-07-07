@@ -1,25 +1,27 @@
-NAMES := russian
+PROJECT := russian
 
 TEX_FILES := $(wildcard *.tex)
 BIB_FILES := $(wildcard *.bib)
-PDF_FILES := $(patsubst %,%.pdf,$(NAMES))
-IMAGE_FILES := $(filter-out $(PDF_FILES),$(wildcard *.pdf))
 UID := $(shell id -u)
 
-all: $(PDF_FILES)
+all: russian.pdf title.pdf
 
-$(PDF_FILES): %.pdf: $(TEX_FILES) $(BIB_FILES) $(IMAGE_FILES)
-	pdflatex $* && \
-		bibtex $* && \
-		pdflatex $* && \
-		pdflatex $* && \
-		pdflatex $* || rm -f $@
+russian.pdf: russian.tex russian.bib abstract.tex
+	pdflatex russian && \
+		bibtex russian && \
+		pdflatex russian && \
+		pdflatex russian && \
+		pdflatex russian || rm -f $@
+
+title.pdf: title.tex
+	pdflatex title && pdflatex title
 
 .PHONY: clean
 clean:
-	rm -f $(PDF_FILES) *.lot *.lof *.toc *.aux *.bbl *.log *.dvi *.blg *.out
+	rm -f russian.pdf title.pdf *.lot *.lof *.toc *.aux *.bbl *.log *.dvi *.blg *.out
 
+.PHONY: docker
 docker:
 	sed s/UID-REPLACE/$(UID)/g < Dockerfile.template > Dockerfile && \
-		docker build -t $(PDF_FILES) . && \
-		docker run -it -v $(PWD):/tmp/paper $(PDF_FILES)
+		docker build -t $(PROJECT) . && \
+		docker run -it -v $(PWD):/tmp/paper $(PROJECT)
