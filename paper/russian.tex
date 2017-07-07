@@ -372,15 +372,12 @@ intruder.  We note this is just the mean (over topics) of the
 \emph{model precision} metric from prior work~\cite{chang2009}
 when one expert is used instead of several non-experts.
 
-Our corpus consists of Russian Wikipedia articles from the dump
-released on 11/02/2015.\footnote{
+Our corpus consists of a dump of Russian Wikipedia articles.\footnote{
     The Wikipedia dump is from November 11, 2015.
-}
-
 }
 We stripped the XML portion of the formatting and then ran the
 lemmatizer described in Section~\ref{sec:inflectional}.  When the
-lemmatizer does not recognize a word, we back off to the word form
+lemmatizer did not recognize a word we backed off to the word form
 itself.\footnote{
     11\% of the 378 million tokens in the raw corpus were
     unrecognized by the lemmatizer.
