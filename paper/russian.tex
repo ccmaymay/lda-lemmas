@@ -116,14 +116,15 @@
 
 \section{Introduction}\label{sec:introduction}
 
-Topic modeling is a standard tool for unsupervised analysis of large
-text corpora. At the core, almost all topic models pick up on
-co-occurrence signals between different words in the corpus, that is,
-words that occur often in the same sentence, are likely to belong to
-the same latent topic. In languages that exhibit rich inflectional
-morphology, the signal becomes weaker given the proliferation of
-unique tokens. In this work, we explore the effect of token-based
-lemmatization on the performance of topic models.
+Topic modeling is a standard tool in the analysis of large
+text corpora. Almost all topic models pick up on
+co-occurrence signals between different words in the corpus;
+words that occur often in the same sentence are likely to belong to
+the same latent topic. In languages with rich inflectional
+morphology, this signal may be weaker because of the proliferation of
+unique tokens. In this study we measure the effect of token-based
+lemmatization on topic models in a morphologically
+rich language.
 
 Syntactic information is not generally considered to exert a strong
 force on the thematic nature of a document.  Indeed, for this reason
@@ -158,8 +159,8 @@ In this study, we show that
 \begin{itemize}
     \item if lemmatization is used, a filtered vocabulary yields more
         interpretable topics than an informative prior; and
-    \item overall, interpretability is best when the corpus consists
-        of long documents, the vocabulary is filtered, and lemmatization
+    \item interpretability is best when the
+        the vocabulary is filtered and lemmatization
         is applied.
 \end{itemize}
 
@@ -195,11 +196,11 @@ combat this issue is to {\em lemmatize} the sentence.  A lemmatizer maps each
 inflection (an element of the paradigm) to a canonical form known as
 the lemma, which is typically the form found in dictionaries written
 in the target language.
-In this work, we employ the TreeTagger
-lemmatizer \cite{schmid1994probabilistic}.\footnote{
+In this study we use the TreeTagger
+lemmatizer \cite{schmid1994probabilistic},\footnote{
    \url{http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/}
 }
-The parameters were estimated using the Russian corpus described in
+estimating its parameters on the Russian corpus described in
 \newcite{sharov2011proper}.
 
 \begin{table}
@@ -339,7 +340,7 @@ Meaningful evaluation of topic models is notoriously
 difficult and has received considerable attention in the
 literature~\cite{chang2009,wallach2009a,newman2010,mimno2011}.
 In general we desire an evaluation metric that correlates with a
-human's ability to use the model to explore or filter a large data set,
+human's ability to use the model to explore a large data set,
 hence, the interpretability of the model.  In this study we moreover
 require an evaluation metric that is comparable across different views
 of the same corpus.
@@ -368,7 +369,7 @@ call this value the \emph{detection rate}:
 where $K$ is the number of topics in the model, $i_k$ is the index
 of the intruder in the randomized word list generated from topic $k$,
 and $\omega_k$ is the index of the word the expert identified as the
-intruder.  We note this is just the mean (over topics) of the
+intruder.  This metric is the mean of the
 \emph{model precision} metric from prior work~\cite{chang2009}
 when one expert is used instead of several non-experts.
 
@@ -404,10 +405,9 @@ the data.  Finally, observing that some of the uninformative
 high-frequency words reappear in this projection, we remove any
 of the top 100 words from the lemmatized and non-lemmatized corpora
 from this list, producing a non-lemmatized vocabulary of 72,641 words.
-While the large size of this vocabulary slows learning,
-we do not believe it impacts the results negatively;
-our priority is retaining the information captured by the lemmatized
-vocabulary to provide a fair comparison.
+This large vocabulary slows learning but fair comparison
+requires that we retain the information captured by the lemmatized
+vocabulary.
 
 We learn LDA by stochastic variational
 inference~\cite{hoffman2013}, initializing the models randomly and
@@ -452,7 +452,7 @@ use of a symmetric prior on a vocabulary with stop words filtered out.
     \end{tabular}
     \caption{Detection rate for the non-lemmatized (non) and
         lemmatized (lem) models
-        and p-values for the one-sided detection rate difference tests.
+        and p-values for the one-sided difference tests.
         (filt and unfilt indicate whether or not the vocabulary is
         filtered; sym and asym indicate whether the prior is
         symmetric.)
@@ -468,9 +468,9 @@ words, such as the topic {\selectlanguage{russian}и в при с у}.
 Hand-aligned topics from the filtered-symmetric models
 are shown in Table~\ref{tab:topics}.
 There is significant redundancy (multiple inflected word forms of the
-same lemma) in the top five words of the non-lemmatized topics; on the
-other hand, the diversity of words in the lemmatized topics lends
-to human interpretation.
+same lemma) in the top five words of the non-lemmatized topics, whereas
+the diversity of words in the lemmatized topics lends to
+interpretation.
 
 
 \section{Conclusion}\label{sec:conclusion}
@@ -485,7 +485,7 @@ context, otherwise stemming as a \emph{post-processing} step as
 needed~\cite{schofield2016}.
 
 \section*{Acknowledgments}\label{sec:ack}
-    We would like to thank the Johns Hopkins Human Language Technology
+    We thank the Johns Hopkins Human Language Technology
     Center of Excellence and the DARPA LORELEI program for providing
     support.
     The second author acknowledges support from a DAAD long-term
