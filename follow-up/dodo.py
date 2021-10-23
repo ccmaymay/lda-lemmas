@@ -1,16 +1,50 @@
 from pathlib import Path
 
+from follow_up.conversion import convert_polyglot_to_mallet
+
 DATA_DIR = '/export/b01/cmay14/polyglot'
+LANGUAGES = ('en', 'fa', 'ko', 'ru')
+MAX_NUM_DOCS = 200000
 
 
 def task_untar():
     data_dir_path = Path(DATA_DIR)
-    for tar_path in data_dir_path.glob('*.tar.lzma'):
-        lang_id = tar_path.name[:2]
-        output_text_path = data_dir_path / lang_id / 'full.txt'
+    for lang in LANGUAGES:
+        input_tar_path = data_dir_path / f'{lang}_wiki_text.tar.lzma'
+        output_text_path = data_dir_path / lang / 'full.txt'
         yield {
-            'name': lang_id,
-            'file_dep': [tar_path],
+            'name': lang,
+            'file_dep': [input_tar_path],
             'actions': [f'tar -C {DATA_DIR} -xvJf %(dependencies)s'],
             'targets': [output_text_path],
+        }
+
+
+def task_convert_polyglot_to_mallet():
+    data_dir_path = Path(DATA_DIR)
+    for lang in LANGUAGES:
+        input_path = data_dir_path / lang / 'full.txt'
+        output_path = data_dir_path / lang / 'mallet.txt'
+        yield {
+            'name': lang,
+            'file_dep': [input_path],
+            'actions': [(convert_polyglot_to_mallet, (), dict(
+                lang=lang,
+                input_path=input_path,
+                output_path=output_path
+            ))],
+            'targets': [output_path],
+        }
+
+
+def task_subsample():
+    data_dir_path = Path(DATA_DIR)
+    for lang in LANGUAGES:
+        input_path = data_dir_path / lang / 'mallet.txt'
+        output_path = data_dir_path / lang / 'mallet-sub.txt'
+        yield {
+            'name': lang,
+            'file_dep': [input_path],
+            'actions': [f'shuf -n {MAX_NUM_DOCS} %(dependencies)s > %(targets)s'],
+            'targets': [output_path],
         }
