@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "follow-up"
+version = "0.1.0"
+description = "Follow-up to original lda-lemmas study"
+authors = ["Chandler May <chandler.camille.may@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+doit = "^0.33.1"
+tqdm = "^4.62.3"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+flake8 = "^4.0.1"
+mypy = "^0.910"
+ipython = "^7.28.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
