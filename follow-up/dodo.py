@@ -1,8 +1,10 @@
 from pathlib import Path
+from collections.abc import Iterable
 
 import pycountry  # type: ignore
 
 from follow_up.conversion import convert_polyglot_to_mallet
+from follow_up.lemmatization import parse_treetagger, lemmatize_polyglot
 
 DATA_ROOT = 'polyglot'
 TREETAGGER_ROOT = 'treetagger'
@@ -15,7 +17,7 @@ LANGUAGE_NAMES = dict(
 )
 
 
-def get_languages():
+def get_languages() -> Iterable[str]:
     data_dir_path = Path(DATA_ROOT)
     for input_tar_path in data_dir_path.glob('??_wiki_text.tar.lzma'):
         lang = input_tar_path.name[:2]
@@ -74,6 +76,42 @@ def task_lemmatize_treetagger():
         yield {
             'name': lang,
             'file_dep': [input_path],
-            'actions': [f'treetagger/cmd/tree-tagger-{lang_name} < %(dependencies)s > %(targets)s'],
+            'actions': [
+                f'treetagger/cmd/tree-tagger-{lang_name} < %(dependencies)s > %(targets)s'
+            ],
+            'targets': [output_path],
+        }
+
+
+def task_parse_treetagger():
+    data_dir_path = Path(DATA_ROOT)
+    for lang in get_languages():
+        input_path = data_dir_path / lang / 'lem-treetagger.txt'
+        output_path = data_dir_path / lang / 'lem-treetagger-parsed.txt'
+        yield {
+            'name': lang,
+            'file_dep': [input_path],
+            'actions': [(parse_treetagger, (), dict(
+                lang=lang,
+                input_path=input_path,
+                output_path=output_path
+            ))],
+            'targets': [output_path],
+        }
+
+
+def task_lemmatize_polyglot():
+    data_dir_path = Path(DATA_ROOT)
+    for lang in get_languages():
+        input_path = data_dir_path / lang / 'full.txt'
+        output_path = data_dir_path / lang / 'lem-polyglot.txt'
+        yield {
+            'name': lang,
+            'file_dep': [input_path],
+            'actions': [(lemmatize_polyglot, (), dict(
+                lang=lang,
+                input_path=input_path,
+                output_path=output_path
+            ))],
             'targets': [output_path],
         }
