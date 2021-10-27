@@ -37,7 +37,7 @@ def parse_treetagger_to_tokens_tsv(f: TextIO) -> Iterable[str]:
     for line in f:
         line = line.strip()
         if line:
-            line_tokens = line.split()
+            line_tokens = line.split('\t')
             if len(line_tokens) == 3:
                 (word, _, lemma) = line_tokens
                 if UNKNOWN_LEMMA_RE.fullmatch(lemma):
