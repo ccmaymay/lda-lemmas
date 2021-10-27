@@ -1,8 +1,7 @@
 import re
 from dataclasses import dataclass
 from os import PathLike
-from collections.abc import Iterable
-from typing import List, Optional
+from typing import Iterable, List, Optional
 
 DOC_ID_RE = re.compile(r'\[\[(?P<doc_id>\d+)\]\]')
 DOC_ID_NUM_TOKENS = 5

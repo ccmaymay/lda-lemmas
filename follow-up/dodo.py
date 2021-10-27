@@ -1,5 +1,5 @@
 from pathlib import Path
-from collections.abc import Iterable
+from typing import Iterable
 
 import pycountry  # type: ignore
 

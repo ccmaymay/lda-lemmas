@@ -1,8 +1,7 @@
 import logging
 import re
-from collections.abc import Iterable
 from os import PathLike
-from typing import TextIO
+from typing import Iterable, TextIO
 
 from polyglot.text import Text  # type: ignore
 
