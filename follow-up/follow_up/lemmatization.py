@@ -3,9 +3,7 @@ import re
 from os import PathLike
 from typing import Iterable, TextIO
 
-from polyglot.text import Text  # type: ignore
-
-from .util import load_polyglot, save_polyglot, parse_polyglot_tokens, Doc
+from .util import save_polyglot, parse_polyglot_tokens, Doc
 
 UNKNOWN_LEMMA_RE = re.compile(r'<unknown>?')
 
@@ -15,17 +13,6 @@ XML_SEG_START_RE = re.compile(r'<seg>')
 XML_SEG_END_RE = re.compile(r'</seg>')
 XML_WORD_START_RE = re.compile(r'<w form="(?P<form>.+)" tag="(?P<tag>.+)">')
 XML_WORD_END_RE = re.compile(r'</w>')
-
-
-def lemmatize_polyglot(lang: str, input_path: PathLike, output_path: PathLike):
-    def _load() -> Iterable[Doc]:
-        for doc in load_polyglot(input_path):
-            yield Doc(doc.doc_id, [
-                [morpheme for word in sentence.words for morpheme in word.morphemes]
-                for sentence in Text(doc.text, hint_language_code=lang).sentences
-            ])
-
-    return save_polyglot(output_path, _load())
 
 
 def parse_treetagger(lang: str, input_path: PathLike, output_path: PathLike):

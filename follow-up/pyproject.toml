@@ -9,11 +9,6 @@ python = ">=3.8,<3.11"
 doit = "^0.33.1"
 tqdm = "^4.62.3"
 pycountry = "^20.7.3"
-polyglot = "^16.7.4"
-# polyglot dependencies
-six = "^1.16.0"
-numpy = "^1.21.3"
-Morfessor = "^2.0.6"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
