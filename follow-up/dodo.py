@@ -107,7 +107,10 @@ def task_lemmatize_polyglot():
         output_path = data_dir_path / lang / 'lem-polyglot.txt'
         yield {
             'name': lang,
-            'file_dep': [input_path],
+            # consider up-to-date as long as target files exist
+            'uptodate': [True],
+            # ensure untar happens first without affecting uptodateness
+            'task_dep': [f'untar:{lang}'],
             'actions': [(lemmatize_polyglot, (), dict(
                 lang=lang,
                 input_path=input_path,

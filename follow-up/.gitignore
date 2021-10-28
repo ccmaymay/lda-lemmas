@@ -1,4 +1,5 @@
-/poetry.lock
-.doit.db.*
+poetry.lock
+.doit.db*
 /polyglot
 /treetagger
+.mypy_cache
