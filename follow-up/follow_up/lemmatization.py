@@ -3,7 +3,7 @@ import re
 from os import PathLike
 from typing import Iterable, TextIO
 
-from .util import save_polyglot, parse_polyglot_tokens, Doc
+from .util import load_polyglot, save_polyglot, parse_polyglot_tokens, Doc
 
 UNKNOWN_LEMMA_RE = re.compile(r'<unknown>?')
 
@@ -13,6 +13,27 @@ XML_SEG_START_RE = re.compile(r'<seg>')
 XML_SEG_END_RE = re.compile(r'</seg>')
 XML_WORD_START_RE = re.compile(r'<w form="(?P<form>.+)" tag="(?P<tag>.+)">')
 XML_WORD_END_RE = re.compile(r'</w>')
+
+
+def lemmatize_docs_polyglot(lang: str, docs: Iterable[Doc]) -> Iterable[Doc]:
+    # Load polyglot dynamically because dependencies are problematic
+    from polyglot.load import load_morfessor_model  # type: ignore
+    model = load_morfessor_model(lang=lang)
+
+    for doc in docs:
+        lem_doc = Doc(doc.doc_id, [])
+        for section in doc.sections:
+            try:
+                lem_doc.sections.append(model.viterbi_segment(' '.join(section))[0])
+            except Exception:
+                logging.exception(f'Caught exception from polyglot lemmatizer')
+
+            if lem_doc.tokens:
+                yield lem_doc
+
+
+def lemmatize_polyglot(lang: str, input_path: PathLike, output_path: PathLike):
+    return save_polyglot(output_path, lemmatize_docs_polyglot(lang, load_polyglot(input_path)))
 
 
 def parse_treetagger(lang: str, input_path: PathLike, output_path: PathLike):
