@@ -28,8 +28,8 @@ def lemmatize_docs_polyglot(lang: str, docs: Iterable[Doc]) -> Iterable[Doc]:
             except Exception:
                 logging.exception(f'Caught exception from polyglot lemmatizer')
 
-            if lem_doc.tokens:
-                yield lem_doc
+        if lem_doc.tokens:
+            yield lem_doc
 
 
 def lemmatize_polyglot(lang: str, input_path: PathLike, output_path: PathLike):
