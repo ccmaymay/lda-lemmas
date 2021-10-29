@@ -1,10 +1,12 @@
 import re
 from dataclasses import dataclass
 from os import PathLike
-from typing import Iterable, List, Optional
+from typing import Callable, Iterable, List, Optional, TypeVar
 
 DOC_ID_RE = re.compile(r'\[\[(?P<doc_id>\d+)\]\]')
 DOC_ID_NUM_TOKENS = 5
+
+T = TypeVar('T')
 
 
 def get_doc_id(line: str) -> Optional[str]:
@@ -15,9 +17,14 @@ def get_doc_id(line: str) -> Optional[str]:
         return match.group('doc_id')
 
 
-def consume_doc_id_tokens(tokens: List[str]) -> Optional[str]:
+def consume_doc_id_tokens(tokens: List[T], key=Optional[Callable[[T], str]]) -> Optional[str]:
+    if key is None:
+        def _key(t: str) -> str:
+            return t
+        key = _key
+
     if len(tokens) >= DOC_ID_NUM_TOKENS:
-        doc_id = get_doc_id(''.join(tokens[-DOC_ID_NUM_TOKENS:]))
+        doc_id = get_doc_id(''.join(key(t) for t in tokens[-DOC_ID_NUM_TOKENS:]))
         if doc_id is None:
             return None
         else:
@@ -83,21 +90,3 @@ def save_polyglot(output_path: PathLike, docs: Iterable[Doc]):
     with open(output_path, encoding='utf-8', mode='w') as f:
         for doc in docs:
             f.write(doc.to_polyglot() + '\n')
-
-
-def parse_polyglot_tokens(tokens: Iterable[str]) -> Iterable[Doc]:
-    doc_id = None
-    doc_tokens = []
-    for token in tokens:
-        doc_tokens.append(token)
-
-        new_doc_id = consume_doc_id_tokens(doc_tokens)
-        if new_doc_id is not None:
-            if doc_id is not None and doc_tokens:
-                yield Doc(doc_id, [doc_tokens])
-
-            doc_id = new_doc_id
-            doc_tokens = []
-
-    if doc_id is not None and doc_tokens:
-        yield Doc(doc_id, [doc_tokens])
