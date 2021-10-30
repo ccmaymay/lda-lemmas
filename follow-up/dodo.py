@@ -1,7 +1,9 @@
+from functools import partial
 from pathlib import Path
 
 import pycountry  # type: ignore
 
+from follow_up.util import subsample_parallel
 from follow_up.conversion import convert_polyglot_to_mallet
 from follow_up.lemmatization import parse_treetagger, lemmatize_polyglot
 
@@ -55,13 +57,17 @@ def task_to_mallet():
 def task_subsample_mallet():
     data_root_path = Path(DATA_ROOT)
     for lang in LANGUAGES:
-        input_path = data_root_path / lang / 'mallet.txt'
-        output_path = data_root_path / lang / 'mallet-sub.txt'
+        input_paths = [
+            data_root_path / lang / 'full.mallet.txt',
+            data_root_path / lang / 'lem-polyglot.mallet.txt',
+            data_root_path / lang / 'lem-treetagger.mallet.txt',
+        ]
+        output_paths = [input_path.with_suffix('.sub.txt') for input_path in input_paths]
         yield {
             'name': lang,
-            'file_dep': [input_path],
-            'actions': [f'shuf -n {MAX_NUM_DOCS} %(dependencies)s > %(targets)s'],
-            'targets': [output_path],
+            'file_dep': input_paths,
+            'actions': partial(subsample_parallel, max_num_lines=MAX_NUM_DOCS),
+            'targets': output_paths,
         }
 
 

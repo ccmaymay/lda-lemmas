@@ -1,7 +1,8 @@
 import re
 from dataclasses import dataclass
 from os import PathLike
-from typing import Callable, Iterable, List, Optional, TypeVar
+from random import sample
+from typing import Callable, Iterable, List, Optional, Tuple, TypeVar
 
 DOC_ID_RE = re.compile(r'\[\[(?P<doc_id>\d+)\]\]')
 DOC_ID_NUM_TOKENS = 5
@@ -90,3 +91,33 @@ def save_polyglot(output_path: PathLike, docs: Iterable[Doc]):
     with open(output_path, encoding='utf-8', mode='w') as f:
         for doc in docs:
             f.write(doc.to_polyglot() + '\n')
+
+
+def _iter_lines_with_ids(f: Iterable[str]) -> Iterable[Tuple[str, str]]:
+    for line in f:
+        line = line.strip()
+        if line:
+            line_id = line.split()[0]
+            yield (line_id, line)
+
+
+def subsample_parallel(dependencies: List[PathLike], targets: List[PathLike], max_num_lines: int):
+    if len(dependencies) != len(targets):
+        raise Exception(
+            f'No. dependencies ({len(dependencies)}) does not match no. targets ({len(targets)})')
+
+    subsampled_line_ids = None
+    for (dependency, target) in zip(dependencies, targets):
+        if subsampled_line_ids is None:
+            line_ids = []
+            with open(dependency, encoding='utf-8') as in_f:
+                for (line_id, _) in _iter_lines_with_ids(in_f):
+                    line_ids.append(line_id)
+
+            subsampled_line_ids = set(sample(line_ids, k=max_num_lines))
+
+        with open(dependency, encoding='utf-8') as in_f, \
+                open(target, encoding='utf-8', mode='w') as out_f:
+            for (line_id, line) in _iter_lines_with_ids(in_f):
+                if line_id in line_ids:
+                    out_f.write(line + '\n')
