@@ -4,6 +4,7 @@ poetry.lock
 /treetagger
 .mypy_cache
 /udpipe
+/mallet
 *.zip
 *.tar.gz
 *.tar.lzma

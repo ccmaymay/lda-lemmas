@@ -129,3 +129,9 @@ def parse_polyglot_lemmas(tokens: Iterable[LemmaData]) -> Iterable[Doc]:
 
     if doc_id is not None and doc_tokens:
         yield Doc(doc_id, [[d.get_lemma() for d in doc_tokens]])
+
+
+def parse_udpipe(lang: str, input_path: PathLike, output_path: PathLike):
+    # with open(input_path, encoding='utf-8') as f:
+    #     return save_polyglot(output_path, _parse_udpipe(lang, f))
+    raise NotImplementedError()
