@@ -197,7 +197,13 @@ def task_mallet_import():
                 'uptodate': [True],  # up-to-date as long as targets exist
                 'task_dep': [prev_task],  # ensure prev task has been run at least once
                 'actions': [
-                    f'{MALLET_PROGRAM} import-file --input {input_path} --output {output_path}'
+                    ' '.join((
+                        f'{MALLET_PROGRAM}',
+                        'import-file',
+                        '--input', '{input_path}',
+                        '--output', '{output_path}',
+                        '--keep-sequence',
+                    ))
                 ],
                 'targets': [output_path],
             }
