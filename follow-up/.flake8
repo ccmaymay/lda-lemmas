@@ -1,3 +1,8 @@
 [flake8]
 max-line-length = 100
-exclude = ./udpipe
+exclude =
+    .git,
+    __pycache__,
+    build,
+    dist,
+    ./udpipe
