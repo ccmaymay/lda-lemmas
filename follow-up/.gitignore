@@ -3,3 +3,7 @@ poetry.lock
 /polyglot
 /treetagger
 .mypy_cache
+/udpipe
+*.zip
+*.tar.gz
+*.tar.lzma

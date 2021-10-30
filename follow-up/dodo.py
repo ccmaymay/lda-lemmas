@@ -6,8 +6,17 @@ from follow_up.util import subsample
 from follow_up.conversion import convert_polyglot_to_mallet
 from follow_up.lemmatization import parse_treetagger, lemmatize_polyglot
 
-DATA_ROOT = 'polyglot'
-TREETAGGER_ROOT = 'treetagger'
+DATA_ROOT = Path('polyglot')
+TREETAGGER_ROOT = Path('treetagger')
+UDPIPE_ROOT = Path('udpipe')
+UDPIPE_BIN = UDPIPE_ROOT / 'bin-linux64'
+UDPIPE_MODELS = {
+    'en': UDPIPE_ROOT / 'english-ewt-ud-2.5-191206.udpipe',
+    'fa': UDPIPE_ROOT / 'persian-seraji-ud-2.5-191206.udpipe',
+    'ko': UDPIPE_ROOT / 'korean-kaist-ud-2.5-191206.udpipe',
+    'ru': UDPIPE_ROOT / 'russian-syntagrus-ud-2.5-191206.udpipe',
+}
+
 MAX_NUM_DOCS = 200000
 
 LANGUAGES = ('en', 'fa', 'ko', 'ru')
@@ -19,10 +28,9 @@ LANGUAGE_NAMES = dict(
 
 
 def task_untar():
-    data_root_path = Path(DATA_ROOT)
     for lang in LANGUAGES:
-        input_path = data_root_path / f'{lang}_wiki_text.tar.lzma'
-        output_path = data_root_path / lang / 'full.txt'
+        input_path = DATA_ROOT / f'{lang}_wiki_text.tar.lzma'
+        output_path = DATA_ROOT / lang / 'full.txt'
         yield {
             'name': lang,
             # consider up-to-date as long as target files exist
@@ -33,12 +41,11 @@ def task_untar():
 
 
 def task_to_mallet():
-    data_root_path = Path(DATA_ROOT)
     for lang in LANGUAGES:
         input_paths = [
-            data_root_path / lang / 'sub.txt',
-            data_root_path / lang / 'sub.lem-polyglot.txt',
-            data_root_path / lang / 'sub.lem-treetagger.parsed.txt',
+            DATA_ROOT / lang / 'sub.txt',
+            DATA_ROOT / lang / 'sub.lem-polyglot.txt',
+            DATA_ROOT / lang / 'sub.lem-treetagger.parsed.txt',
         ]
         prev_tasks = [
             f'subsample:{lang}',
@@ -63,10 +70,9 @@ def task_to_mallet():
 
 
 def task_subsample():
-    data_root_path = Path(DATA_ROOT)
     for lang in LANGUAGES:
-        input_path = data_root_path / lang / 'full.txt'
-        output_path = data_root_path / lang / 'sub.txt'
+        input_path = DATA_ROOT / lang / 'full.txt'
+        output_path = DATA_ROOT / lang / 'sub.txt'
         yield {
             'name': lang,
             # consider up-to-date as long as target files exist
@@ -83,11 +89,11 @@ def task_subsample():
 
 
 def task_lemmatize_treetagger():
-    data_root_path = Path(DATA_ROOT)
     for lang in LANGUAGES:
         lang_name = LANGUAGE_NAMES[lang]
-        input_path = data_root_path / lang / 'sub.txt'
+        input_path = DATA_ROOT / lang / 'sub.txt'
         output_path = input_path.with_suffix('.lem-treetagger.txt')
+        program_path = TREETAGGER_ROOT / f'cmd/tree-tagger-{lang_name}'
         yield {
             'name': lang,
             # consider up-to-date as long as target files exist
@@ -95,16 +101,15 @@ def task_lemmatize_treetagger():
             # ensure subsample happens first without affecting uptodateness
             'task_dep': [f'subsample:{lang}'],
             'actions': [
-                f'treetagger/cmd/tree-tagger-{lang_name} < {input_path} > {output_path}'
+                f'{program_path} < {input_path} > {output_path}'
             ],
             'targets': [output_path],
         }
 
 
 def task_parse_treetagger():
-    data_root_path = Path(DATA_ROOT)
     for lang in LANGUAGES:
-        input_path = data_root_path / lang / 'sub.lem-treetagger.txt'
+        input_path = DATA_ROOT / lang / 'sub.lem-treetagger.txt'
         output_path = input_path.with_suffix('.parsed.txt')
         yield {
             'name': lang,
@@ -122,9 +127,8 @@ def task_parse_treetagger():
 
 
 def task_lemmatize_polyglot():
-    data_root_path = Path(DATA_ROOT)
     for lang in LANGUAGES:
-        input_path = data_root_path / lang / 'sub.txt'
+        input_path = DATA_ROOT / lang / 'sub.txt'
         output_path = input_path.with_suffix('.lem-polyglot.txt')
         yield {
             'name': lang,
@@ -137,5 +141,27 @@ def task_lemmatize_polyglot():
                 input_path=input_path,
                 output_path=output_path
             ))],
+            'targets': [output_path],
+        }
+
+
+def task_lemmatize_udpipe():
+    for lang in LANGUAGES:
+        input_path = DATA_ROOT / lang / 'sub.txt'
+        output_path = input_path.with_suffix('.lem-udpipe.txt')
+        program_path = UDPIPE_BIN / f'udpipe'
+        model_path = UDPIPE_MODELS[lang]
+        yield {
+            'name': lang,
+            # consider up-to-date as long as target files exist
+            'uptodate': [True],
+            # ensure subsample happens first without affecting uptodateness
+            'task_dep': [f'subsample:{lang}'],
+            'actions': [
+                f'{program_path} '
+                f'--tag --immediate --input=horizontal --outfile={output_path} '
+                f'{model_path} '
+                f'{input_path}'
+            ],
             'targets': [output_path],
         }
