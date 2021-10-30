@@ -33,8 +33,7 @@ def task_untar():
         output_path = DATA_ROOT / lang / 'full.txt'
         yield {
             'name': lang,
-            # consider up-to-date as long as target files exist
-            'uptodate': [True],
+            'uptodate': [True],  # up-to-date as long as targets exist
             'actions': [f'tar -C {DATA_ROOT} -xvJf {input_path}'],
             'targets': [output_path],
         }
@@ -56,10 +55,8 @@ def task_to_mallet():
             output_path = input_path.with_suffix('.mallet.txt')
             yield {
                 'name': f'{lang}-{input_path.stem}',
-                # consider up-to-date as long as target files exist
-                'uptodate': [True],
-                # ensure other task happens first without affecting uptodateness
-                'task_dep': [prev_task],
+                'uptodate': [True],  # up-to-date as long as targets exist
+                'task_dep': [prev_task],  # ensure prev task has been run at least once
                 'actions': [(convert_polyglot_to_mallet, (), dict(
                     lang=lang,
                     input_path=input_path,
@@ -75,10 +72,8 @@ def task_subsample():
         output_path = DATA_ROOT / lang / 'sub.txt'
         yield {
             'name': lang,
-            # consider up-to-date as long as target files exist
-            'uptodate': [True],
-            # ensure untar happens first without affecting uptodateness
-            'task_dep': [f'untar:{lang}'],
+            'uptodate': [True],  # up-to-date as long as targets exist
+            'task_dep': [f'untar:{lang}'],  # ensure untar has been run at least once
             'actions': [(subsample, (), dict(
                 input_path=input_path,
                 output_path=output_path,
@@ -96,10 +91,8 @@ def task_lemmatize_treetagger():
         program_path = TREETAGGER_ROOT / f'cmd/tree-tagger-{lang_name}'
         yield {
             'name': lang,
-            # consider up-to-date as long as target files exist
-            'uptodate': [True],
-            # ensure subsample happens first without affecting uptodateness
-            'task_dep': [f'subsample:{lang}'],
+            'uptodate': [True],  # up-to-date as long as targets exist
+            'task_dep': [f'subsample:{lang}'],  # ensure subsample has been run at least once
             'actions': [
                 f'{program_path} < {input_path} > {output_path}'
             ],
@@ -113,10 +106,8 @@ def task_parse_treetagger():
         output_path = input_path.with_suffix('.parsed.txt')
         yield {
             'name': lang,
-            # consider up-to-date as long as target files exist
-            'uptodate': [True],
-            # ensure lemmatize happens first without affecting uptodateness
-            'task_dep': [f'lemmatize_treetagger:{lang}'],
+            'uptodate': [True],  # up-to-date as long as targets exist
+            'task_dep': [f'lemmatize_treetagger:{lang}'],  # ensure has been run at least once
             'actions': [(parse_treetagger, (), dict(
                 lang=lang,
                 input_path=input_path,
@@ -132,10 +123,8 @@ def task_lemmatize_polyglot():
         output_path = input_path.with_suffix('.lem-polyglot.txt')
         yield {
             'name': lang,
-            # consider up-to-date as long as target files exist
-            'uptodate': [True],
-            # ensure subsample happens first without affecting uptodateness
-            'task_dep': [f'subsample:{lang}'],
+            'uptodate': [True],  # up-to-date as long as targets exist
+            'task_dep': [f'subsample:{lang}'],  # ensure subsample has been run at least once
             'actions': [(lemmatize_polyglot, (), dict(
                 lang=lang,
                 input_path=input_path,
@@ -153,10 +142,8 @@ def task_lemmatize_udpipe():
         model_path = UDPIPE_MODELS[lang]
         yield {
             'name': lang,
-            # consider up-to-date as long as target files exist
-            'uptodate': [True],
-            # ensure subsample happens first without affecting uptodateness
-            'task_dep': [f'subsample:{lang}'],
+            'uptodate': [True],  # up-to-date as long as targets exist
+            'task_dep': [f'subsample:{lang}'],  # ensure subsample has been run at least once
             'actions': [
                 f'{program_path} '
                 f'--tag --immediate --input=horizontal --outfile={output_path} '
