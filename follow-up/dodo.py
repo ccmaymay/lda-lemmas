@@ -66,7 +66,7 @@ def task_subsample_mallet():
         yield {
             'name': lang,
             'file_dep': input_paths,
-            'actions': partial(subsample_parallel, max_num_lines=MAX_NUM_DOCS),
+            'actions': [partial(subsample_parallel, max_num_lines=MAX_NUM_DOCS)],
             'targets': output_paths,
         }
 
