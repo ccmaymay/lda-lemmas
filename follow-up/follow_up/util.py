@@ -5,7 +5,7 @@ from random import sample
 from typing import Callable, Iterable, List, Optional, TypeVar
 
 DOC_ID_RE = re.compile(r'\[\[(?P<doc_id>\d+)\]\]')
-DOC_ID_NUM_TOKENS = 5
+DOC_ID_NUM_TOKENS_LIST = (5, 3, 1)  # [ [ id ] ], [[ id ]], [[id]]
 
 T = TypeVar('T')
 
@@ -24,16 +24,15 @@ def consume_doc_id_tokens(tokens: List[T], key=Optional[Callable[[T], str]]) -> 
             return t
         key = _key
 
-    if len(tokens) >= DOC_ID_NUM_TOKENS:
-        doc_id = get_doc_id(''.join(key(t) for t in tokens[-DOC_ID_NUM_TOKENS:]))
-        if doc_id is None:
-            return None
-        else:
-            for _ in range(DOC_ID_NUM_TOKENS):
-                tokens.pop()
-            return doc_id
-    else:
-        return None
+    for num_tokens in DOC_ID_NUM_TOKENS_LIST:
+        if len(tokens) >= num_tokens:
+            doc_id = get_doc_id(''.join(key(t) for t in tokens[-num_tokens:]))
+            if doc_id is not None:
+                for _ in range(num_tokens):
+                    tokens.pop()
+                return doc_id
+
+    return None
 
 
 @dataclass
