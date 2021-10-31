@@ -76,12 +76,10 @@ experiments; it sufficed to use `pip` to install the packages listed in
 
 ### UDPipe
 
-Download and install UDPipe from [the UDPipe home
-page](https://ufal.mff.cuni.cz/udpipe/1) to a subdirectory `udpipe` of
-this directory.  I downloaded the pre-compiled binaries for [UDPipe
-1.2.0](https://github.com/ufal/udpipe/releases/tag/v1.2.0), so all that
-was necessary to install UDPipe was unzipping the archive and renaming
-the unzipped `udpipe-1.2.0-bin` directory to `udpipe`.
+Download and unpack [UDPipe](https://ufal.mff.cuni.cz/udpipe/1) to a
+subdirectory `udpipe` of this directory.  I downloaded the pre-compiled
+binaries for [UDPipe
+1.2.0](https://github.com/ufal/udpipe/releases/tag/v1.2.0).
 
 Then, download models from [the UD 2.5 UDPipe models
 page](https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-3131)
@@ -91,3 +89,9 @@ to the `udpipe` subdirectory:
 * [Persian](https://lindat.mff.cuni.cz/repository/xmlui/bitstream/handle/11234/1-3131/persian-seraji-ud-2.5-191206.udpipe?sequence=78&isAllowed=y)
 * [Korean](https://lindat.mff.cuni.cz/repository/xmlui/bitstream/handle/11234/1-3131/korean-kaist-ud-2.5-191206.udpipe?sequence=61&isAllowed=y)
 * [Russian](https://lindat.mff.cuni.cz/repository/xmlui/bitstream/handle/11234/1-3131/russian-syntagrus-ud-2.5-191206.udpipe?sequence=70&isAllowed=y)
+
+### MALLET
+
+Download and unpack [MALLET](http://mallet.cs.umass.edu/download.php)
+to a subdirectory `mallet` of this directory.  I downloaded MALLET
+version 2.0.8.
