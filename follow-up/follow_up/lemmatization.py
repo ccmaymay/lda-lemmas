@@ -134,8 +134,11 @@ def parse_polyglot_lemmas(tokens: Iterable[LemmaData]) -> Iterable[Doc]:
 
 def _parse_conllu_sentence(sentence: conllu.TokenList) -> Iterable[LemmaData]:
     for token in sentence:
-        # TODO: filter out unknowns
-        yield LemmaData(form=token['form'], lemma=token['lemma'])
+        # TODO: does this catch all unknowns?
+        if token['lemma'] == '_':
+            yield LemmaData(form=token['form'], lemma=None)
+        else:
+            yield LemmaData(form=token['form'], lemma=token['lemma'])
 
 
 def parse_udpipe(lang: str, input_path: PathLike, output_path: PathLike):
