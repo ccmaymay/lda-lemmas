@@ -21,6 +21,17 @@ MALLET_PROGRAM = MALLET_ROOT / 'bin' / 'mallet'
 
 MAX_NUM_DOCS = 200000
 
+DATA_SET_FILENAMES = (
+    'sub.txt',
+    'sub.lem-polyglot.txt',
+    'sub.lem-treetagger.parsed.txt',
+    'sub.lem-udpipe.parsed.txt',
+)
+
+NUM_TOPICS = 100
+NUM_ITERATIONS = 100
+OPTIMIZE_INTERVAL = 10
+
 LANGUAGES = ('en', 'fa', 'ko', 'ru')
 LANGUAGE_NAMES = dict(
     (lang.alpha_2, lang.name.lower())
@@ -148,10 +159,8 @@ def task_parse_udpipe():
 def task_to_mallet():
     for lang in LANGUAGES:
         input_paths = [
-            DATA_ROOT / lang / 'sub.txt',
-            DATA_ROOT / lang / 'sub.lem-polyglot.txt',
-            DATA_ROOT / lang / 'sub.lem-treetagger.parsed.txt',
-            DATA_ROOT / lang / 'sub.lem-udpipe.parsed.txt',
+            DATA_ROOT / lang / filename
+            for filename in DATA_SET_FILENAMES
         ]
         for input_path in input_paths:
             output_path = input_path.with_suffix('.mallet.txt')
@@ -170,10 +179,8 @@ def task_to_mallet():
 def task_mallet_import():
     for lang in LANGUAGES:
         input_paths = [
-            DATA_ROOT / lang / 'sub.mallet.txt',
-            DATA_ROOT / lang / 'sub.lem-polyglot.mallet.txt',
-            DATA_ROOT / lang / 'sub.lem-treetagger.parsed.mallet.txt',
-            DATA_ROOT / lang / 'sub.lem-udpipe.parsed.mallet.txt',
+            (DATA_ROOT / lang / filename).with_suffix('.mallet.txt')
+            for filename in DATA_SET_FILENAMES
         ]
         for input_path in input_paths:
             name = f'{lang}-{input_path.stem}'
@@ -191,4 +198,33 @@ def task_mallet_import():
                     ))
                 ],
                 'targets': [output_path],
+            }
+
+
+def task_mallet_train():
+    for lang in LANGUAGES:
+        input_paths = [
+            (DATA_ROOT / lang / filename).with_suffix('.dat')
+            for filename in DATA_SET_FILENAMES
+        ]
+        for input_path in input_paths:
+            name = f'{lang}-{input_path.stem}'
+            output_state_path = input_path.with_suffix('.topic-state.txt.gz')
+            output_keys_path = input_path.with_suffix('.topic-keys.txt.gz')
+            yield {
+                'name': name,
+                'file_dep': [input_path],
+                'actions': [
+                    ' '.join((
+                        f'{MALLET_PROGRAM}',
+                        'train-topics',
+                        '--num-topics', '{NUM_TOPICS}',
+                        '--num-iterations', '{NUM_ITERATIONS}',
+                        '--optimize-interval', '{OPTIMIZE_INTERVAL}',
+                        '--input', '{input_path}',
+                        '--output-state', '{output_state_path}',
+                        '--output-topic-keys', '{output_keys_path}',
+                    ))
+                ],
+                'targets': [output_state_path, output_keys_path],
             }
