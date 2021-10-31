@@ -35,7 +35,7 @@ def task_untar():
         output_path = DATA_ROOT / lang / 'full.txt'
         yield {
             'name': lang,
-            'uptodate': [True],  # up-to-date as long as targets exist
+            'file_dep': [input_path],
             'actions': [f'tar -C {DATA_ROOT} -xvJf {input_path}'],
             'targets': [output_path],
         }
@@ -47,8 +47,7 @@ def task_subsample():
         output_path = DATA_ROOT / lang / 'sub.txt'
         yield {
             'name': lang,
-            'uptodate': [True],  # up-to-date as long as targets exist
-            'task_dep': [f'untar:{lang}'],  # ensure untar has been run at least once
+            'file_dep': [input_path],
             'actions': [(subsample, (), dict(
                 input_path=input_path,
                 output_path=output_path,
@@ -66,8 +65,7 @@ def task_lemmatize_treetagger():
         program_path = TREETAGGER_ROOT / f'cmd/tree-tagger-{lang_name}'
         yield {
             'name': lang,
-            'uptodate': [True],  # up-to-date as long as targets exist
-            'task_dep': [f'subsample:{lang}'],  # ensure subsample has been run at least once
+            'file_dep': [input_path],
             'actions': [
                 f'{program_path} < {input_path} > {output_path}'
             ],
@@ -81,8 +79,7 @@ def task_parse_treetagger():
         output_path = input_path.with_suffix('.parsed.txt')
         yield {
             'name': lang,
-            'uptodate': [True],  # up-to-date as long as targets exist
-            'task_dep': [f'lemmatize_treetagger:{lang}'],  # ensure has been run at least once
+            'file_dep': [input_path],
             'actions': [(parse_treetagger, (), dict(
                 lang=lang,
                 input_path=input_path,
@@ -98,8 +95,7 @@ def task_lemmatize_polyglot():
         output_path = input_path.with_suffix('.lem-polyglot.txt')
         yield {
             'name': lang,
-            'uptodate': [True],  # up-to-date as long as targets exist
-            'task_dep': [f'subsample:{lang}'],  # ensure subsample has been run at least once
+            'file_dep': [input_path],
             'actions': [(lemmatize_polyglot, (), dict(
                 lang=lang,
                 input_path=input_path,
@@ -117,8 +113,7 @@ def task_lemmatize_udpipe():
         model_path = UDPIPE_MODELS[lang]
         yield {
             'name': lang,
-            'uptodate': [True],  # up-to-date as long as targets exist
-            'task_dep': [f'subsample:{lang}'],  # ensure subsample has been run at least once
+            'file_dep': [input_path, model_path],
             'actions': [
                 ' '.join((
                     f'{program_path}',
@@ -140,8 +135,7 @@ def task_parse_udpipe():
         output_path = input_path.with_suffix('.parsed.txt')
         yield {
             'name': lang,
-            'uptodate': [True],  # up-to-date as long as targets exist
-            'task_dep': [f'lemmatize_udpipe:{lang}'],  # ensure has been run at least once
+            'file_dep': [input_path],
             'actions': [(parse_udpipe, (), dict(
                 lang=lang,
                 input_path=input_path,
@@ -159,18 +153,11 @@ def task_to_mallet():
             DATA_ROOT / lang / 'sub.lem-treetagger.parsed.txt',
             DATA_ROOT / lang / 'sub.lem-udpipe.parsed.txt',
         ]
-        prev_tasks = [
-            f'subsample:{lang}',
-            f'lemmatize_polyglot:{lang}',
-            f'parse_treetagger:{lang}',
-            f'parse_udpipe:{lang}',
-        ]
-        for (input_path, prev_task) in zip(input_paths, prev_tasks):
+        for input_path in input_paths:
             output_path = input_path.with_suffix('.mallet.txt')
             yield {
                 'name': f'{lang}-{input_path.stem}',
-                'uptodate': [True],  # up-to-date as long as targets exist
-                'task_dep': [prev_task],  # ensure prev task has been run at least once
+                'file_dep': [input_path],
                 'actions': [(convert_polyglot_to_mallet, (), dict(
                     lang=lang,
                     input_path=input_path,
@@ -190,12 +177,10 @@ def task_mallet_import():
         ]
         for input_path in input_paths:
             name = f'{lang}-{input_path.stem}'
-            prev_task = f'to_mallet:{name}'
             output_path = input_path.with_suffix('.dat')
             yield {
                 'name': name,
-                'uptodate': [True],  # up-to-date as long as targets exist
-                'task_dep': [prev_task],  # ensure prev task has been run at least once
+                'file_dep': [input_path],
                 'actions': [
                     ' '.join((
                         f'{MALLET_PROGRAM}',
