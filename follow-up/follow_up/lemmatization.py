@@ -6,7 +6,7 @@ from typing import Iterable, Optional, TextIO
 
 import conllu
 
-from .util import load_polyglot, save_polyglot, Doc, consume_doc_id_tokens
+from .util import save_polyglot, Doc, consume_doc_id_tokens
 
 UNKNOWN_LEMMA_RE = re.compile(r'<unknown>?')
 
@@ -29,27 +29,6 @@ class LemmaData(object):
     def get_lemma(self) -> str:
         # back off to word form
         return self.lemma if self.lemma is not None else self.form
-
-
-def lemmatize_docs_polyglot(lang: str, docs: Iterable[Doc]) -> Iterable[Doc]:
-    # Load polyglot dynamically because dependencies are problematic
-    from polyglot.load import load_morfessor_model  # type: ignore
-    model = load_morfessor_model(lang=lang)
-
-    for doc in docs:
-        lem_doc = Doc(doc.doc_id, [])
-        for section in doc.sections:
-            try:
-                lem_doc.sections.append(model.viterbi_segment(' '.join(section))[0])
-            except Exception:
-                logging.exception('Caught exception from polyglot lemmatizer')
-
-        if lem_doc.tokens:
-            yield lem_doc
-
-
-def lemmatize_polyglot(lang: str, input_path: PathLike, output_path: PathLike):
-    save_polyglot(output_path, lemmatize_docs_polyglot(lang, load_polyglot(input_path)))
 
 
 def parse_treetagger(lang: str, input_path: PathLike, output_path: PathLike):

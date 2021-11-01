@@ -4,7 +4,7 @@ import pycountry  # type: ignore
 
 from follow_up.util import subsample
 from follow_up.conversion import convert_polyglot_to_mallet
-from follow_up.lemmatization import parse_treetagger, lemmatize_polyglot, parse_udpipe
+from follow_up.lemmatization import parse_treetagger, parse_udpipe
 
 DATA_ROOT = Path('polyglot')
 TREETAGGER_ROOT = Path('treetagger')
@@ -23,7 +23,6 @@ MAX_NUM_DOCS = 200000
 
 DATA_SET_FILENAMES = (
     'sub.txt',
-    'sub.lem-polyglot.txt',
     'sub.lem-treetagger.parsed.txt',
     'sub.lem-udpipe.parsed.txt',
 )
@@ -92,22 +91,6 @@ def task_parse_treetagger():
             'name': lang,
             'file_dep': [input_path],
             'actions': [(parse_treetagger, (), dict(
-                lang=lang,
-                input_path=input_path,
-                output_path=output_path
-            ))],
-            'targets': [output_path],
-        }
-
-
-def task_lemmatize_polyglot():
-    for lang in LANGUAGES:
-        input_path = DATA_ROOT / lang / 'sub.txt'
-        output_path = input_path.with_suffix('.lem-polyglot.txt')
-        yield {
-            'name': lang,
-            'file_dep': [input_path],
-            'actions': [(lemmatize_polyglot, (), dict(
                 lang=lang,
                 input_path=input_path,
                 output_path=output_path

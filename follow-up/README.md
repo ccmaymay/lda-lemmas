@@ -24,56 +24,6 @@ parameters, to a subdirectory `treetagger` of this directory:
 * [korean](https://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/korean.par.gz)
 * [russian](https://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/russian.par.gz)
 
-### Polyglot Lemmatizer
-
-I was unable to successfully install polyglot on a managed system, or
-at all when using poetry, but your results may vary.  The main issue 
-I had was installing the `PyICU` package, one of polyglot's effective
-dependencies; pip did not automatically install it for me when I
-installed the `polyglot` package.  Specifically, I found that the
-following additional Python packages were necessary:
-
-* `six`
-* `numpy`
-* `Morfessor`
-* `PyICU`
-* `pycld2`
-
-To install polyglot sufficiently for lemmatization to work, I did the
-following on my Ubuntu 20.04 system (note, these commands seem to be
-sufficient, but they might not all be necessary):
-
-```
-sudo apt-get update -y
-sudo apt-get upgrade -y
-sudo apt-get install -y \
-    build-essential \
-    python3{,-dev,-icu,-numpy,-pip,-six}
-pip3 install --user morfessor pycld2 polyglot
-export PATH=$HOME/.local/bin:$PATH
-```
-
-After installing polyglot and its dependencies, download the required
-models with the following commands:
-
-```
-polyglot download morph2.en
-polyglot download morph2.fa
-polyglot download morph2.ko
-polyglot download morph2.ru
-```
-
-Run the following command to test that polyglot's lemmatizer works:
-
-```
-python3 -c 'from polyglot.text import Text; print(Text("Hello, world!").morphemes)'
-```
-
-Since I did not install polyglot in poetry, it was also necessary in
-my case to manually install the remaining dependencies for my
-experiments; it sufficed to use `pip` to install the packages listed in
-`pyproject.toml` under `tool.poetry.dependencies`.
-
 ### UDPipe
 
 Download and unpack [UDPipe](https://ufal.mff.cuni.cz/udpipe/1) to a
