@@ -175,8 +175,8 @@ def task_mallet_import():
                     ' '.join((
                         f'{MALLET_PROGRAM}',
                         'import-file',
-                        '--input', '{input_path}',
-                        '--output', '{output_path}',
+                        '--input', f'{input_path}',
+                        '--output', f'{output_path}',
                         '--keep-sequence',
                     ))
                 ],
@@ -187,7 +187,7 @@ def task_mallet_import():
 def task_mallet_train():
     for lang in LANGUAGES:
         input_paths = [
-            (DATA_ROOT / lang / filename).with_suffix('.dat')
+            (DATA_ROOT / lang / filename).with_suffix('.mallet.dat')
             for filename in DATA_SET_FILENAMES
         ]
         for input_path in input_paths:
@@ -201,12 +201,12 @@ def task_mallet_train():
                     ' '.join((
                         f'{MALLET_PROGRAM}',
                         'train-topics',
-                        '--num-topics', '{NUM_TOPICS}',
-                        '--num-iterations', '{NUM_ITERATIONS}',
-                        '--optimize-interval', '{OPTIMIZE_INTERVAL}',
-                        '--input', '{input_path}',
-                        '--output-state', '{output_state_path}',
-                        '--output-topic-keys', '{output_keys_path}',
+                        '--num-topics', f'{NUM_TOPICS}',
+                        '--num-iterations', f'{NUM_ITERATIONS}',
+                        '--optimize-interval', f'{OPTIMIZE_INTERVAL}',
+                        '--input', f'{input_path}',
+                        '--output-state', f'{output_state_path}',
+                        '--output-topic-keys', f'{output_keys_path}',
                     ))
                 ],
                 'targets': [output_state_path, output_keys_path],
