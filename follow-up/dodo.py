@@ -192,9 +192,9 @@ def task_mallet_train():
         ]
         for input_path in input_paths:
             name = f'{lang}-{input_path.stem}'
-            output_model_path = input_path.with_suffix(f'.{NUM_ITERATIONS}.topic-model.txt.gz')
-            output_state_path = input_path.with_suffix(f'.{NUM_ITERATIONS}.topic-state.txt.gz')
-            output_keys_path = input_path.with_suffix(f'.{NUM_ITERATIONS}.topic-keys.txt.gz')
+            output_model_path = input_path.with_suffix('.topic-model')
+            output_state_path = input_path.with_suffix('.topic-state.txt.gz')
+            output_topic_keys_path = input_path.with_suffix('.topic-keys.txt')
             yield {
                 'name': name,
                 'file_dep': [input_path],
@@ -208,8 +208,8 @@ def task_mallet_train():
                         '--input', f'{input_path}',
                         '--output-model', f'{output_model_path}',
                         '--output-state', f'{output_state_path}',
-                        '--output-topic-keys', f'{output_keys_path}',
+                        '--output-topic-keys', f'{output_topic_keys_path}',
                     ))
                 ],
-                'targets': [output_state_path, output_keys_path],
+                'targets': [output_model_path, output_state_path, output_topic_keys_path],
             }
