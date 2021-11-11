@@ -8,7 +8,6 @@ from follow_up.evaluation import check_corpus_alignment
 from follow_up.lemmatization import parse_treetagger, parse_udpipe
 
 DATA_ROOT = Path('polyglot')
-TREETAGGER_ROOT = Path('treetagger')
 UDPIPE_ROOT = Path('udpipe')
 UDPIPE_BIN = UDPIPE_ROOT / 'bin-linux64'
 UDPIPE_MODELS = {
@@ -73,7 +72,7 @@ def task_lemmatize_treetagger():
         lang_name = LANGUAGE_NAMES[lang]
         input_path = DATA_ROOT / lang / 'sub.txt'
         output_path = input_path.with_suffix('.lem-treetagger.txt')
-        program_path = TREETAGGER_ROOT / f'cmd/tree-tagger-{lang_name}'
+        program_path = f'./tree-tagger-{lang_name}'
         yield {
             'name': lang,
             'file_dep': [input_path],

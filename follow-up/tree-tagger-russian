@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Set these paths appropriately
+
+BIN="$PWD/treetagger/bin"
+CMD="$PWD/treetagger/cmd"
+LIB="$PWD/treetagger/lib"
+
+OPTIONS="-token -lemma -sgml"
+
+TAGGER=${BIN}/tree-tagger
+PARFILE=${LIB}/russian.par
+
+# do tokenization
+perl -pe 'tr/ /\n/' $* |
+# remove empty lines
+grep -v '^$' |
+$TAGGER $OPTIONS $PARFILE
