@@ -11,8 +11,7 @@ OPTIONS="-token -lemma -sgml"
 TAGGER=${BIN}/tree-tagger
 PARFILE=${LIB}/persian.par
 
-# do tokenization
-perl -pe 'tr/ /\n/' $* |
-# remove empty lines
+grep -v '^$' $* |
+perl -pe 's/^/<s> /;s/$/ <\/s>/;tr/ /\n/' |
 grep -v '^$' |
 $TAGGER $OPTIONS $PARFILE

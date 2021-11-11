@@ -6,7 +6,7 @@ from functools import cached_property
 from os import PathLike
 from pathlib import PurePath
 from random import sample
-from typing import Callable, Dict, Iterable, List, Optional, TypeVar
+from typing import Dict, Iterable, List, Optional, TypeVar
 
 DOC_ID_RE = re.compile(r'\[\[(?P<doc_id>\d+)\]\]')
 DOC_ID_NUM_TOKENS_LIST = (5, 3, 1)  # [ [ id ] ], [[ id ]], [[id]]
@@ -101,23 +101,6 @@ def get_doc_id(line: str) -> Optional[str]:
         return None
     else:
         return match.group('doc_id')
-
-
-def consume_doc_id_tokens(tokens: List[T], key=Optional[Callable[[T], str]]) -> Optional[str]:
-    if key is None:
-        def _key(t: str) -> str:
-            return t
-        key = _key
-
-    for num_tokens in DOC_ID_NUM_TOKENS_LIST:
-        if len(tokens) >= num_tokens:
-            doc_id = get_doc_id(''.join(key(t) for t in tokens[-num_tokens:]))
-            if doc_id is not None:
-                for _ in range(num_tokens):
-                    tokens.pop()
-                return doc_id
-
-    return None
 
 
 def load_polyglot(input_path: PathLike) -> Iterable[Doc]:
