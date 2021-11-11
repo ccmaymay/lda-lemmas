@@ -4,6 +4,7 @@ import pycountry  # type: ignore
 
 from follow_up.util import subsample
 from follow_up.conversion import convert_polyglot_to_mallet
+from follow_up.evaluation import check_corpus_alignment
 from follow_up.lemmatization import parse_treetagger, parse_udpipe
 
 DATA_ROOT = Path('polyglot')
@@ -139,6 +140,27 @@ def task_parse_udpipe():
         }
 
 
+def task_check_corpus_alignment():
+    for lang in LANGUAGES:
+        orig_input_path = DATA_ROOT / lang / DATA_SET_FILENAMES[0]
+        input_paths = [
+            DATA_ROOT / lang / filename
+            for filename in DATA_SET_FILENAMES
+        ]
+        for input_path in input_paths:
+            # Create a trivial task for the original (unlemmatized) corpus to simplify later tasks
+            is_non_trivial = (input_path != orig_input_path)
+            yield {
+                'name': f'{lang}-{input_path.stem}',
+                'file_dep': [orig_input_path, input_path] if is_non_trivial else [input_path],
+                'actions': [(check_corpus_alignment, (), dict(
+                    corpus1_path=orig_input_path,
+                    corpus2_path=input_path,
+                ))] if is_non_trivial else ['true'],
+                'uptodate': [True],  # up-to-date iff action has succeeded
+            }
+
+
 def task_to_mallet():
     for lang in LANGUAGES:
         input_paths = [
@@ -147,9 +169,11 @@ def task_to_mallet():
         ]
         for input_path in input_paths:
             output_path = input_path.with_suffix('.mallet.txt')
+            name = f'{lang}-{input_path.stem}'
             yield {
-                'name': f'{lang}-{input_path.stem}',
+                'name': name,
                 'file_dep': [input_path],
+                'task_dep': [f'check_corpus_alignment:{name}'],
                 'actions': [(convert_polyglot_to_mallet, (), dict(
                     lang=lang,
                     input_path=input_path,
