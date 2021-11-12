@@ -83,7 +83,10 @@ def parse_treetagger_to_tokens_korean(f: TextIO) -> Iterable[List[LemmaData]]:
         if line:
             word_start_match = WORD_START_RE.fullmatch(line)
 
-            if SENT_START_RE.fullmatch(line) or SENT_END_RE.fullmatch(line):
+            if SENT_START_RE.fullmatch(line):
+                pass
+
+            elif SENT_END_RE.fullmatch(line):
                 if sentence:
                     yield sentence
                     sentence = []
@@ -94,12 +97,11 @@ def parse_treetagger_to_tokens_korean(f: TextIO) -> Iterable[List[LemmaData]]:
             elif SEG_END_RE.fullmatch(line):
                 # ensure doc id gets its own sentence
                 if len(sentence) >= DOC_ID_NUM_TOKENS_KO_TT:
-                    doc_id = get_doc_id(
-                        ''.join(token.get_form() for token in sentence[-DOC_ID_NUM_TOKENS_KO_TT:])
-                    )
+                    doc_id_sentence = sentence[-DOC_ID_NUM_TOKENS_KO_TT:]
+                    doc_id = get_doc_id(''.join(token.get_form() for token in doc_id_sentence))
                     if doc_id is not None:
-                        yield sentence
-                        sentence = []
+                        yield doc_id_sentence
+                        sentence = sentence[:-DOC_ID_NUM_TOKENS_KO_TT]
 
             elif word_start_match:
                 form = word_start_match.group('form')
