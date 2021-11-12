@@ -11,7 +11,7 @@ from .util import save_polyglot, Doc, get_doc_id
 # treetagger treats <> as SGML, so we allow for that here as well:
 SGML_TAG_RE = re.compile(r'<.*>')
 
-UNKNOWN_LEMMA_RE = re.compile(r'<unknown>?')
+UNKNOWN_LEMMA_RE = re.compile(r'<unknown>')
 
 SENT_START_RE = re.compile(r'<s>')
 SENT_END_RE = re.compile(r'</s>')
