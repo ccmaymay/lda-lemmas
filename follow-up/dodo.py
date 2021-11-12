@@ -1,3 +1,4 @@
+import platform
 from pathlib import Path
 
 import pycountry  # type: ignore
@@ -8,14 +9,24 @@ from follow_up.evaluation import check_corpus_alignment
 from follow_up.lemmatization import parse_treetagger, parse_udpipe
 
 DATA_ROOT = Path('polyglot')
+
 UDPIPE_ROOT = Path('udpipe')
-UDPIPE_BIN = UDPIPE_ROOT / 'bin-linux64'
 UDPIPE_MODELS = {
     'en': UDPIPE_ROOT / 'english-ewt-ud-2.5-191206.udpipe',
     'fa': UDPIPE_ROOT / 'persian-seraji-ud-2.5-191206.udpipe',
     'ko': UDPIPE_ROOT / 'korean-kaist-ud-2.5-191206.udpipe',
     'ru': UDPIPE_ROOT / 'russian-syntagrus-ud-2.5-191206.udpipe',
 }
+if platform.system() == 'Linux':
+    UDPIPE_BIN = UDPIPE_ROOT / 'bin-linux64'
+elif platform.system() == 'Darwin':
+    UDPIPE_BIN = UDPIPE_ROOT / 'bin-osx'
+elif platform.system() == 'Windows':
+    UDPIPE_BIN = UDPIPE_ROOT / 'bin-win64'
+else:
+    # For other systems, assume the correct dir has been linked/copied to "bin"
+    UDPIPE_BIN = UDPIPE_ROOT / 'bin'
+
 MALLET_ROOT = Path('mallet')
 MALLET_PROGRAM = MALLET_ROOT / 'bin' / 'mallet'
 
