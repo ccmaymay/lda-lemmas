@@ -9,10 +9,9 @@ LIB="$PWD/treetagger/lib"
 OPTIONS="-token -lemma -sgml"
 
 TAGGER=${BIN}/tree-tagger
-TOKENIZER=${CMD}/tokenize-korean.pl
 PARFILE=${LIB}/korean.par
 
-$TOKENIZER $* |
-$TAGGER $OPTIONS $PARFILE |
-$CMD/add-korean-sentence-markers.pl |
-$CMD/reformat-korean-tagger-output.pl
+grep -v '^$' $* |
+perl -pe 's/^/<s> /;s/$/ <\/s>/;tr/ /\n/' |
+grep -v '^$' |
+$TAGGER $OPTIONS $PARFILE

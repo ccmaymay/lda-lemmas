@@ -15,12 +15,6 @@ UNKNOWN_LEMMA_RE = re.compile(r'<unknown>')
 
 SENT_START_RE = re.compile(r'<s>')
 SENT_END_RE = re.compile(r'</s>')
-SEG_START_RE = re.compile(r'<seg>')
-SEG_END_RE = re.compile(r'</seg>')
-WORD_START_RE = re.compile(r'<w form="(?P<form>.+)" tag="(?P<tag>.+)">')
-WORD_END_RE = re.compile(r'</w>')
-
-DOC_ID_NUM_TOKENS_KO_TT = 5
 
 
 @dataclass
@@ -43,7 +37,16 @@ def parse_treetagger(lang: str, input_path: PathLike, output_path: PathLike):
 
 def _parse_treetagger(lang: str, f: TextIO) -> Iterable[Doc]:
     if lang == 'ko':
-        return parse_polyglot_lemmas(parse_treetagger_to_tokens_korean(f))
+        return parse_polyglot_lemmas(
+            [
+                LemmaData(
+                    form=token.form,
+                    lemma=token.lemma.split('_')[0] if token.lemma is not None else None
+                )
+                for token in section
+            ]
+            for section in parse_treetagger_to_tokens(f)
+        )
     else:
         return parse_polyglot_lemmas(parse_treetagger_to_tokens(f))
 
@@ -53,7 +56,10 @@ def parse_treetagger_to_tokens(f: TextIO) -> Iterable[List[LemmaData]]:
     for line in f:
         line = line.strip()
         if line:
-            if SENT_START_RE.fullmatch(line) or SENT_END_RE.fullmatch(line):
+            if SENT_START_RE.fullmatch(line):
+                pass
+
+            elif SENT_END_RE.fullmatch(line):
                 if sentence:
                     yield sentence
                     sentence = []
@@ -66,67 +72,8 @@ def parse_treetagger_to_tokens(f: TextIO) -> Iterable[List[LemmaData]]:
                         sentence.append(LemmaData(form=form, lemma=None))
                     else:
                         sentence.append(LemmaData(form=form, lemma=lemma))
-                elif len(line_tokens) == 1 and SGML_TAG_RE.fullmatch(line_tokens[0]) is not None:
-                    sentence.append(LemmaData(form=form, lemma=None))
-                else:
-                    logging.warning(f'Unexpected number of tokens in line: {line_tokens}')
-
-    if sentence:
-        yield sentence
-
-
-def parse_treetagger_to_tokens_korean(f: TextIO) -> Iterable[List[LemmaData]]:
-    form = None
-    segment: List[LemmaData] = []
-    sentence: List[LemmaData] = []
-    for line in f:
-        line = line.strip()
-        if line:
-            word_start_match = WORD_START_RE.fullmatch(line)
-
-            if SENT_START_RE.fullmatch(line):
-                pass
-
-            elif SENT_END_RE.fullmatch(line):
-                if sentence:
-                    yield sentence
-                    sentence = []
-
-            elif SEG_START_RE.fullmatch(line):
-                pass
-
-            elif SEG_END_RE.fullmatch(line):
-                # ensure doc id gets its own sentence
-                if len(segment) >= DOC_ID_NUM_TOKENS_KO_TT:
-                    doc_id_segment = segment[-DOC_ID_NUM_TOKENS_KO_TT:]
-                    doc_id = get_doc_id(''.join(token.get_form() for token in doc_id_segment))
-                    if doc_id is not None:
-                        if len(segment) > DOC_ID_NUM_TOKENS_KO_TT:
-                            # hack to reduce multiple words, morphemes to single lemma
-                            sentence.append(segment[0])
-                        yield doc_id_segment
-                        segment = []
-
-                if segment:
-                    # hack to reduce multiple words, morphemes to single lemma
-                    sentence.append(segment[0])
-                    segment = []
-
-            elif word_start_match:
-                form = word_start_match.group('form')
-
-            elif WORD_END_RE.fullmatch(line):
-                form = None
-
-            else:
-                line_tokens = line.split()
-                if len(line_tokens) == 2:
-                    (lemma, _) = line_tokens
-                    if form is not None:
-                        if UNKNOWN_LEMMA_RE.fullmatch(lemma):
-                            segment.append(LemmaData(form=form, lemma=None))
-                        else:
-                            segment.append(LemmaData(form=form, lemma=lemma))
+                elif SGML_TAG_RE.fullmatch(line) is not None:
+                    sentence.append(LemmaData(form=line, lemma=None))
                 else:
                     logging.warning(f'Unexpected number of tokens in line: {line_tokens}')
 
