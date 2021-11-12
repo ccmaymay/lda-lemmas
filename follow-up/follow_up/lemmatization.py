@@ -40,19 +40,13 @@ def parse_treetagger(lang: str, input_path: PathLike, output_path: PathLike):
 
 
 def _parse_treetagger(lang: str, f: TextIO) -> Iterable[Doc]:
-    if lang == 'en':
-        return parse_polyglot_lemmas(parse_treetagger_to_tokens_tsv(f))
-    elif lang == 'fa':
-        return parse_polyglot_lemmas(parse_treetagger_to_tokens_tsv(f))
-    elif lang == 'ko':
-        return parse_polyglot_lemmas(parse_treetagger_to_tokens_sgml(f))
-    elif lang == 'ru':
-        return parse_polyglot_lemmas(parse_treetagger_to_tokens_tsv(f))
+    if lang == 'ko':
+        return parse_polyglot_lemmas(parse_treetagger_to_tokens_korean(f))
     else:
-        raise Exception(f'Unrecognized treetagger parser language {lang}')
+        return parse_polyglot_lemmas(parse_treetagger_to_tokens(f))
 
 
-def parse_treetagger_to_tokens_tsv(f: TextIO) -> Iterable[List[LemmaData]]:
+def parse_treetagger_to_tokens(f: TextIO) -> Iterable[List[LemmaData]]:
     sentence: List[LemmaData] = []
     for line in f:
         line = line.strip()
@@ -79,7 +73,7 @@ def parse_treetagger_to_tokens_tsv(f: TextIO) -> Iterable[List[LemmaData]]:
         yield sentence
 
 
-def parse_treetagger_to_tokens_sgml(f: TextIO) -> Iterable[List[LemmaData]]:
+def parse_treetagger_to_tokens_korean(f: TextIO) -> Iterable[List[LemmaData]]:
     form = None
     sentence: List[LemmaData] = []
     for line in f:
