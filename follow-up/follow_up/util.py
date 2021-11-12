@@ -9,7 +9,6 @@ from random import sample
 from typing import Dict, Iterable, List, Optional, TypeVar
 
 DOC_ID_RE = re.compile(r'\[\[(?P<doc_id>\d+)\]\]')
-DOC_ID_NUM_TOKENS_LIST = (5, 3, 1)  # [ [ id ] ], [[ id ]], [[id]]
 
 T = TypeVar('T')
 

@@ -20,6 +20,8 @@ SEG_END_RE = re.compile(r'</seg>')
 WORD_START_RE = re.compile(r'<w form="(?P<form>.+)" tag="(?P<tag>.+)">')
 WORD_END_RE = re.compile(r'</w>')
 
+DOC_ID_NUM_TOKENS_KO_TT = 5
+
 
 @dataclass
 class LemmaData(object):
@@ -91,8 +93,10 @@ def parse_treetagger_to_tokens_korean(f: TextIO) -> Iterable[List[LemmaData]]:
 
             elif SEG_END_RE.fullmatch(line):
                 # ensure doc id gets its own sentence
-                if sentence:
-                    doc_id = get_doc_id(''.join(token.get_form() for token in sentence))
+                if len(sentence) >= DOC_ID_NUM_TOKENS_KO_TT:
+                    doc_id = get_doc_id(
+                        ''.join(token.get_form() for token in sentence[-DOC_ID_NUM_TOKENS_KO_TT:])
+                    )
                     if doc_id is not None:
                         yield sentence
                         sentence = []
