@@ -77,6 +77,7 @@ def parse_treetagger_to_tokens(f: TextIO) -> Iterable[List[LemmaData]]:
 
 def parse_treetagger_to_tokens_korean(f: TextIO) -> Iterable[List[LemmaData]]:
     form = None
+    segment: List[LemmaData] = []
     sentence: List[LemmaData] = []
     for line in f:
         line = line.strip()
@@ -96,12 +97,20 @@ def parse_treetagger_to_tokens_korean(f: TextIO) -> Iterable[List[LemmaData]]:
 
             elif SEG_END_RE.fullmatch(line):
                 # ensure doc id gets its own sentence
-                if len(sentence) >= DOC_ID_NUM_TOKENS_KO_TT:
-                    doc_id_sentence = sentence[-DOC_ID_NUM_TOKENS_KO_TT:]
-                    doc_id = get_doc_id(''.join(token.get_form() for token in doc_id_sentence))
+                if len(segment) >= DOC_ID_NUM_TOKENS_KO_TT:
+                    doc_id_segment = segment[-DOC_ID_NUM_TOKENS_KO_TT:]
+                    doc_id = get_doc_id(''.join(token.get_form() for token in doc_id_segment))
                     if doc_id is not None:
-                        yield doc_id_sentence
-                        sentence = sentence[:-DOC_ID_NUM_TOKENS_KO_TT]
+                        if len(segment) > DOC_ID_NUM_TOKENS_KO_TT:
+                            # hack to reduce multiple words, morphemes to single lemma
+                            sentence.append(segment[0])
+                        yield doc_id_segment
+                        segment = []
+
+                if segment:
+                    # hack to reduce multiple words, morphemes to single lemma
+                    sentence.append(segment[0])
+                    segment = []
 
             elif word_start_match:
                 form = word_start_match.group('form')
@@ -115,9 +124,9 @@ def parse_treetagger_to_tokens_korean(f: TextIO) -> Iterable[List[LemmaData]]:
                     (lemma, _) = line_tokens
                     if form is not None:
                         if UNKNOWN_LEMMA_RE.fullmatch(lemma):
-                            sentence.append(LemmaData(form=form, lemma=None))
+                            segment.append(LemmaData(form=form, lemma=None))
                         else:
-                            sentence.append(LemmaData(form=form, lemma=lemma))
+                            segment.append(LemmaData(form=form, lemma=lemma))
                 else:
                     logging.warning(f'Unexpected number of tokens in line: {line_tokens}')
 
