@@ -65,7 +65,7 @@ def parse_treetagger_to_tokens(f: TextIO) -> Iterable[List[LemmaData]]:
                     else:
                         sentence.append(LemmaData(form=form, lemma=lemma))
                 elif len(line_tokens) == 1 and SGML_TAG_RE.fullmatch(line_tokens[0]) is not None:
-                    logging.debug(f'Skipping SGML tag line: {line}')
+                    sentence.append(LemmaData(form=form, lemma=None))
                 else:
                     logging.warning(f'Unexpected number of tokens in line: {line_tokens}')
 
