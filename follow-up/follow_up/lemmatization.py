@@ -20,7 +20,8 @@ SENT_END_RE = re.compile(r'</s>')
 @dataclass
 class LemmaData(object):
     form: str
-    lemma: Optional[str]
+    lemma: Optional[str] = None
+    pos: Optional[str] = None
 
     def get_form(self) -> str:
         return self.form
@@ -41,7 +42,12 @@ def _parse_treetagger(lang: str, f: TextIO) -> Iterable[Doc]:
             [
                 LemmaData(
                     form=token.form,
-                    lemma=token.lemma.split('_')[0] if token.lemma is not None else None
+                    lemma=(
+                        token.lemma.split('_')[0]
+                        if token.lemma is not None and token.pos is not None and '_' in token.pos
+                        else token.lemma
+                    ),
+                    pos=token.pos
                 )
                 for token in section
             ]
@@ -67,13 +73,13 @@ def parse_treetagger_to_tokens(f: TextIO) -> Iterable[List[LemmaData]]:
             else:
                 line_tokens = line.split('\t')
                 if len(line_tokens) == 3:
-                    (form, _, lemma) = line_tokens
+                    (form, pos, lemma) = line_tokens
                     if UNKNOWN_LEMMA_RE.fullmatch(lemma):
-                        sentence.append(LemmaData(form=form, lemma=None))
+                        sentence.append(LemmaData(form=form, pos=pos))
                     else:
-                        sentence.append(LemmaData(form=form, lemma=lemma))
+                        sentence.append(LemmaData(form=form, pos=pos, lemma=lemma))
                 elif SGML_TAG_RE.fullmatch(line) is not None:
-                    sentence.append(LemmaData(form=line, lemma=None))
+                    sentence.append(LemmaData(form=line))
                 else:
                     logging.warning(f'Unexpected number of tokens in line: {line_tokens}')
 
@@ -98,11 +104,10 @@ def parse_polyglot_lemmas(tokens: Iterable[List[LemmaData]]) -> Iterable[Doc]:
 
 def _parse_conllu_sentence(sentence: conllu.TokenList) -> Iterable[LemmaData]:
     for token in sentence:
-        # TODO: does this catch all unknowns?
         if token['lemma'] == '_':
-            yield LemmaData(form=token['form'], lemma=None)
+            yield LemmaData(form=token['form'], pos=token['upos'])
         else:
-            yield LemmaData(form=token['form'], lemma=token['lemma'])
+            yield LemmaData(form=token['form'], pos=token['upos'], lemma=token['lemma'])
 
 
 def parse_udpipe(lang: str, input_path: PathLike, output_path: PathLike):
