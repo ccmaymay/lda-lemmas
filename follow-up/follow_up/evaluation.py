@@ -1,18 +1,27 @@
 import gzip
 import logging
 from collections import Counter
+from dataclasses import dataclass
 from difflib import unified_diff
 from math import log
 from os import PathLike
 from pathlib import PurePath
-from typing import List, NamedTuple
+from typing import List, Optional
 
 from .util import Corpus, Doc, load_polyglot_corpus
 
 
-class TokenAssignment(NamedTuple):
+@dataclass
+class TokenAssignment(object):
     word: str
     topic: int
+
+
+@dataclass
+class TopicState(object):
+    alpha: List[float]
+    beta: float
+    assignments: List[Doc[TokenAssignment]]
 
 
 def check_corpus_alignment(corpus1_path: PathLike, corpus2_path: PathLike):
@@ -42,7 +51,7 @@ def check_token_assignment_alignment(
     corpus = load_polyglot_corpus(corpus_path)
     token_assignments_corpus: Corpus[TokenAssignment] = Corpus(
         PurePath(token_assignments_path).name,
-        load_token_assignments(token_assignments_path)
+        load_topic_state(token_assignments_path).assignments
     )
     # the token assignments file doesn't contain doc ids, so we just copy them from corpus
     for (ta_doc, doc) in zip(token_assignments_corpus.docs, corpus.docs):
@@ -50,11 +59,19 @@ def check_token_assignment_alignment(
     return _check_corpus_alignment(corpus, token_assignments_corpus)
 
 
-def load_token_assignments(input_path: PathLike) -> List[Doc[TokenAssignment]]:
+def load_topic_state(input_path: PathLike) -> TopicState:
+    alpha: Optional[List[float]] = None
+    beta: Optional[float] = None
     docs: List[Doc[TokenAssignment]] = []
+    alpha_prefix = '#alpha : '
+    beta_prefix = '#beta : '
     with gzip.open(input_path, mode='rt', encoding='utf-8') as f:
         for line in f:
-            if not line.startswith('#'):
+            if line.startswith(alpha_prefix):
+                alpha = [float(t) for t in line[len(alpha_prefix):].strip().split()]
+            elif line.startswith(beta_prefix):
+                beta = float(line[len(beta_prefix):].strip())
+            elif not line.startswith('#'):
                 [doc_num_str, _1, _2, _3, word, topic_num_str] = line.strip().split()
                 doc_num = int(doc_num_str)
                 topic_num = int(topic_num_str)
@@ -62,10 +79,15 @@ def load_token_assignments(input_path: PathLike) -> List[Doc[TokenAssignment]]:
                     docs.append(Doc(str(len(docs)), [[]]))
                 docs[doc_num].sections[0].append(TokenAssignment(word=word, topic=topic_num))
 
-    return docs
+    if alpha is None:
+        raise Exception(f'Failed to extract alpha from topic state file {input_path}')
+    elif beta is None:
+        raise Exception(f'Failed to extract beta from topic state file {input_path}')
+    else:
+        return TopicState(alpha=alpha, beta=beta, assignments=docs)
 
 
-def load_topic_state(input_path: PathLike):
+def load_topic_keys(input_path: PathLike):
     raise NotImplementedError()
 
 
