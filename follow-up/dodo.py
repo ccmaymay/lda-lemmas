@@ -3,8 +3,7 @@ from pathlib import Path
 
 import pycountry  # type: ignore
 
-from follow_up.util import subsample
-from follow_up.conversion import convert_polyglot_to_mallet
+from follow_up.util import subsample, convert_polyglot_to_mallet
 from follow_up.evaluation import (
     check_corpus_alignment, check_token_assignment_alignment,
     print_coherence, print_coherence_lemmatized,

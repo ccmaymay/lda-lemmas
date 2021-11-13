@@ -128,3 +128,9 @@ def save_polyglot(output_path: PathLike, docs: Iterable[Doc]):
 def subsample(input_path: PathLike, output_path: PathLike, max_num_docs: int):
     doc_ids = set(sample([doc.doc_id for doc in load_polyglot(input_path)], k=max_num_docs))
     save_polyglot(output_path, (doc for doc in load_polyglot(input_path) if doc.doc_id in doc_ids))
+
+
+def convert_polyglot_to_mallet(lang, input_path, output_path):
+    with open(output_path, encoding='utf-8', mode='w') as f:
+        for doc in load_polyglot(input_path):
+            f.write(doc.to_mallet(lang) + '\n')
