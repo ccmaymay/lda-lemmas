@@ -1,16 +1,19 @@
 import gzip
 import logging
-from collections import Counter
+import collections
 from dataclasses import dataclass
 from difflib import unified_diff
 from math import log
 from os import PathLike
 from pathlib import PurePath
-from typing import Any, List, Optional
+from typing import Any, Counter, Dict, List, Literal, Optional, Tuple, TypeVar, overload
 
 from .util import Corpus, Doc, load_polyglot_corpus
 
 DEFAULT_NUM_KEYS = 5
+
+T = TypeVar('T')
+U = TypeVar('U')
 
 
 @dataclass
@@ -24,6 +27,10 @@ class TopicState(object):
     alpha: List[float]
     beta: float
     assignments: List[Doc[TokenAssignment]]
+
+    @property
+    def num_topics(self) -> int:
+        return len(self.alpha)
 
 
 def check_corpus_alignment(corpus1_path: PathLike, corpus2_path: PathLike):
@@ -103,15 +110,15 @@ def load_topic_keys(input_path: PathLike, num_keys: int = DEFAULT_NUM_KEYS) -> L
 
 
 def infer_topic_keys(
-        token_assignment_docs: List[Doc[TokenAssignment]],
+        topic_state: TopicState,
         num_topics: int,
         num_keys: int = DEFAULT_NUM_KEYS) -> List[List[str]]:
     return [
         [
             word
-            for (word, _) in Counter(
+            for (word, _) in collections.Counter(
                 token_assignment.word
-                for doc in token_assignment_docs
+                for doc in topic_state.assignments
                 for token_assignment in doc.tokens
                 if token_assignment.topic == topic_num
             ).most_common(num_keys)
@@ -169,10 +176,82 @@ def print_coherence_lemmatized(
     coherence = compute_coherence(
         load_polyglot_corpus(corpus_path),
         infer_topic_keys(
-            topic_state.assignments,
-            num_topics=len(topic_state.alpha),
+            topic_state,
+            num_topics=topic_state.num_topics,
             num_keys=num_keys
         ),
         topic_state.beta
     )
     print_to_optional_file(coherence, output_path, mode='w')
+
+
+def compute_entropy(pmf: Dict[T, float]) -> float:
+    return sum(-p * log(p) for p in pmf.values())
+
+
+def compute_pmf(counts: Dict[T, int]) -> Dict[T, float]:
+    total = sum(counts.values())
+    return dict((t, c / total) for (t, c) in counts.items())
+
+
+def compute_mi(entropy_x: float, entropy_y: float, entropy_xy: float) -> float:
+    return entropy_x + entropy_y - entropy_xy
+
+
+def compute_voi(joint_counts: Dict[Tuple[T, U], int]) -> float:
+    entropy_x = compute_entropy(compute_pmf(compute_marginal_counts(joint_counts, 0)))
+    entropy_y = compute_entropy(compute_pmf(compute_marginal_counts(joint_counts, 1)))
+    mi = compute_mi(entropy_x, entropy_y, compute_entropy(compute_pmf(joint_counts)))
+    return entropy_x + entropy_y - 2 * mi
+
+
+def compute_joint_topic_assignment_counts(
+        topic_state_1: TopicState,
+        topic_state_2: TopicState) -> Dict[Tuple[int, int], int]:
+    counts: Counter[Tuple[int, int]] = collections.Counter()
+    for (doc1, doc2) in zip(topic_state_1.assignments, topic_state_2.assignments):
+        for (ta1, ta2) in zip(doc1.tokens, doc2.tokens):
+            counts[(ta1.topic, ta2.topic)] += 1
+
+    return counts
+
+
+@overload
+def compute_marginal_counts(
+        joint_counts: Dict[Tuple[T, U], int],
+        index: Literal[0]) -> Dict[T, int]:
+    pass
+
+
+@overload
+def compute_marginal_counts(
+        joint_counts: Dict[Tuple[T, U], int],
+        index: Literal[1]) -> Dict[U, int]:
+    pass
+
+
+def compute_marginal_counts(
+        joint_counts,
+        index):
+    counts = collections.Counter()
+    for (topic_pair, count) in joint_counts.items():
+        counts[topic_pair[index]] += count
+
+    return counts
+
+
+def compute_topic_assignment_voi(
+        topic_state_1: TopicState,
+        topic_state_2: TopicState) -> float:
+    return compute_voi(compute_joint_topic_assignment_counts(topic_state_1, topic_state_2))
+
+
+def print_topic_assignment_voi(
+        topic_state_1_path: PathLike,
+        topic_state_2_path: PathLike,
+        output_path: Optional[PathLike] = None):
+    voi = compute_topic_assignment_voi(
+        load_topic_state(topic_state_1_path),
+        load_topic_state(topic_state_2_path),
+    )
+    print_to_optional_file(voi, output_path, mode='w')
