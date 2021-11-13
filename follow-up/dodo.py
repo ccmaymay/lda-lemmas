@@ -215,6 +215,8 @@ def task_mallet_import():
                         '--input', f'{input_path}',
                         '--output', f'{output_path}',
                         '--keep-sequence',
+                        '--preserve-case',
+                        '--token-regex', '[^ ]+',
                     ))
                 ],
                 'targets': [output_path],
@@ -229,9 +231,9 @@ def task_mallet_train():
         ]
         for input_path in input_paths:
             name = f'{lang}-{input_path.stem}'
-            output_model_path = input_path.with_suffix('.topic-model')
-            output_state_path = input_path.with_suffix('.topic-state.txt.gz')
-            output_topic_keys_path = input_path.with_suffix('.topic-keys.txt')
+            output_model_path = input_path.with_suffix('.topic-model.dat')
+            output_state_path = input_path.with_suffix('.topic-model.state.txt.gz')
+            output_topic_keys_path = input_path.with_suffix('.topic-model.keys.txt')
             yield {
                 'name': name,
                 'file_dep': [input_path],
@@ -259,7 +261,7 @@ def task_check_token_assignment_alignment():
             for filename in DATA_SET_FILENAMES
         ]
         for corpus_path in corpus_paths:
-            state_path = corpus_path.with_suffix('.mallet.topic-state.txt.gz')
+            state_path = corpus_path.with_suffix('.mallet.topic-model.state.txt.gz')
             yield {
                 'name': f'{lang}-{corpus_path.stem}',
                 'file_dep': [corpus_path, state_path],
@@ -280,9 +282,9 @@ def task_compute_coherence():
         # First entry in DATA_SET_FILENAMES is unlemmatized corpus
         is_lemmatized = False
         for corpus_path in corpus_paths:
-            topic_keys_path = corpus_path.with_suffix('.mallet.topic-keys.txt')
-            state_path = corpus_path.with_suffix('.mallet.topic-state.txt.gz')
-            output_path = corpus_path.with_suffix('.mallet.coherence.txt')
+            topic_keys_path = corpus_path.with_suffix('.mallet.topic-model.keys.txt')
+            state_path = corpus_path.with_suffix('.mallet.topic-model.state.txt.gz')
+            output_path = corpus_path.with_suffix('.mallet.topic-model.coherence.txt')
             name = f'{lang}-{corpus_path.stem}'
             yield {
                 'name': name,
