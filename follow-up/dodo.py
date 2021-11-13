@@ -5,7 +5,7 @@ import pycountry  # type: ignore
 
 from follow_up.util import subsample
 from follow_up.conversion import convert_polyglot_to_mallet
-from follow_up.evaluation import check_corpus_alignment
+from follow_up.evaluation import check_corpus_alignment, check_token_assignment_alignment
 from follow_up.lemmatization import parse_treetagger, parse_udpipe
 
 DATA_ROOT = Path('polyglot')
@@ -246,4 +246,23 @@ def task_mallet_train():
                     ))
                 ],
                 'targets': [output_model_path, output_state_path, output_topic_keys_path],
+            }
+
+
+def task_check_token_assignment_alignment():
+    for lang in LANGUAGES:
+        corpus_paths = [
+            DATA_ROOT / lang / filename
+            for filename in DATA_SET_FILENAMES
+        ]
+        for corpus_path in corpus_paths:
+            state_path = corpus_path.with_suffix('.topic-state.txt.gz')
+            yield {
+                'name': f'{lang}-{corpus_path.stem}',
+                'file_dep': [corpus_path, state_path],
+                'actions': [(check_token_assignment_alignment, (), dict(
+                    corpus_path=corpus_path,
+                    token_assignments_path=state_path,
+                ))],
+                'uptodate': [True],  # up-to-date iff action has succeeded
             }

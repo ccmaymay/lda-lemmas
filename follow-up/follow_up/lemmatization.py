@@ -36,7 +36,7 @@ def parse_treetagger(lang: str, input_path: PathLike, output_path: PathLike):
         save_polyglot(output_path, _parse_treetagger(lang, f))
 
 
-def _parse_treetagger(lang: str, f: TextIO) -> Iterable[Doc]:
+def _parse_treetagger(lang: str, f: TextIO) -> Iterable[Doc[str]]:
     if lang == 'ko':
         return parse_polyglot_lemmas(
             [
@@ -87,8 +87,8 @@ def parse_treetagger_to_tokens(f: TextIO) -> Iterable[List[LemmaData]]:
         yield sentence
 
 
-def parse_polyglot_lemmas(tokens: Iterable[List[LemmaData]]) -> Iterable[Doc]:
-    doc = None
+def parse_polyglot_lemmas(tokens: Iterable[List[LemmaData]]) -> Iterable[Doc[str]]:
+    doc: Optional[Doc[str]] = None
     for sent_tokens in tokens:
         doc_id = get_doc_id(''.join(token.get_form() for token in sent_tokens))
         if doc_id is not None:

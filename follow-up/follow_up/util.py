@@ -6,7 +6,7 @@ from functools import cached_property
 from os import PathLike
 from pathlib import PurePath
 from random import sample
-from typing import Dict, Iterable, List, Optional, TypeVar
+from typing import Dict, Generic, Iterable, List, Optional, TypeVar
 
 DOC_ID_RE = re.compile(r'\[\[(?P<doc_id>\d+)\]\]')
 
@@ -14,16 +14,16 @@ T = TypeVar('T')
 
 
 @dataclass
-class Doc(object):
+class Doc(Generic[T]):
     doc_id: str
-    sections: List[List[str]]
+    sections: List[List[T]]
 
     @property
     def num_tokens(self) -> int:
         return len(self.tokens)
 
     @property
-    def tokens(self) -> List[str]:
+    def tokens(self) -> List[T]:
         return [
             token
             for section in self.sections
@@ -33,13 +33,13 @@ class Doc(object):
     @property
     def text(self) -> str:
         return ''.join(
-            ' '.join(section) + '\n'
+            ' '.join(str(t) for t in section) + '\n'
             for section in self.sections
         )
 
     @property
     def flat_text(self) -> str:
-        return ' '.join(self.tokens)
+        return ' '.join(str(t) for t in self.tokens)
 
     def to_mallet(self, cls: str) -> str:
         return f'{self.doc_id} {cls} {self.flat_text}'
@@ -49,13 +49,13 @@ class Doc(object):
 
 
 @dataclass
-class Corpus(object):
-    name: str
-    docs: List[Doc]
+class Corpus(Generic[T]):
+    corpus_id: str
+    docs: List[Doc[T]]
 
     @cached_property
-    def vocab(self) -> List[str]:
-        _vocab: List[str] = []
+    def vocab(self) -> List[T]:
+        _vocab: List[T] = []
         for doc in self.docs:
             for section in doc.sections:
                 for word in section:
@@ -65,7 +65,7 @@ class Corpus(object):
         return _vocab
 
     @cached_property
-    def word_ids(self) -> Dict[str, int]:
+    def word_ids(self) -> Dict[T, int]:
         return dict((word, word_id) for (word_id, word) in enumerate(self.vocab))
 
     @cached_property
@@ -86,12 +86,9 @@ class Corpus(object):
 
         return counter
 
-    def save(self, output_path: PathLike):
-        save_polyglot(output_path, self.docs)
 
-    @classmethod
-    def load(cls, input_path: PathLike):
-        return cls(PurePath(input_path).name, list(load_polyglot(input_path)))
+def load_polyglot_corpus(input_path: PathLike) -> Corpus[str]:
+    return Corpus(PurePath(input_path).name, list(load_polyglot(input_path)))
 
 
 def get_doc_id(line: str) -> Optional[str]:
@@ -102,10 +99,10 @@ def get_doc_id(line: str) -> Optional[str]:
         return match.group('doc_id')
 
 
-def load_polyglot(input_path: PathLike) -> Iterable[Doc]:
+def load_polyglot(input_path: PathLike) -> Iterable[Doc[str]]:
     with open(input_path, encoding='utf-8') as f:
         prev_line = None
-        doc = None
+        doc: Optional[Doc[str]] = None
         for line in f:
             line = line.strip()
             doc_id = get_doc_id(line)
@@ -131,7 +128,3 @@ def save_polyglot(output_path: PathLike, docs: Iterable[Doc]):
 def subsample(input_path: PathLike, output_path: PathLike, max_num_docs: int):
     doc_ids = set(sample([doc.doc_id for doc in load_polyglot(input_path)], k=max_num_docs))
     save_polyglot(output_path, (doc for doc in load_polyglot(input_path) if doc.doc_id in doc_ids))
-
-
-def load_topic_state(input_path: PathLike):
-    raise NotImplementedError()

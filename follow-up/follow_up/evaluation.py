@@ -1,11 +1,13 @@
+import gzip
 import logging
 from collections import Counter
 from difflib import unified_diff
 from math import log
 from os import PathLike
+from pathlib import PurePath
 from typing import List, NamedTuple
 
-from .util import Corpus
+from .util import Corpus, Doc, load_polyglot_corpus
 
 
 class TokenAssignment(NamedTuple):
@@ -14,45 +16,61 @@ class TokenAssignment(NamedTuple):
 
 
 def check_corpus_alignment(corpus1_path: PathLike, corpus2_path: PathLike):
-    corpus1 = Corpus.load(corpus1_path)
-    corpus2 = Corpus.load(corpus2_path)
+    return _check_corpus_alignment(
+        load_polyglot_corpus(corpus1_path),
+        load_polyglot_corpus(corpus2_path)
+    )
 
+
+def _check_corpus_alignment(corpus1: Corpus, corpus2: Corpus):
     corpus1_doc_infos = [f'{doc.doc_id} {doc.num_tokens}' for doc in corpus1.docs]
     corpus2_doc_infos = [f'{doc.doc_id} {doc.num_tokens}' for doc in corpus2.docs]
     if corpus1_doc_infos != corpus2_doc_infos:
         logging.warning(
-            f'Corpora {corpus1.name}, {corpus2.name} do not align')
+            f'Corpora {corpus1.corpus_id}, {corpus2.corpus_id} do not align')
         for diff_line in unified_diff(
                 corpus1_doc_infos, corpus2_doc_infos,
-                fromfile=corpus1.name, tofile=corpus2.name):
+                fromfile=corpus1.corpus_id, tofile=corpus2.corpus_id):
             logging.warning(diff_line)
         raise Exception(
-            f'Corpora {corpus1.name}, {corpus2.name} do not align')
+            f'Corpora {corpus1.corpus_id}, {corpus2.corpus_id} do not align')
 
 
-def check_corpus_token_assignment_alignment(
-        corpus: Corpus,
-        token_assignments: List[List[TokenAssignment]]):
-    raise NotImplementedError()
+def check_token_assignment_alignment(
+        corpus_path: PathLike,
+        token_assignments_path: PathLike):
+    corpus = load_polyglot_corpus(corpus_path)
+    token_assignments_corpus: Corpus[TokenAssignment] = Corpus(
+        PurePath(token_assignments_path).name,
+        load_token_assignments(token_assignments_path)
+    )
+    # the token assignments file doesn't contain doc ids, so we just copy them from corpus
+    for (ta_doc, doc) in zip(token_assignments_corpus.docs, corpus.docs):
+        ta_doc.doc_id = doc.doc_id
+    return _check_corpus_alignment(corpus, token_assignments_corpus)
 
 
-def load_token_assignments(input_path: PathLike) -> List[List[TokenAssignment]]:
-    token_assignments: List[List[TokenAssignment]] = []
-    with open(input_path, encoding='utf-8') as f:
+def load_token_assignments(input_path: PathLike) -> List[Doc[TokenAssignment]]:
+    docs: List[Doc[TokenAssignment]] = []
+    with gzip.open(input_path, mode='rt', encoding='utf-8') as f:
         for line in f:
             if not line.startswith('#'):
                 [doc_num_str, _1, _2, _3, word, topic_num_str] = line.strip().split()
                 doc_num = int(doc_num_str)
                 topic_num = int(topic_num_str)
-                while doc_num >= len(token_assignments):
-                    token_assignments.append([])
-                token_assignments[doc_num].append(TokenAssignment(word=word, topic=topic_num))
+                while doc_num >= len(docs):
+                    docs.append(Doc(str(len(docs)), [[]]))
+                docs[doc_num].sections[0].append(TokenAssignment(word=word, topic=topic_num))
 
-    return token_assignments
+    return docs
+
+
+def load_topic_state(input_path: PathLike):
+    raise NotImplementedError()
 
 
 def infer_topic_keys(
-        token_assignments: List[List[TokenAssignment]],
+        token_assignment_docs: List[Doc[TokenAssignment]],
         num_topics: int,
         num_keys=5) -> List[List[str]]:
     return [
@@ -60,8 +78,8 @@ def infer_topic_keys(
             word
             for (word, _) in Counter(
                 token_assignment.word
-                for doc_token_assignments in token_assignments
-                for token_assignment in doc_token_assignments
+                for doc in token_assignment_docs
+                for token_assignment in doc.tokens
                 if token_assignment.topic == topic_num
             ).most_common(num_keys)
         ]
