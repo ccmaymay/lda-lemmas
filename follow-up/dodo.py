@@ -1,4 +1,5 @@
 import platform
+from itertools import product
 from pathlib import Path
 
 import pycountry  # type: ignore
@@ -6,7 +7,7 @@ import pycountry  # type: ignore
 from follow_up.util import subsample, convert_polyglot_to_mallet
 from follow_up.evaluation import (
     check_corpus_alignment, check_token_assignment_alignment,
-    print_coherence, print_coherence_lemmatized,
+    print_coherence, print_coherence_lemmatized, print_topic_assignment_voi
 )
 from follow_up.lemmatization import parse_treetagger, parse_udpipe
 
@@ -305,3 +306,38 @@ def task_compute_coherence():
                     'targets': [output_path],
                 }
                 is_lemmatized = True
+
+
+def task_compute_voi():
+    for lang in LANGUAGES:
+        corpus_paths = [
+            DATA_ROOT / lang / filename
+            for filename in DATA_SET_FILENAMES
+        ]
+        for (corpus_1_path, corpus_2_path) in product(corpus_paths, corpus_paths):
+            for (trial1, trial2) in product(range(NUM_TRIALS), range(NUM_TRIALS)):
+                tm_1_name = f'topic-model-{NUM_TOPICS}-{trial1}'
+                tm_2_name = f'topic-model-{NUM_TOPICS}-{trial2}'
+                name1 = f'{lang}-{corpus_1_path.stem}-{tm_1_name}'
+                name2 = f'{lang}-{corpus_2_path.stem}-{tm_2_name}'
+                name = f'{lang}-{corpus_1_path.stem}-{tm_1_name}-{corpus_2_path.stem}-{tm_2_name}'
+                state_1_path = corpus_1_path.with_suffix(f'.mallet.{tm_1_name}.state.txt.gz')
+                state_2_path = corpus_2_path.with_suffix(f'.mallet.{tm_2_name}.state.txt.gz')
+                output_path = corpus_1_path.with_suffix(
+                    f'.mallet.{tm_1_name}.{corpus_2_path.stem}.mallet.{tm_2_name}.voi.txt')
+                yield {
+                    'name': name,
+                    'file_dep': [state_1_path, state_2_path],
+                    'task_dep': [
+                        f'check_token_assignment_alignment:{name1}',
+                        f'check_token_assignment_alignment:{name2}',
+                    ],
+                    'actions': [(
+                        print_topic_assignment_voi, (), dict(
+                            topic_state_1_path=state_1_path,
+                            topic_state_2_path=state_2_path,
+                            output_path=output_path,
+                        ),
+                    )],
+                    'targets': [output_path],
+                }
