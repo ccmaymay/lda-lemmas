@@ -59,7 +59,7 @@ def task_untar():
         yield {
             'name': lang,
             'file_dep': [input_path],
-            'actions': [f'tar -C {DATA_ROOT} -xvJf {input_path}'],
+            'actions': [['tar', '-C', f'{DATA_ROOT}', '-xvJf', f'{input_path}']],
             'targets': [output_path],
         }
 
@@ -121,17 +121,15 @@ def task_lemmatize_udpipe():
         yield {
             'name': lang,
             'file_dep': [input_path, model_path],
-            'actions': [
-                ' '.join((
-                    f'{program_path}',
-                    '--tag',
-                    '--immediate',
-                    '--input=horizontal',
-                    f'--outfile={output_path}',
-                    f'{model_path}',
-                    f'{input_path}',
-                ))
-            ],
+            'actions': [[
+                f'{program_path}',
+                '--tag',
+                '--immediate',
+                '--input=horizontal',
+                f'--outfile={output_path}',
+                f'{model_path}',
+                f'{input_path}',
+            ]],
             'targets': [output_path],
         }
 
@@ -207,17 +205,15 @@ def task_mallet_import():
             yield {
                 'name': name,
                 'file_dep': [input_path],
-                'actions': [
-                    ' '.join((
-                        f'{MALLET_PROGRAM}',
-                        'import-file',
-                        '--input', f'{input_path}',
-                        '--output', f'{output_path}',
-                        '--keep-sequence',
-                        '--preserve-case',
-                        '--token-regex', '[^ ]+',
-                    ))
-                ],
+                'actions': [[
+                    f'{MALLET_PROGRAM}',
+                    'import-file',
+                    '--input', f'{input_path}',
+                    '--output', f'{output_path}',
+                    '--keep-sequence',
+                    '--preserve-case',
+                    '--token-regex', '[^ ]+',
+                ]],
                 'targets': [output_path],
             }
 
@@ -236,19 +232,17 @@ def task_mallet_train():
             yield {
                 'name': name,
                 'file_dep': [input_path],
-                'actions': [
-                    ' '.join((
-                        f'{MALLET_PROGRAM}',
-                        'train-topics',
-                        '--num-topics', f'{NUM_TOPICS}',
-                        '--num-iterations', f'{NUM_ITERATIONS}',
-                        '--optimize-interval', f'{OPTIMIZE_INTERVAL}',
-                        '--input', f'{input_path}',
-                        '--output-model', f'{output_model_path}',
-                        '--output-state', f'{output_state_path}',
-                        '--output-topic-keys', f'{output_topic_keys_path}',
-                    ))
-                ],
+                'actions': [[
+                    f'{MALLET_PROGRAM}',
+                    'train-topics',
+                    '--num-topics', f'{NUM_TOPICS}',
+                    '--num-iterations', f'{NUM_ITERATIONS}',
+                    '--optimize-interval', f'{OPTIMIZE_INTERVAL}',
+                    '--input', f'{input_path}',
+                    '--output-model', f'{output_model_path}',
+                    '--output-state', f'{output_state_path}',
+                    '--output-topic-keys', f'{output_topic_keys_path}',
+                ]],
                 'targets': [output_model_path, output_state_path, output_topic_keys_path],
             }
 
