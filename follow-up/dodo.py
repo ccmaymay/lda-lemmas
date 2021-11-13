@@ -5,7 +5,10 @@ import pycountry  # type: ignore
 
 from follow_up.util import subsample
 from follow_up.conversion import convert_polyglot_to_mallet
-from follow_up.evaluation import check_corpus_alignment, check_token_assignment_alignment
+from follow_up.evaluation import (
+    check_corpus_alignment, check_token_assignment_alignment,
+    print_coherence, print_coherence_lemmatized,
+)
 from follow_up.lemmatization import parse_treetagger, parse_udpipe
 
 DATA_ROOT = Path('polyglot')
@@ -262,7 +265,39 @@ def task_check_token_assignment_alignment():
                 'file_dep': [corpus_path, state_path],
                 'actions': [(check_token_assignment_alignment, (), dict(
                     corpus_path=corpus_path,
-                    token_assignments_path=state_path,
+                    topic_state_path=state_path,
                 ))],
                 'uptodate': [True],  # up-to-date iff action has succeeded
             }
+
+
+def task_compute_coherence():
+    for lang in LANGUAGES:
+        corpus_paths = [
+            DATA_ROOT / lang / filename
+            for filename in DATA_SET_FILENAMES
+        ]
+        # First entry in DATA_SET_FILENAMES is unlemmatized corpus
+        is_lemmatized = False
+        for corpus_path in corpus_paths:
+            topic_keys_path = corpus_path.with_suffix('.topic-keys.txt')
+            state_path = corpus_path.with_suffix('.topic-state.txt.gz')
+            output_path = corpus_path.with_suffix('.coherence.txt')
+            name = f'{lang}-{corpus_path.stem}'
+            yield {
+                'name': name,
+                'file_dep': [corpus_path, state_path, topic_keys_path],
+                'task_dep': [f'check_token_assignment_alignment:{name}'],
+                'actions': [(
+                    print_coherence_lemmatized if is_lemmatized else print_coherence,
+                    (),
+                    dict(
+                        corpus_path=corpus_path,
+                        topic_keys_path=topic_keys_path,
+                        topic_state_path=state_path,
+                        output_path=output_path,
+                    ),
+                )],
+                'targets': [output_path],
+            }
+            is_lemmatized = True
