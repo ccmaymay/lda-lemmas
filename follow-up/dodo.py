@@ -42,6 +42,7 @@ DATA_SET_FILENAMES = (
 
 NUM_TOPICS = 100
 NUM_ITERATIONS = 1000
+NUM_TRIALS = 1
 OPTIMIZE_INTERVAL = 10
 
 LANGUAGES = ('en', 'fa', 'ko', 'ru')
@@ -220,31 +221,34 @@ def task_mallet_import():
 
 def task_mallet_train():
     for lang in LANGUAGES:
-        input_paths = [
-            (DATA_ROOT / lang / filename).with_suffix('.mallet.dat')
+        corpus_paths = [
+            DATA_ROOT / lang / filename
             for filename in DATA_SET_FILENAMES
         ]
-        for input_path in input_paths:
-            name = f'{lang}-{input_path.stem}'
-            output_model_path = input_path.with_suffix('.topic-model.dat')
-            output_state_path = input_path.with_suffix('.topic-model.state.txt.gz')
-            output_topic_keys_path = input_path.with_suffix('.topic-model.keys.txt')
-            yield {
-                'name': name,
-                'file_dep': [input_path],
-                'actions': [[
-                    f'{MALLET_PROGRAM}',
-                    'train-topics',
-                    '--num-topics', f'{NUM_TOPICS}',
-                    '--num-iterations', f'{NUM_ITERATIONS}',
-                    '--optimize-interval', f'{OPTIMIZE_INTERVAL}',
-                    '--input', f'{input_path}',
-                    '--output-model', f'{output_model_path}',
-                    '--output-state', f'{output_state_path}',
-                    '--output-topic-keys', f'{output_topic_keys_path}',
-                ]],
-                'targets': [output_model_path, output_state_path, output_topic_keys_path],
-            }
+        for corpus_path in corpus_paths:
+            for trial in range(NUM_TRIALS):
+                input_path = corpus_path.with_suffix('.mallet.dat')
+                topic_model_name = f'topic-model-{NUM_TOPICS}-{trial}'
+                name = f'{lang}-{corpus_path.stem}-{topic_model_name}'
+                output_model_path = input_path.with_suffix(f'.{topic_model_name}.dat')
+                output_state_path = input_path.with_suffix(f'.{topic_model_name}.state.txt.gz')
+                output_topic_keys_path = input_path.with_suffix(f'.{topic_model_name}.keys.txt')
+                yield {
+                    'name': name,
+                    'file_dep': [input_path],
+                    'actions': [[
+                        f'{MALLET_PROGRAM}',
+                        'train-topics',
+                        '--num-topics', f'{NUM_TOPICS}',
+                        '--num-iterations', f'{NUM_ITERATIONS}',
+                        '--optimize-interval', f'{OPTIMIZE_INTERVAL}',
+                        '--input', f'{input_path}',
+                        '--output-model', f'{output_model_path}',
+                        '--output-state', f'{output_state_path}',
+                        '--output-topic-keys', f'{output_topic_keys_path}',
+                    ]],
+                    'targets': [output_model_path, output_state_path, output_topic_keys_path],
+                }
 
 
 def task_check_token_assignment_alignment():
@@ -254,16 +258,19 @@ def task_check_token_assignment_alignment():
             for filename in DATA_SET_FILENAMES
         ]
         for corpus_path in corpus_paths:
-            state_path = corpus_path.with_suffix('.mallet.topic-model.state.txt.gz')
-            yield {
-                'name': f'{lang}-{corpus_path.stem}',
-                'file_dep': [corpus_path, state_path],
-                'actions': [(check_token_assignment_alignment, (), dict(
-                    corpus_path=corpus_path,
-                    topic_state_path=state_path,
-                ))],
-                'uptodate': [True],  # up-to-date iff action has succeeded
-            }
+            for trial in range(NUM_TRIALS):
+                topic_model_name = f'topic-model-{NUM_TOPICS}-{trial}'
+                name = f'{lang}-{corpus_path.stem}-{topic_model_name}'
+                state_path = corpus_path.with_suffix(f'.mallet.{topic_model_name}.state.txt.gz')
+                yield {
+                    'name': name,
+                    'file_dep': [corpus_path, state_path],
+                    'actions': [(check_token_assignment_alignment, (), dict(
+                        corpus_path=corpus_path,
+                        topic_state_path=state_path,
+                    ))],
+                    'uptodate': [True],  # up-to-date iff action has succeeded
+                }
 
 
 def task_compute_coherence():
@@ -275,24 +282,26 @@ def task_compute_coherence():
         # First entry in DATA_SET_FILENAMES is unlemmatized corpus
         is_lemmatized = False
         for corpus_path in corpus_paths:
-            topic_keys_path = corpus_path.with_suffix('.mallet.topic-model.keys.txt')
-            state_path = corpus_path.with_suffix('.mallet.topic-model.state.txt.gz')
-            output_path = corpus_path.with_suffix('.mallet.topic-model.coherence.txt')
-            name = f'{lang}-{corpus_path.stem}'
-            yield {
-                'name': name,
-                'file_dep': [corpus_path, state_path, topic_keys_path],
-                'task_dep': [f'check_token_assignment_alignment:{name}'],
-                'actions': [(
-                    print_coherence_lemmatized if is_lemmatized else print_coherence,
-                    (),
-                    dict(
-                        corpus_path=corpus_path,
-                        topic_keys_path=topic_keys_path,
-                        topic_state_path=state_path,
-                        output_path=output_path,
-                    ),
-                )],
-                'targets': [output_path],
-            }
-            is_lemmatized = True
+            for trial in range(NUM_TRIALS):
+                topic_model_name = f'topic-model-{NUM_TOPICS}-{trial}'
+                name = f'{lang}-{corpus_path.stem}-{topic_model_name}'
+                topic_keys_path = corpus_path.with_suffix(f'.mallet.{topic_model_name}.keys.txt')
+                state_path = corpus_path.with_suffix(f'.mallet.{topic_model_name}.state.txt.gz')
+                output_path = corpus_path.with_suffix(f'.mallet.{topic_model_name}.coherence.txt')
+                yield {
+                    'name': name,
+                    'file_dep': [corpus_path, state_path, topic_keys_path],
+                    'task_dep': [f'check_token_assignment_alignment:{name}'],
+                    'actions': [(
+                        print_coherence_lemmatized if is_lemmatized else print_coherence,
+                        (),
+                        dict(
+                            corpus_path=corpus_path,
+                            topic_keys_path=topic_keys_path,
+                            topic_state_path=state_path,
+                            output_path=output_path,
+                        ),
+                    )],
+                    'targets': [output_path],
+                }
+                is_lemmatized = True
