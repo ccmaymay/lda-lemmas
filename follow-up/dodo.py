@@ -163,7 +163,7 @@ def task_check_corpus_alignment():
             # Create a trivial task for the original (unlemmatized) corpus to simplify later tasks
             is_non_trivial = (input_path != orig_input_path)
             yield {
-                'name': f'{lang}-{input_path.stem}',
+                'name': f'{lang}.{input_path.stem}',
                 'file_dep': [orig_input_path, input_path] if is_non_trivial else [input_path],
                 'actions': [(check_corpus_alignment, (), dict(
                     corpus1_path=orig_input_path,
@@ -181,7 +181,7 @@ def task_to_mallet():
         ]
         for input_path in input_paths:
             output_path = input_path.with_suffix('.mallet.txt')
-            name = f'{lang}-{input_path.stem}'
+            name = f'{lang}.{input_path.stem}'
             yield {
                 'name': name,
                 'file_dep': [input_path],
@@ -202,7 +202,7 @@ def task_mallet_import():
             for filename in DATA_SET_FILENAMES
         ]
         for input_path in input_paths:
-            name = f'{lang}-{input_path.stem}'
+            name = f'{lang}.{input_path.stem}'
             output_path = input_path.with_suffix('.dat')
             yield {
                 'name': name,
@@ -230,7 +230,7 @@ def task_mallet_train():
             for trial in range(NUM_TRIALS):
                 input_path = corpus_path.with_suffix('.mallet.dat')
                 topic_model_name = f'topic-model-{NUM_TOPICS}-{trial}'
-                name = f'{lang}-{corpus_path.stem}-{topic_model_name}'
+                name = f'{lang}.{corpus_path.stem}.{topic_model_name}'
                 output_model_path = input_path.with_suffix(f'.{topic_model_name}.dat')
                 output_state_path = input_path.with_suffix(f'.{topic_model_name}.state.txt.gz')
                 output_topic_keys_path = input_path.with_suffix(f'.{topic_model_name}.keys.txt')
@@ -261,7 +261,7 @@ def task_check_token_assignment_alignment():
         for corpus_path in corpus_paths:
             for trial in range(NUM_TRIALS):
                 topic_model_name = f'topic-model-{NUM_TOPICS}-{trial}'
-                name = f'{lang}-{corpus_path.stem}-{topic_model_name}'
+                name = f'{lang}.{corpus_path.stem}.{topic_model_name}'
                 state_path = corpus_path.with_suffix(f'.mallet.{topic_model_name}.state.txt.gz')
                 yield {
                     'name': name,
@@ -285,7 +285,7 @@ def task_compute_coherence():
         for corpus_path in corpus_paths:
             for trial in range(NUM_TRIALS):
                 topic_model_name = f'topic-model-{NUM_TOPICS}-{trial}'
-                name = f'{lang}-{corpus_path.stem}-{topic_model_name}'
+                name = f'{lang}.{corpus_path.stem}.{topic_model_name}'
                 topic_keys_path = corpus_path.with_suffix(f'.mallet.{topic_model_name}.keys.txt')
                 state_path = corpus_path.with_suffix(f'.mallet.{topic_model_name}.state.txt.gz')
                 output_path = corpus_path.with_suffix(f'.mallet.{topic_model_name}.coherence.txt')
@@ -318,9 +318,9 @@ def task_compute_voi():
             for (trial1, trial2) in product(range(NUM_TRIALS), range(NUM_TRIALS)):
                 tm_1_name = f'topic-model-{NUM_TOPICS}-{trial1}'
                 tm_2_name = f'topic-model-{NUM_TOPICS}-{trial2}'
-                name1 = f'{lang}-{corpus_1_path.stem}-{tm_1_name}'
-                name2 = f'{lang}-{corpus_2_path.stem}-{tm_2_name}'
-                name = f'{lang}-{corpus_1_path.stem}-{tm_1_name}-{corpus_2_path.stem}-{tm_2_name}'
+                name1 = f'{lang}.{corpus_1_path.stem}.{tm_1_name}'
+                name2 = f'{lang}.{corpus_2_path.stem}.{tm_2_name}'
+                name = f'{lang}.{corpus_1_path.stem}.{tm_1_name}.{corpus_2_path.stem}.{tm_2_name}'
                 state_1_path = corpus_1_path.with_suffix(f'.mallet.{tm_1_name}.state.txt.gz')
                 state_2_path = corpus_2_path.with_suffix(f'.mallet.{tm_2_name}.state.txt.gz')
                 output_path = corpus_1_path.with_suffix(
