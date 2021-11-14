@@ -6,7 +6,7 @@ from difflib import unified_diff
 from math import log
 from os import PathLike
 from pathlib import PurePath
-from typing import Any, Counter, Dict, List, Literal, Optional, Tuple, TypeVar, overload
+from typing import Counter, Dict, List, Literal, Optional, Tuple, TypeVar, overload
 
 from .util import Corpus, Doc, load_polyglot_corpus
 
@@ -127,7 +127,7 @@ def infer_topic_keys(
     ]
 
 
-def compute_coherence(
+def _compute_coherence(
         corpus: Corpus,
         topic_keys_per_topic: List[List[str]],
         beta: float = 1.) -> float:
@@ -144,36 +144,25 @@ def compute_coherence(
     ) / len(topic_keys_per_topic)
 
 
-def print_to_optional_file(s: Any, path: Optional[PathLike], *args, **kwargs):
-    if path is not None:
-        with open(path, *args, **kwargs) as f:
-            print(s, file=f)
-    else:
-        print(s)
-
-
-def print_coherence(
+def compute_coherence(
         corpus_path: PathLike,
         topic_keys_path: PathLike,
         topic_state_path: PathLike,
-        output_path: Optional[PathLike] = None,
-        num_keys: int = DEFAULT_NUM_KEYS):
-    coherence = compute_coherence(
+        num_keys: int = DEFAULT_NUM_KEYS) -> Dict[str, float]:
+    return dict(coherence=_compute_coherence(
         load_polyglot_corpus(corpus_path),
         load_topic_keys(topic_keys_path, num_keys=num_keys),
         load_topic_state(topic_state_path).beta
-    )
-    print_to_optional_file(coherence, output_path, mode='w')
+    ))
 
 
-def print_coherence_lemmatized(
+def compute_coherence_lemmatized(
         corpus_path: PathLike,
         topic_keys_path: PathLike,
         topic_state_path: PathLike,
-        output_path: Optional[PathLike] = None,
-        num_keys: int = DEFAULT_NUM_KEYS):
+        num_keys: int = DEFAULT_NUM_KEYS) -> Dict[str, float]:
     topic_state = load_topic_state(topic_state_path)
-    coherence = compute_coherence(
+    return dict(coherence=_compute_coherence(
         load_polyglot_corpus(corpus_path),
         infer_topic_keys(
             topic_state,
@@ -181,8 +170,7 @@ def print_coherence_lemmatized(
             num_keys=num_keys
         ),
         topic_state.beta
-    )
-    print_to_optional_file(coherence, output_path, mode='w')
+    ))
 
 
 def compute_entropy(pmf: Dict[T, float]) -> float:
@@ -240,18 +228,23 @@ def compute_marginal_counts(
     return counts
 
 
-def compute_topic_assignment_voi(
+def _compute_topic_assignment_voi(
         topic_state_1: TopicState,
         topic_state_2: TopicState) -> float:
     return compute_voi(compute_joint_topic_assignment_counts(topic_state_1, topic_state_2))
 
 
-def print_topic_assignment_voi(
+def compute_topic_assignment_voi(
         topic_state_1_path: PathLike,
-        topic_state_2_path: PathLike,
-        output_path: Optional[PathLike] = None):
-    voi = compute_topic_assignment_voi(
+        topic_state_2_path: PathLike) -> Dict[str, float]:
+    return dict(voi=_compute_topic_assignment_voi(
         load_topic_state(topic_state_1_path),
         load_topic_state(topic_state_2_path),
-    )
-    print_to_optional_file(voi, output_path, mode='w')
+    ))
+
+
+def collect_subtask_scores(scores, output_path):
+    with open(output_path, encoding='utf-8', mode='w') as f:
+        f.write('subtask\tscore\n')
+        for (subtask, score) in scores.items():
+            f.write(f'{subtask}\t{score}\n')

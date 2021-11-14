@@ -7,7 +7,8 @@ import pycountry  # type: ignore
 from follow_up.util import subsample, convert_polyglot_to_mallet
 from follow_up.evaluation import (
     check_corpus_alignment, check_token_assignment_alignment,
-    print_coherence, print_coherence_lemmatized, print_topic_assignment_voi
+    compute_coherence, compute_coherence_lemmatized, compute_topic_assignment_voi,
+    collect_subtask_scores,
 )
 from follow_up.lemmatization import parse_treetagger, parse_udpipe
 
@@ -288,22 +289,19 @@ def task_compute_coherence():
                 name = f'{lang}.{corpus_path.stem}.{topic_model_name}'
                 topic_keys_path = corpus_path.with_suffix(f'.mallet.{topic_model_name}.keys.txt')
                 state_path = corpus_path.with_suffix(f'.mallet.{topic_model_name}.state.txt.gz')
-                output_path = corpus_path.with_suffix(f'.mallet.{topic_model_name}.coherence.txt')
                 yield {
                     'name': name,
                     'file_dep': [corpus_path, state_path, topic_keys_path],
                     'task_dep': [f'check_token_assignment_alignment:{name}'],
                     'actions': [(
-                        print_coherence_lemmatized if is_lemmatized else print_coherence,
+                        compute_coherence_lemmatized if is_lemmatized else compute_coherence,
                         (),
                         dict(
                             corpus_path=corpus_path,
                             topic_keys_path=topic_keys_path,
                             topic_state_path=state_path,
-                            output_path=output_path,
                         ),
                     )],
-                    'targets': [output_path],
                 }
                 is_lemmatized = True
 
@@ -323,8 +321,6 @@ def task_compute_voi():
                 name = f'{lang}.{corpus_1_path.stem}.{tm_1_name}.{corpus_2_path.stem}.{tm_2_name}'
                 state_1_path = corpus_1_path.with_suffix(f'.mallet.{tm_1_name}.state.txt.gz')
                 state_2_path = corpus_2_path.with_suffix(f'.mallet.{tm_2_name}.state.txt.gz')
-                output_path = corpus_1_path.with_suffix(
-                    f'.mallet.{tm_1_name}.{corpus_2_path.stem}.mallet.{tm_2_name}.voi.txt')
                 yield {
                     'name': name,
                     'file_dep': [state_1_path, state_2_path],
@@ -333,11 +329,27 @@ def task_compute_voi():
                         f'check_token_assignment_alignment:{name2}',
                     ],
                     'actions': [(
-                        print_topic_assignment_voi, (), dict(
+                        compute_topic_assignment_voi, (), dict(
                             topic_state_1_path=state_1_path,
                             topic_state_2_path=state_2_path,
-                            output_path=output_path,
                         ),
                     )],
-                    'targets': [output_path],
                 }
+
+
+def task_collect_coherence():
+    output_path = DATA_ROOT / 'coherence.tsv'
+    return {
+        'getargs': {'scores': ('compute_coherence', 'coherence')},
+        'actions': [(collect_subtask_scores, (), dict(output_path=output_path))],
+        'targets': [output_path],
+    }
+
+
+def task_collect_voi():
+    output_path = DATA_ROOT / 'voi.tsv'
+    return {
+        'getargs': {'scores': ('compute_voi', 'voi')},
+        'actions': [(collect_subtask_scores, (), dict(output_path=output_path))],
+        'targets': [output_path],
+    }
