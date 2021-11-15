@@ -269,13 +269,14 @@ def task_to_mallet():
 
 def task_mallet_import():
     for lang in LANGUAGES:
-        input_paths = [
-            (DATA_ROOT / lang / filename).with_suffix('.mallet.txt')
+        corpus_paths = [
+            DATA_ROOT / lang / filename
             for filename in DATA_SET_FILENAMES
         ]
-        for input_path in input_paths:
-            name = f'{lang}.{input_path.stem}'
-            output_path = input_path.with_suffix('.dat')
+        for corpus_path in corpus_paths:
+            name = f'{lang}.{corpus_path.stem}'
+            input_path = corpus_path.with_suffix('.mallet.txt')
+            output_path = corpus_path.with_suffix('.mallet.dat')
             yield {
                 'name': name,
                 'file_dep': [input_path],
