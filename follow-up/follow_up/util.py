@@ -1,5 +1,5 @@
 import collections
-import json
+import numpy as np
 import re
 from dataclasses import dataclass
 from itertools import product
@@ -7,7 +7,7 @@ from functools import cached_property
 from os import PathLike
 from pathlib import PurePath
 from random import sample
-from typing import Counter, Dict, Generic, Iterable, Iterator, List, Optional, Tuple, TypeVar
+from typing import Counter, Dict, Generic, Iterable, Iterator, List, Optional, TypeVar
 
 DOC_ID_RE = re.compile(r'\[\[(?P<doc_id>\d+)\]\]')
 
@@ -54,40 +54,39 @@ class CorpusSummary(Generic[T]):
     corpus_id: str
     num_docs: int
     vocab: List[T]
-    word_cooccur: Counter[Tuple[T, T]]
+    word_cooccur: np.ndarray
 
     @cached_property
     def word_index(self) -> Dict[T, int]:
         return dict((word, i) for (i, word) in enumerate(self.vocab))
 
     @cached_property
-    def word_occur(self) -> Counter[T]:
+    def word_occur(self) -> np.ndarray:
+        return np.array([self.word_cooccur[i, i] for i in range(len(self.vocab))], dtype=np.uint)
+
+    @property
+    def word_occur_counter(self) -> Counter[T]:
         return collections.Counter(dict(
-            (word1, c) for ((word1, word2), c) in self.word_cooccur.items()
-            if word1 == word2
+            (word, self.word_occur[i]) for (i, word) in enumerate(self.vocab)
         ))
 
     def save(self, path: PathLike):
-        with open(path, mode='w') as f:
-            json.dump(
-                dict(
-                    corpus_id=self.corpus_id,
-                    num_docs=self.num_docs,
-                    vocab=self.vocab,
-                    word_cooccur=dict(self.word_cooccur),
-                ),
-                f
-            )
+        np.savez(
+            path,
+            corpus_id=self.corpus_id,
+            num_docs=self.num_docs,
+            vocab=self.vocab,
+            word_cooccur=self.word_cooccur,
+        )
 
 
 def load_corpus_summary(path: PathLike) -> CorpusSummary:
-    with open(path) as f:
-        archive = json.load(f)
+    archive = np.load(path)
     return CorpusSummary(
-        corpus_id=archive['corpus_id'],
-        num_docs=archive['num_docs'],
-        vocab=archive['vocab'],
-        word_cooccur=collections.Counter(archive['word_cooccur']),
+        corpus_id=archive['corpus_id'].item(),
+        num_docs=archive['num_docs'].item(),
+        vocab=archive['vocab'].tolist(),
+        word_cooccur=archive['word_cooccur'],
     )
 
 
@@ -100,14 +99,17 @@ class Corpus(Generic[T]):
     def summary(self) -> CorpusSummary[T]:
         num_docs: int = 0
         vocab: List[T] = []
-        word_cooccur: Counter[Tuple[T, T]] = collections.Counter()
         for doc in self.docs:
             num_docs += 1
             for word in doc.tokens:
                 if word not in vocab:
                     vocab.append(word)
-            for (word1, word2) in product(set(doc.tokens), repeat=2):
-                word_cooccur[(word1, word2)] += 1
+
+        word_index = dict((word, i) for (i, word) in enumerate(vocab))
+        word_cooccur = np.zeros((len(vocab), len(vocab)), dtype=np.uint)
+        for doc in self.docs:
+            for (i1, i2) in product([word_index[word] for word in set(doc.tokens)], repeat=2):
+                word_cooccur[i1, i2] += 1
 
         return CorpusSummary(
             corpus_id=self.corpus_id,
@@ -186,5 +188,5 @@ def summarize_corpus(input_path: PathLike, output_path: PathLike):
 
 def compute_common_words(input_path: PathLike, output_path: PathLike, num_words: int):
     with open(output_path, encoding='utf-8', mode='w') as f:
-        for (word, _) in load_corpus_summary(input_path).word_occur.most_common(num_words):
+        for (word, _) in load_corpus_summary(input_path).word_occur_counter.most_common(num_words):
             f.write(word + '\n')
