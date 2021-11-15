@@ -1,5 +1,4 @@
 import collections
-import gzip
 import json
 import re
 from dataclasses import dataclass
@@ -69,7 +68,7 @@ class CorpusSummary(Generic[T]):
         ))
 
     def save(self, path: PathLike):
-        with gzip.open(path, mode='wt') as f:
+        with open(path, mode='w') as f:
             json.dump(
                 dict(
                     corpus_id=self.corpus_id,
@@ -82,7 +81,7 @@ class CorpusSummary(Generic[T]):
 
 
 def load_corpus_summary(path: PathLike) -> CorpusSummary:
-    with gzip.open(path, mode='rt') as f:
+    with open(path) as f:
         archive = json.load(f)
     return CorpusSummary(
         corpus_id=archive['corpus_id'],
