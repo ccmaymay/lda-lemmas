@@ -312,8 +312,8 @@ def task_compute_voi():
             DATA_ROOT / lang / filename
             for filename in DATA_SET_FILENAMES
         ]
-        for (corpus_1_path, corpus_2_path) in product(corpus_paths, corpus_paths):
-            for (trial1, trial2) in product(range(NUM_TRIALS), range(NUM_TRIALS)):
+        for (corpus_1_path, corpus_2_path) in product(corpus_paths, repeat=2):
+            for (trial1, trial2) in product(range(NUM_TRIALS), repeat=2):
                 tm_1_name = f'topic-model-{NUM_TOPICS}-{trial1}'
                 tm_2_name = f'topic-model-{NUM_TOPICS}-{trial2}'
                 name1 = f'{lang}.{corpus_1_path.stem}.{tm_1_name}'

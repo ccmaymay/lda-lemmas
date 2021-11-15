@@ -1,32 +1,68 @@
 import gzip
 import logging
 import collections
-from dataclasses import dataclass
 from difflib import unified_diff
 from math import log
 from os import PathLike
 from pathlib import PurePath
-from typing import Counter, Dict, List, Literal, Optional, Tuple, TypeVar, overload
+from typing import (
+    Counter, Dict, Iterable, Iterator, List, Literal, Optional, NamedTuple, Tuple, TypeVar,
+    overload,
+)
 
-from .util import Corpus, Doc, load_polyglot_corpus
+from .util import Corpus, Doc, PolyglotCorpus
 
 DEFAULT_NUM_KEYS = 5
 
 T = TypeVar('T')
-U = TypeVar('U')
+X = TypeVar('X')
+Y = TypeVar('Y')
 
 
-@dataclass
-class TokenAssignment(object):
+class TokenAssignment(NamedTuple):
     word: str
     topic: int
 
 
-@dataclass
-class TopicState(object):
-    alpha: List[float]
-    beta: float
-    assignments: List[Doc[TokenAssignment]]
+class TopicState(Corpus[TokenAssignment], Iterable[Doc[TokenAssignment]]):
+    topic_state_path: PathLike
+    _alpha: Optional[List[float]]
+    _beta: Optional[float]
+
+    def __init__(self, topic_state_path):
+        self.topic_state_path = topic_state_path
+        super().__init__(PurePath(topic_state_path).name, self)
+
+    def __iter__(self) -> Iterator[Doc[TokenAssignment]]:
+        return iter(load_token_assignments(self.topic_state_path))
+
+    def _load(self):
+        alpha_prefix = '#alpha : '
+        beta_prefix = '#beta : '
+        with gzip.open(self.topic_state_path, mode='rt', encoding='utf-8') as f:
+            for line in f:
+                if line.startswith(alpha_prefix):
+                    self._alpha = [float(t) for t in line[len(alpha_prefix):].strip().split()]
+                elif line.startswith(beta_prefix):
+                    self._beta = float(line[len(beta_prefix):].strip())
+                if self._alpha is not None and self._beta is not None:
+                    break
+
+    @property
+    def alpha(self) -> List[float]:
+        if self._alpha is None:
+            self._load()
+        if self._alpha is None:
+            raise Exception(f'Failed to read alpha from topic state file {self.topic_state_path}')
+        return self._alpha
+
+    @property
+    def beta(self) -> float:
+        if self._beta is None:
+            self._load()
+        if self._beta is None:
+            raise Exception(f'Failed to read beta from topic state file {self.topic_state_path}')
+        return self._beta
 
     @property
     def num_topics(self) -> int:
@@ -34,15 +70,17 @@ class TopicState(object):
 
 
 def check_corpus_alignment(corpus1_path: PathLike, corpus2_path: PathLike):
-    return _check_corpus_alignment(
-        load_polyglot_corpus(corpus1_path),
-        load_polyglot_corpus(corpus2_path)
-    )
+    return _check_corpus_alignment(PolyglotCorpus(corpus1_path), PolyglotCorpus(corpus2_path))
 
 
-def _check_corpus_alignment(corpus1: Corpus, corpus2: Corpus):
-    corpus1_doc_infos = [f'{doc.doc_id} {doc.num_tokens}' for doc in corpus1.docs]
-    corpus2_doc_infos = [f'{doc.doc_id} {doc.num_tokens}' for doc in corpus2.docs]
+def _check_corpus_alignment(corpus1: Corpus, corpus2: Corpus, check_doc_ids=True):
+    if check_doc_ids:
+        corpus1_doc_infos = [f'{doc.doc_id} {doc.num_tokens}' for doc in corpus1.docs]
+        corpus2_doc_infos = [f'{doc.doc_id} {doc.num_tokens}' for doc in corpus2.docs]
+    else:
+        corpus1_doc_infos = [f'{i} {doc.num_tokens}' for (i, doc) in enumerate(corpus1.docs)]
+        corpus2_doc_infos = [f'{i} {doc.num_tokens}' for (i, doc) in enumerate(corpus2.docs)]
+
     if corpus1_doc_infos != corpus2_doc_infos:
         logging.warning(
             f'Corpora {corpus1.corpus_id}, {corpus2.corpus_id} do not align')
@@ -54,46 +92,42 @@ def _check_corpus_alignment(corpus1: Corpus, corpus2: Corpus):
             f'Corpora {corpus1.corpus_id}, {corpus2.corpus_id} do not align')
 
 
-def check_token_assignment_alignment(
-        corpus_path: PathLike,
-        topic_state_path: PathLike):
-    corpus = load_polyglot_corpus(corpus_path)
-    token_assignments_corpus: Corpus[TokenAssignment] = Corpus(
-        PurePath(topic_state_path).name,
-        load_topic_state(topic_state_path).assignments
+def check_token_assignment_alignment(corpus_path: PathLike, topic_state_path: PathLike):
+    return _check_corpus_alignment(
+        PolyglotCorpus(corpus_path),
+        TopicState(topic_state_path),
+        check_doc_ids=False
     )
-    # the token assignments file doesn't contain doc ids, so we just copy them from corpus
-    for (ta_doc, doc) in zip(token_assignments_corpus.docs, corpus.docs):
-        ta_doc.doc_id = doc.doc_id
-    return _check_corpus_alignment(corpus, token_assignments_corpus)
 
 
-def load_topic_state(input_path: PathLike) -> TopicState:
-    alpha: Optional[List[float]] = None
-    beta: Optional[float] = None
-    docs: List[Doc[TokenAssignment]] = []
-    alpha_prefix = '#alpha : '
-    beta_prefix = '#beta : '
+def load_token_assignments(input_path: PathLike) -> Iterable[Doc[TokenAssignment]]:
+    doc: Optional[Doc[TokenAssignment]] = None
+    prev_doc_num: int = -1
     with gzip.open(input_path, mode='rt', encoding='utf-8') as f:
         for line in f:
-            if line.startswith(alpha_prefix):
-                alpha = [float(t) for t in line[len(alpha_prefix):].strip().split()]
-            elif line.startswith(beta_prefix):
-                beta = float(line[len(beta_prefix):].strip())
-            elif not line.startswith('#'):
+            if not line.startswith('#'):
                 [doc_num_str, _1, _2, _3, word, topic_num_str] = line.strip().split()
                 doc_num = int(doc_num_str)
                 topic_num = int(topic_num_str)
-                while doc_num >= len(docs):
-                    docs.append(Doc(str(len(docs)), [[]]))
-                docs[doc_num].sections[0].append(TokenAssignment(word=word, topic=topic_num))
+                if doc_num != prev_doc_num:
+                    if doc_num != prev_doc_num + 1:
+                        raise Exception(
+                            'Expected successive document numbers, '
+                            f'but got {prev_doc_num} followed by {doc_num}')
+                    if doc is not None:
+                        yield doc
+                    doc = Doc(str(doc_num), [[]])
+                    prev_doc_num = doc_num
 
-    if alpha is None:
-        raise Exception(f'Failed to extract alpha from topic state file {input_path}')
-    elif beta is None:
-        raise Exception(f'Failed to extract beta from topic state file {input_path}')
-    else:
-        return TopicState(alpha=alpha, beta=beta, assignments=docs)
+                if doc is None:
+                    raise Exception(
+                        'Encountered token assignment before first doc initialized... '
+                        'is first doc id -1?')
+
+                doc.sections[0].append(TokenAssignment(word=word, topic=topic_num))
+
+    if doc is not None:
+        yield doc
 
 
 def load_topic_keys(input_path: PathLike, num_keys: int = DEFAULT_NUM_KEYS) -> List[List[str]]:
@@ -118,7 +152,7 @@ def infer_topic_keys(
             word
             for (word, _) in collections.Counter(
                 token_assignment.word
-                for doc in topic_state.assignments
+                for doc in topic_state.docs
                 for token_assignment in doc.tokens
                 if token_assignment.topic == topic_num
             ).most_common(num_keys)
@@ -128,8 +162,8 @@ def infer_topic_keys(
 
 
 def _compute_coherence(
-        corpus: Corpus,
-        topic_keys_per_topic: List[List[str]],
+        corpus: Corpus[T],
+        topic_keys_per_topic: List[List[T]],
         beta: float = 1.) -> float:
     return sum(
         sum(
@@ -150,9 +184,9 @@ def compute_coherence(
         topic_state_path: PathLike,
         num_keys: int = DEFAULT_NUM_KEYS) -> Dict[str, float]:
     return dict(coherence=_compute_coherence(
-        load_polyglot_corpus(corpus_path),
+        PolyglotCorpus(corpus_path),
         load_topic_keys(topic_keys_path, num_keys=num_keys),
-        load_topic_state(topic_state_path).beta
+        TopicState(topic_state_path).beta
     ))
 
 
@@ -161,9 +195,9 @@ def compute_coherence_lemmatized(
         topic_keys_path: PathLike,
         topic_state_path: PathLike,
         num_keys: int = DEFAULT_NUM_KEYS) -> Dict[str, float]:
-    topic_state = load_topic_state(topic_state_path)
+    topic_state = TopicState(topic_state_path)
     return dict(coherence=_compute_coherence(
-        load_polyglot_corpus(corpus_path),
+        PolyglotCorpus(corpus_path),
         infer_topic_keys(
             topic_state,
             num_topics=topic_state.num_topics,
@@ -173,20 +207,20 @@ def compute_coherence_lemmatized(
     ))
 
 
-def compute_entropy(pmf: Dict[T, float]) -> float:
+def compute_entropy(pmf: Dict[X, float]) -> float:
     return sum(-p * log(p) for p in pmf.values())
 
 
-def compute_pmf(counts: Dict[T, int]) -> Dict[T, float]:
+def compute_pmf(counts: Dict[X, int]) -> Dict[X, float]:
     total = sum(counts.values())
-    return dict((t, c / total) for (t, c) in counts.items())
+    return dict((x, c / total) for (x, c) in counts.items())
 
 
 def compute_mi(entropy_x: float, entropy_y: float, entropy_xy: float) -> float:
     return entropy_x + entropy_y - entropy_xy
 
 
-def compute_voi(joint_counts: Dict[Tuple[T, U], int]) -> float:
+def compute_voi(joint_counts: Dict[Tuple[X, Y], int]) -> float:
     entropy_x = compute_entropy(compute_pmf(compute_marginal_counts(joint_counts, 0)))
     entropy_y = compute_entropy(compute_pmf(compute_marginal_counts(joint_counts, 1)))
     mi = compute_mi(entropy_x, entropy_y, compute_entropy(compute_pmf(joint_counts)))
@@ -197,7 +231,7 @@ def compute_joint_topic_assignment_counts(
         topic_state_1: TopicState,
         topic_state_2: TopicState) -> Dict[Tuple[int, int], int]:
     counts: Counter[Tuple[int, int]] = collections.Counter()
-    for (doc1, doc2) in zip(topic_state_1.assignments, topic_state_2.assignments):
+    for (doc1, doc2) in zip(topic_state_1.docs, topic_state_2.docs):
         for (ta1, ta2) in zip(doc1.tokens, doc2.tokens):
             counts[(ta1.topic, ta2.topic)] += 1
 
@@ -206,15 +240,15 @@ def compute_joint_topic_assignment_counts(
 
 @overload
 def compute_marginal_counts(
-        joint_counts: Dict[Tuple[T, U], int],
-        index: Literal[0]) -> Dict[T, int]:
+        joint_counts: Dict[Tuple[X, Y], int],
+        index: Literal[0]) -> Dict[X, int]:
     pass
 
 
 @overload
 def compute_marginal_counts(
-        joint_counts: Dict[Tuple[T, U], int],
-        index: Literal[1]) -> Dict[U, int]:
+        joint_counts: Dict[Tuple[X, Y], int],
+        index: Literal[1]) -> Dict[Y, int]:
     pass
 
 
@@ -228,9 +262,7 @@ def compute_marginal_counts(
     return counts
 
 
-def _compute_topic_assignment_voi(
-        topic_state_1: TopicState,
-        topic_state_2: TopicState) -> float:
+def _compute_topic_assignment_voi(topic_state_1: TopicState, topic_state_2: TopicState) -> float:
     return compute_voi(compute_joint_topic_assignment_counts(topic_state_1, topic_state_2))
 
 
@@ -238,8 +270,8 @@ def compute_topic_assignment_voi(
         topic_state_1_path: PathLike,
         topic_state_2_path: PathLike) -> Dict[str, float]:
     return dict(voi=_compute_topic_assignment_voi(
-        load_topic_state(topic_state_1_path),
-        load_topic_state(topic_state_2_path),
+        TopicState(topic_state_1_path),
+        TopicState(topic_state_2_path),
     ))
 
 

@@ -1,12 +1,12 @@
 import re
-from collections import Counter
+import collections
 from dataclasses import dataclass
 from itertools import product
 from functools import cached_property
 from os import PathLike
 from pathlib import PurePath
 from random import sample
-from typing import Dict, Generic, Iterable, List, Optional, TypeVar
+from typing import Counter, Dict, Generic, Iterable, Iterator, List, Optional, Tuple, TypeVar
 
 DOC_ID_RE = re.compile(r'\[\[(?P<doc_id>\d+)\]\]')
 
@@ -51,7 +51,7 @@ class Doc(Generic[T]):
 @dataclass
 class Corpus(Generic[T]):
     corpus_id: str
-    docs: List[Doc[T]]
+    docs: Iterable[Doc[T]]
 
     @cached_property
     def vocab(self) -> List[T]:
@@ -69,17 +69,15 @@ class Corpus(Generic[T]):
         return dict((word, word_id) for (word_id, word) in enumerate(self.vocab))
 
     @cached_property
-    def word_occur(self) -> Counter:
-        counter: Counter = Counter()
-        for doc in self.docs:
-            for word in set(doc.tokens):
-                counter[word] += 1
-
-        return counter
+    def word_occur(self) -> Counter[T]:
+        return Counter(dict(
+            (word1, count) for ((word1, word2), count) in self.word_cooccur.items()
+            if word1 == word2
+        ))
 
     @cached_property
-    def word_cooccur(self) -> Counter:
-        counter: Counter = Counter()
+    def word_cooccur(self) -> Counter[Tuple[T, T]]:
+        counter: Counter[Tuple[T, T]] = collections.Counter()
         for doc in self.docs:
             for (word1, word2) in product(set(doc.tokens), repeat=2):
                 counter[(word1, word2)] += 1
@@ -87,8 +85,15 @@ class Corpus(Generic[T]):
         return counter
 
 
-def load_polyglot_corpus(input_path: PathLike) -> Corpus[str]:
-    return Corpus(PurePath(input_path).name, list(load_polyglot(input_path)))
+class PolyglotCorpus(Corpus[str], Iterable[Doc[str]]):
+    corpus_path: PathLike
+
+    def __init__(self, corpus_path: PathLike):
+        self.corpus_path = corpus_path
+        super().__init__(PurePath(corpus_path).name, self)
+
+    def __iter__(self) -> Iterator[Doc[str]]:
+        return iter(load_polyglot(self.corpus_path))
 
 
 def get_doc_id(line: str) -> Optional[str]:
@@ -119,7 +124,7 @@ def load_polyglot(input_path: PathLike) -> Iterable[Doc[str]]:
             yield doc
 
 
-def save_polyglot(output_path: PathLike, docs: Iterable[Doc]):
+def save_polyglot(output_path: PathLike, docs: Iterable[Doc[str]]):
     with open(output_path, encoding='utf-8', mode='w') as f:
         for doc in docs:
             f.write(doc.to_polyglot() + '\n')
