@@ -360,17 +360,18 @@ def task_compute_coherence():
             for trial in range(NUM_TRIALS):
                 topic_model_name = f'topic-model-{NUM_TOPICS}-{trial}'
                 name = f'{lang}.{corpus_path.stem}.{topic_model_name}'
+                corpus_summary_path = corpus_path.with_suffix('.summary.npz')
                 topic_keys_path = corpus_path.with_suffix(f'.mallet.{topic_model_name}.keys.txt')
                 state_path = corpus_path.with_suffix(f'.mallet.{topic_model_name}.state.txt.gz')
                 yield {
                     'name': name,
-                    'file_dep': [corpus_path, state_path, topic_keys_path],
+                    'file_dep': [corpus_summary_path, state_path, topic_keys_path],
                     'task_dep': [f'check_token_assignment_alignment:{name}'],
                     'actions': [(
                         compute_coherence_lemmatized if is_lemmatized else compute_coherence,
                         (),
                         dict(
-                            corpus_path=corpus_path,
+                            corpus_summary_path=corpus_summary_path,
                             topic_keys_path=topic_keys_path,
                             topic_state_path=state_path,
                         ),

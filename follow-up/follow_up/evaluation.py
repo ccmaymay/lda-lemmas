@@ -10,7 +10,7 @@ from typing import (
     overload,
 )
 
-from .util import Corpus, Doc, PolyglotCorpus
+from .util import Corpus, CorpusSummary, Doc, PolyglotCorpus, load_corpus_summary
 
 DEFAULT_NUM_KEYS = 5
 
@@ -162,14 +162,14 @@ def infer_topic_keys(
 
 
 def _compute_coherence(
-        corpus: Corpus[T],
+        corpus_summary: CorpusSummary[T],
         topic_keys_per_topic: List[List[T]],
         beta: float = 1.) -> float:
     return sum(
         sum(
             log(
-                (corpus.word_cooccur[(key2, key1)] + beta) /
-                (corpus.word_occur[key2] + beta)
+                (corpus_summary.word_cooccur[(key2, key1)] + beta) /
+                (corpus_summary.word_occur[key2] + beta)
             )
             for key1 in topic_keys[1:]
             for key2 in topic_keys[:-1]
@@ -179,25 +179,25 @@ def _compute_coherence(
 
 
 def compute_coherence(
-        corpus_path: PathLike,
+        corpus_summary_path: PathLike,
         topic_keys_path: PathLike,
         topic_state_path: PathLike,
         num_keys: int = DEFAULT_NUM_KEYS) -> Dict[str, float]:
     return dict(coherence=_compute_coherence(
-        PolyglotCorpus(corpus_path),
+        load_corpus_summary(corpus_summary_path),
         load_topic_keys(topic_keys_path, num_keys=num_keys),
         TopicState(topic_state_path).beta
     ))
 
 
 def compute_coherence_lemmatized(
-        corpus_path: PathLike,
+        corpus_summary_path: PathLike,
         topic_keys_path: PathLike,
         topic_state_path: PathLike,
         num_keys: int = DEFAULT_NUM_KEYS) -> Dict[str, float]:
     topic_state = TopicState(topic_state_path)
     return dict(coherence=_compute_coherence(
-        PolyglotCorpus(corpus_path),
+        load_corpus_summary(corpus_summary_path),
         infer_topic_keys(
             topic_state,
             num_topics=topic_state.num_topics,

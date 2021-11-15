@@ -54,12 +54,15 @@ class CorpusSummary(Generic[T]):
     corpus_id: str
     num_docs: int
     vocab: List[T]
-    word_occur: np.ndarray
     word_cooccur: np.ndarray
 
     @cached_property
     def word_index(self) -> Dict[T, int]:
         return dict((word, i) for (i, word) in enumerate(self.vocab))
+
+    @cached_property
+    def word_occur(self) -> np.ndarray:
+        return np.array([self.word_cooccur[i, i] for i in range(len(self.vocab))], dtype=np.uint)
 
     @property
     def word_occur_counter(self) -> Counter[T]:
@@ -73,7 +76,6 @@ class CorpusSummary(Generic[T]):
             corpus_id=self.corpus_id,
             num_docs=self.num_docs,
             vocab=self.vocab,
-            word_occur=self.word_occur,
             word_cooccur=self.word_cooccur,
         )
 
@@ -84,7 +86,6 @@ def load_corpus_summary(path: PathLike) -> CorpusSummary:
         corpus_id=archive['corpus_id'].item(),
         num_docs=archive['num_docs'].item(),
         vocab=archive['vocab'].tolist(),
-        word_occur=archive['word_occur'],
         word_cooccur=archive['word_cooccur'],
     )
 
@@ -95,47 +96,26 @@ class Corpus(Generic[T]):
     docs: Iterable[Doc[T]]
 
     @cached_property
-    def num_docs(self) -> int:
-        n = 0
+    def summary(self) -> CorpusSummary[T]:
+        num_docs: int = 0
+        vocab: List[T] = []
         for doc in self.docs:
-            n += 1
-        return n
-
-    @cached_property
-    def vocab(self) -> List[T]:
-        _vocab: List[T] = []
-        for doc in self.docs:
+            num_docs += 1
             for word in doc.tokens:
-                if word not in _vocab:
-                    _vocab.append(word)
+                if word not in vocab:
+                    vocab.append(word)
 
-        return _vocab
-
-    @cached_property
-    def word_index(self) -> Dict[T, int]:
-        return dict((word, i) for (i, word) in enumerate(self.vocab))
-
-    @cached_property
-    def word_occur(self) -> np.ndarray:
-        return np.array([self.word_cooccur[i, i] for i in range(len(self.vocab))], dtype=np.uint)
-
-    @cached_property
-    def word_cooccur(self) -> np.ndarray:
-        counts = np.zeros((len(self.vocab), len(self.vocab)), dtype=np.uint)
+        word_index = dict((word, i) for (i, word) in enumerate(vocab))
+        word_cooccur = np.zeros((len(vocab), len(vocab)), dtype=np.uint)
         for doc in self.docs:
-            for (i1, i2) in product([self.word_index[word] for word in set(doc.tokens)], repeat=2):
-                counts[i1, i2] += 1
+            for (i1, i2) in product([word_index[word] for word in set(doc.tokens)], repeat=2):
+                word_cooccur[i1, i2] += 1
 
-        return counts
-
-    @property
-    def summary(self) -> CorpusSummary:
         return CorpusSummary(
             corpus_id=self.corpus_id,
-            num_docs=self.num_docs,
-            vocab=self.vocab,
-            word_occur=self.word_occur,
-            word_cooccur=self.word_cooccur,
+            num_docs=num_docs,
+            vocab=vocab,
+            word_cooccur=word_cooccur,
         )
 
 
