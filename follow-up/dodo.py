@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pycountry  # type: ignore
 
-from follow_up.util import subsample, convert_polyglot_to_mallet
+from follow_up.util import subsample, convert_polyglot_to_mallet, lowercase_polyglot
 from follow_up.evaluation import (
     check_corpus_alignment, check_token_assignment_alignment,
     compute_coherence, compute_coherence_lemmatized, compute_topic_assignment_voi,
@@ -36,10 +36,14 @@ MALLET_PROGRAM = MALLET_ROOT / 'bin' / 'mallet'
 
 MAX_NUM_DOCS = 200000
 
-DATA_SET_FILENAMES = (
+CASED_DATA_SET_FILENAMES = (
     'sub.txt',
     'sub.lem-treetagger.parsed.txt',
     'sub.lem-udpipe.parsed.txt',
+)
+DATA_SET_FILENAMES = tuple(
+    filename[:-len('.txt')] + '.lower.txt'
+    for filename in CASED_DATA_SET_FILENAMES
 )
 
 NUM_TOPICS = 100
@@ -151,6 +155,27 @@ def task_parse_udpipe():
             ))],
             'targets': [output_path],
         }
+
+
+def task_lowercase():
+    for lang in LANGUAGES:
+        input_paths = [
+            DATA_ROOT / lang / filename
+            for filename in CASED_DATA_SET_FILENAMES
+        ]
+        for input_path in input_paths:
+            output_path = input_path.with_suffix('.lower.txt')
+            name = f'{lang}.{input_path.stem}'
+            yield {
+                'name': name,
+                'file_dep': [input_path],
+                'actions': [(lowercase_polyglot, (), dict(
+                    lang=lang,
+                    input_path=input_path,
+                    output_path=output_path
+                ))],
+                'targets': [output_path],
+            }
 
 
 def task_check_corpus_alignment():

@@ -135,7 +135,14 @@ def subsample(input_path: PathLike, output_path: PathLike, max_num_docs: int):
     save_polyglot(output_path, (doc for doc in load_polyglot(input_path) if doc.doc_id in doc_ids))
 
 
-def convert_polyglot_to_mallet(lang, input_path, output_path):
+def convert_polyglot_to_mallet(lang: str, input_path: PathLike, output_path: PathLike):
     with open(output_path, encoding='utf-8', mode='w') as f:
         for doc in load_polyglot(input_path):
             f.write(doc.to_mallet(lang) + '\n')
+
+
+def lowercase_polyglot(input_path: PathLike, output_path: PathLike):
+    save_polyglot(output_path, (
+        Doc(doc.doc_id, [[token.lower() for token in section] for section in doc.sections])
+        for doc in load_polyglot(input_path)
+    ))
