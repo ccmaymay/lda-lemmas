@@ -7,9 +7,11 @@ from functools import cached_property
 from os import PathLike
 from pathlib import PurePath
 from random import sample
-from typing import Counter, Dict, Generic, Iterable, Iterator, List, Optional, TypeVar
+from typing import Counter, Dict, Generic, Iterable, Iterator, List, Optional, Tuple, TypeVar
 
 DOC_ID_RE = re.compile(r'\[\[(?P<doc_id>\d+)\]\]')
+
+MAX_COOCCUR_NUM_WORDS = 10000
 
 T = TypeVar('T')
 
@@ -54,20 +56,25 @@ class CorpusSummary(Generic[T]):
     corpus_id: str
     num_docs: int
     vocab: List[T]
+    word_occur: np.ndarray
     word_cooccur: np.ndarray
+    cooccur_word_ids: List[int]
 
     @cached_property
     def word_index(self) -> Dict[T, int]:
         return dict((word, i) for (i, word) in enumerate(self.vocab))
 
     @cached_property
-    def word_occur(self) -> np.ndarray:
-        return np.array([self.word_cooccur[i, i] for i in range(len(self.vocab))], dtype=np.uint)
-
-    @property
     def word_occur_counter(self) -> Counter[T]:
         return collections.Counter(dict(
             (word, self.word_occur[i]) for (i, word) in enumerate(self.vocab)
+        ))
+
+    @cached_property
+    def word_cooccur_counter(self) -> Counter[Tuple[T, T]]:
+        return collections.Counter(dict(
+            ((self.vocab[i1], self.vocab[i2]), self.word_cooccur[j1, j2])
+            for ((j1, i1), (j2, i2)) in product(enumerate(self.cooccur_word_ids), repeat=2)
         ))
 
     def save(self, path: PathLike):
@@ -76,7 +83,9 @@ class CorpusSummary(Generic[T]):
             corpus_id=self.corpus_id,
             num_docs=self.num_docs,
             vocab=self.vocab,
+            word_occur=self.word_occur,
             word_cooccur=self.word_cooccur,
+            cooccur_word_ids=self.cooccur_word_ids,
         )
 
 
@@ -86,7 +95,9 @@ def load_corpus_summary(path: PathLike) -> CorpusSummary:
         corpus_id=archive['corpus_id'].item(),
         num_docs=archive['num_docs'].item(),
         vocab=archive['vocab'].tolist(),
+        word_occur=archive['word_occur'],
         word_cooccur=archive['word_cooccur'],
+        cooccur_word_ids=archive['cooccur_word_ids'].tolist(),
     )
 
 
@@ -98,24 +109,41 @@ class Corpus(Generic[T]):
     @cached_property
     def summary(self) -> CorpusSummary[T]:
         num_docs: int = 0
+        word_index: Dict[T, int] = {}
         vocab: List[T] = []
+        word_occur_counter: Counter[int] = collections.Counter()
         for doc in self.docs:
             num_docs += 1
-            for word in doc.tokens:
+            for word in set(doc.tokens):
                 if word not in vocab:
+                    word_index[word] = len(vocab)
                     vocab.append(word)
+                word_occur_counter[word_index[word]] += 1
 
-        word_index = dict((word, i) for (i, word) in enumerate(vocab))
-        word_cooccur = np.zeros((len(vocab), len(vocab)), dtype=np.uint)
+        assert len(word_index) == len(vocab)
+        assert len(word_occur_counter) == len(vocab)
+
+        word_occur = np.array([c for (i, c) in sorted(word_occur_counter.items())], dtype=np.uint)
+        cooccur_num_words = min(len(vocab), MAX_COOCCUR_NUM_WORDS)
+        cooccur_word_ids = [i for (i, c) in word_occur_counter.most_common(cooccur_num_words)]
+        cooccur_word_ids_set = set(cooccur_word_ids)
+        word_cooccur = np.zeros((cooccur_num_words, cooccur_num_words), dtype=np.uint)
         for doc in self.docs:
-            for (i1, i2) in product([word_index[word] for word in set(doc.tokens)], repeat=2):
+            doc_word_ids = set(
+                i
+                for i in (word_index[word] for word in set(doc.tokens))
+                if i in cooccur_word_ids_set
+            )
+            for (i1, i2) in product(doc_word_ids, repeat=2):
                 word_cooccur[i1, i2] += 1
 
         return CorpusSummary(
             corpus_id=self.corpus_id,
             num_docs=num_docs,
             vocab=vocab,
+            word_occur=word_occur,
             word_cooccur=word_cooccur,
+            cooccur_word_ids=cooccur_word_ids,
         )
 
 

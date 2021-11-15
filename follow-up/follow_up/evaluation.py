@@ -168,8 +168,8 @@ def _compute_coherence(
     return sum(
         sum(
             log(
-                (corpus_summary.word_cooccur[(key2, key1)] + beta) /
-                (corpus_summary.word_occur[key2] + beta)
+                (corpus_summary.word_cooccur_counter[(key2, key1)] + beta) /
+                (corpus_summary.word_occur_counter[key2] + beta)
             )
             for key1 in topic_keys[1:]
             for key2 in topic_keys[:-1]
