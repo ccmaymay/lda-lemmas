@@ -189,7 +189,7 @@ def task_summarize_corpus():
             for filename in DATA_SET_FILENAMES
         ]
         for input_path in input_paths:
-            output_path = input_path.with_suffix('.summary.npz')
+            output_path = input_path.with_suffix('.summary.json.gz')
             name = f'{lang}.{input_path.stem}'
             yield {
                 'name': name,
@@ -209,7 +209,7 @@ def task_compute_common_words():
             for filename in DATA_SET_FILENAMES
         ]
         for corpus_path in corpus_paths:
-            input_path = corpus_path.with_suffix('.summary.npz')
+            input_path = corpus_path.with_suffix('.summary.json.gz')
             output_path = corpus_path.with_suffix('.common-words.txt')
             name = f'{lang}.{corpus_path.stem}'
             yield {
@@ -360,7 +360,7 @@ def task_compute_coherence():
             for trial in range(NUM_TRIALS):
                 topic_model_name = f'topic-model-{NUM_TOPICS}-{trial}'
                 name = f'{lang}.{corpus_path.stem}.{topic_model_name}'
-                corpus_summary_path = corpus_path.with_suffix('.summary.npz')
+                corpus_summary_path = corpus_path.with_suffix('.summary.json.gz')
                 topic_keys_path = corpus_path.with_suffix(f'.mallet.{topic_model_name}.keys.txt')
                 state_path = corpus_path.with_suffix(f'.mallet.{topic_model_name}.state.txt.gz')
                 yield {
