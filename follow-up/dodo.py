@@ -216,6 +216,7 @@ def task_mallet_import():
                     '--keep-sequence',
                     '--preserve-case',
                     '--token-regex', '[^ ]+',
+                    '--line-regex', '^(\S+) (\S+) (.*)$',
                 ]],
                 'targets': [output_path],
             }
