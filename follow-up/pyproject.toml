@@ -10,6 +10,8 @@ doit = "^0.33.1"
 tqdm = "^4.62.3"
 pycountry = "^20.7.3"
 conllu = "^4.4.1"
+requests = "^2.26.0"
+types-requests = "^2.26.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
