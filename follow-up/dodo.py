@@ -6,6 +6,7 @@ import pycountry  # type: ignore
 
 from follow_up.util import (
     subsample, convert_polyglot_to_mallet, lowercase_polyglot, compute_common_words,
+    summarize_corpus,
 )
 from follow_up.evaluation import (
     check_corpus_alignment, check_token_assignment_alignment,
@@ -181,15 +182,36 @@ def task_lowercase():
             }
 
 
-def task_compute_common_words():
+def task_summarize_corpus():
     for lang in LANGUAGES:
         input_paths = [
             DATA_ROOT / lang / filename
             for filename in DATA_SET_FILENAMES
         ]
         for input_path in input_paths:
-            output_path = input_path.with_suffix('.common-words.txt')
+            output_path = input_path.with_suffix('.summary.npz')
             name = f'{lang}.{input_path.stem}'
+            yield {
+                'name': name,
+                'file_dep': [input_path],
+                'actions': [(summarize_corpus, (), dict(
+                    input_path=input_path,
+                    output_path=output_path,
+                ))],
+                'targets': [output_path],
+            }
+
+
+def task_compute_common_words():
+    for lang in LANGUAGES:
+        corpus_paths = [
+            DATA_ROOT / lang / filename
+            for filename in DATA_SET_FILENAMES
+        ]
+        for corpus_path in corpus_paths:
+            input_path = corpus_path.with_suffix('.summary.npz')
+            output_path = corpus_path.with_suffix('.common-words.txt')
+            name = f'{lang}.{corpus_path.stem}'
             yield {
                 'name': name,
                 'file_dep': [input_path],

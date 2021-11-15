@@ -49,10 +49,57 @@ class Doc(Generic[T]):
         return f'[[{self.doc_id}]]\n{self.text}'
 
 
-@dataclass
+@dataclass(frozen=True)
+class CorpusSummary(Generic[T]):
+    corpus_id: str
+    num_docs: int
+    vocab: List[T]
+    word_occur: np.ndarray
+    word_cooccur: np.ndarray
+
+    @cached_property
+    def word_index(self) -> Dict[T, int]:
+        return dict((word, i) for (i, word) in enumerate(self.vocab))
+
+    @property
+    def word_occur_counter(self) -> Counter[T]:
+        return collections.Counter(dict(
+            (word, self.word_occur[i]) for (i, word) in enumerate(self.vocab)
+        ))
+
+    def save(self, path: PathLike):
+        np.savez(
+            path,
+            corpus_id=self.corpus_id,
+            num_docs=self.num_docs,
+            vocab=self.vocab,
+            word_occur=self.word_occur,
+            word_cooccur=self.word_cooccur,
+        )
+
+
+def load_corpus_summary(path: PathLike) -> CorpusSummary:
+    archive = np.load(path)
+    return CorpusSummary(
+        corpus_id=archive['corpus_id'].item(),
+        num_docs=archive['num_docs'].item(),
+        vocab=archive['vocab'].tolist(),
+        word_occur=archive['word_occur'],
+        word_cooccur=archive['word_cooccur'],
+    )
+
+
+@dataclass(frozen=True)
 class Corpus(Generic[T]):
     corpus_id: str
     docs: Iterable[Doc[T]]
+
+    @cached_property
+    def num_docs(self) -> int:
+        n = 0
+        for doc in self.docs:
+            n += 1
+        return n
 
     @cached_property
     def vocab(self) -> List[T]:
@@ -68,12 +115,6 @@ class Corpus(Generic[T]):
     def word_index(self) -> Dict[T, int]:
         return dict((word, i) for (i, word) in enumerate(self.vocab))
 
-    @property
-    def word_occur_counter(self) -> Counter[T]:
-        return collections.Counter(dict(
-            (word, self.word_occur[i]) for (i, word) in enumerate(self.vocab)
-        ))
-
     @cached_property
     def word_occur(self) -> np.ndarray:
         return np.array([self.word_cooccur[i, i] for i in range(len(self.vocab))], dtype=np.uint)
@@ -86,6 +127,16 @@ class Corpus(Generic[T]):
                 counts[i1, i2] += 1
 
         return counts
+
+    @property
+    def summary(self) -> CorpusSummary:
+        return CorpusSummary(
+            corpus_id=self.corpus_id,
+            num_docs=self.num_docs,
+            vocab=self.vocab,
+            word_occur=self.word_occur,
+            word_cooccur=self.word_cooccur,
+        )
 
 
 class PolyglotCorpus(Corpus[str], Iterable[Doc[str]]):
@@ -151,7 +202,11 @@ def lowercase_polyglot(input_path: PathLike, output_path: PathLike):
     ))
 
 
+def summarize_corpus(input_path: PathLike, output_path: PathLike):
+    PolyglotCorpus(input_path).summary.save(output_path)
+
+
 def compute_common_words(input_path: PathLike, output_path: PathLike, num_words: int):
     with open(output_path, encoding='utf-8', mode='w') as f:
-        for (word, _) in PolyglotCorpus(input_path).word_occur_counter.most_common(num_words):
+        for (word, _) in load_corpus_summary(input_path).word_occur_counter.most_common(num_words):
             f.write(word + '\n')

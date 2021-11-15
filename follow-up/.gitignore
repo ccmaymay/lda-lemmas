@@ -8,3 +8,4 @@ poetry.lock
 *.zip
 *.tar.gz
 *.tar.lzma
+*.npz
