@@ -4,7 +4,9 @@ from pathlib import Path
 
 import pycountry  # type: ignore
 
-from follow_up.util import subsample, convert_polyglot_to_mallet, lowercase_polyglot
+from follow_up.util import (
+    subsample, convert_polyglot_to_mallet, lowercase_polyglot, compute_common_words,
+)
 from follow_up.evaluation import (
     check_corpus_alignment, check_token_assignment_alignment,
     compute_coherence, compute_coherence_lemmatized, compute_topic_assignment_voi,
@@ -50,6 +52,8 @@ NUM_TOPICS = 100
 NUM_ITERATIONS = 1000
 NUM_TRIALS = 5
 OPTIMIZE_INTERVAL = 10
+
+NUM_STOP_WORDS = 200
 
 LANGUAGES = ('en', 'fa', 'ko', 'ru')
 LANGUAGE_NAMES = dict(
@@ -172,6 +176,27 @@ def task_lowercase():
                 'actions': [(lowercase_polyglot, (), dict(
                     input_path=input_path,
                     output_path=output_path
+                ))],
+                'targets': [output_path],
+            }
+
+
+def task_compute_common_words():
+    for lang in LANGUAGES:
+        input_paths = [
+            DATA_ROOT / lang / filename
+            for filename in DATA_SET_FILENAMES
+        ]
+        for input_path in input_paths:
+            output_path = input_path.with_suffix('.common-words.txt')
+            name = f'{lang}.{input_path.stem}'
+            yield {
+                'name': name,
+                'file_dep': [input_path],
+                'actions': [(compute_common_words, (), dict(
+                    input_path=input_path,
+                    output_path=output_path,
+                    num_words=NUM_STOP_WORDS,
                 ))],
                 'targets': [output_path],
             }

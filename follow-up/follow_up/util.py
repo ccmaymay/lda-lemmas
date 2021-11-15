@@ -146,3 +146,9 @@ def lowercase_polyglot(input_path: PathLike, output_path: PathLike):
         Doc(doc.doc_id, [[token.lower() for token in section] for section in doc.sections])
         for doc in load_polyglot(input_path)
     ))
+
+
+def compute_common_words(input_path: PathLike, output_path: PathLike, num_words: int):
+    with open(output_path, encoding='utf-8', mode='w') as f:
+        for (word, _) in PolyglotCorpus(input_path).word_occur.most_common(num_words):
+            f.write(word + '\n')
