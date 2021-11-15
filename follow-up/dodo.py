@@ -170,7 +170,6 @@ def task_lowercase():
                 'name': name,
                 'file_dep': [input_path],
                 'actions': [(lowercase_polyglot, (), dict(
-                    lang=lang,
                     input_path=input_path,
                     output_path=output_path
                 ))],
