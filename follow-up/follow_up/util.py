@@ -1,12 +1,13 @@
-import re
 import collections
+import numpy as np
+import re
 from dataclasses import dataclass
 from itertools import product
 from functools import cached_property
 from os import PathLike
 from pathlib import PurePath
 from random import sample
-from typing import Counter, Dict, Generic, Iterable, Iterator, List, Optional, Tuple, TypeVar
+from typing import Counter, Dict, Generic, Iterable, Iterator, List, Optional, TypeVar
 
 DOC_ID_RE = re.compile(r'\[\[(?P<doc_id>\d+)\]\]')
 
@@ -57,32 +58,34 @@ class Corpus(Generic[T]):
     def vocab(self) -> List[T]:
         _vocab: List[T] = []
         for doc in self.docs:
-            for section in doc.sections:
-                for word in section:
-                    if word not in _vocab:
-                        _vocab.append(word)
+            for word in doc.tokens:
+                if word not in _vocab:
+                    _vocab.append(word)
 
         return _vocab
 
     @cached_property
-    def word_ids(self) -> Dict[T, int]:
-        return dict((word, word_id) for (word_id, word) in enumerate(self.vocab))
+    def word_index(self) -> Dict[T, int]:
+        return dict((word, i) for (i, word) in enumerate(self.vocab))
 
-    @cached_property
-    def word_occur(self) -> Counter[T]:
-        return Counter(dict(
-            (word1, count) for ((word1, word2), count) in self.word_cooccur.items()
-            if word1 == word2
+    @property
+    def word_occur_counter(self) -> Counter[T]:
+        return collections.Counter(dict(
+            (word, self.word_occur[i]) for (i, word) in enumerate(self.vocab)
         ))
 
     @cached_property
-    def word_cooccur(self) -> Counter[Tuple[T, T]]:
-        counter: Counter[Tuple[T, T]] = collections.Counter()
-        for doc in self.docs:
-            for (word1, word2) in product(set(doc.tokens), repeat=2):
-                counter[(word1, word2)] += 1
+    def word_occur(self) -> np.ndarray:
+        return np.array([self.word_cooccur[i, i] for i in range(len(self.vocab))], dtype=np.uint)
 
-        return counter
+    @cached_property
+    def word_cooccur(self) -> np.ndarray:
+        counts = np.zeros((len(self.vocab), len(self.vocab)), dtype=np.uint)
+        for doc in self.docs:
+            for (i1, i2) in product([self.word_index[word] for word in set(doc.tokens)], repeat=2):
+                counts[i1, i2] += 1
+
+        return counts
 
 
 class PolyglotCorpus(Corpus[str], Iterable[Doc[str]]):
@@ -150,5 +153,5 @@ def lowercase_polyglot(input_path: PathLike, output_path: PathLike):
 
 def compute_common_words(input_path: PathLike, output_path: PathLike, num_words: int):
     with open(output_path, encoding='utf-8', mode='w') as f:
-        for (word, _) in PolyglotCorpus(input_path).word_occur.most_common(num_words):
+        for (word, _) in PolyglotCorpus(input_path).word_occur_counter.most_common(num_words):
             f.write(word + '\n')
