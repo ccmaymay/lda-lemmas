@@ -58,7 +58,6 @@ class CorpusSummary(Generic[T]):
     vocab: List[T]
     word_occur: np.ndarray
     word_cooccur: np.ndarray
-    cooccur_word_ids: List[int]
 
     @cached_property
     def word_index(self) -> Dict[T, int]:
@@ -73,8 +72,8 @@ class CorpusSummary(Generic[T]):
     @cached_property
     def word_cooccur_counter(self) -> Counter[Tuple[T, T]]:
         return collections.Counter(dict(
-            ((self.vocab[i1], self.vocab[i2]), self.word_cooccur[j1, j2])
-            for ((j1, i1), (j2, i2)) in product(enumerate(self.cooccur_word_ids), repeat=2)
+            ((self.vocab[i1], self.vocab[i2]), self.word_cooccur[i1, i2])
+            for (i1, i2) in product(range(self.word_cooccur.shape[0]), repeat=2)
         ))
 
     def save(self, path: PathLike):
@@ -85,7 +84,6 @@ class CorpusSummary(Generic[T]):
             vocab=self.vocab,
             word_occur=self.word_occur,
             word_cooccur=self.word_cooccur,
-            cooccur_word_ids=self.cooccur_word_ids,
         )
 
 
@@ -97,7 +95,6 @@ def load_corpus_summary(path: PathLike) -> CorpusSummary:
         vocab=archive['vocab'].tolist(),
         word_occur=archive['word_occur'],
         word_cooccur=archive['word_cooccur'],
-        cooccur_word_ids=archive['cooccur_word_ids'].tolist(),
     )
 
 
@@ -109,31 +106,28 @@ class Corpus(Generic[T]):
     @cached_property
     def summary(self) -> CorpusSummary[T]:
         num_docs: int = 0
-        word_index: Dict[T, int] = {}
-        vocab: List[T] = []
-        word_occur_counter: Counter[int] = collections.Counter()
+        word_occur_counter: Counter[T] = collections.Counter()
         for doc in self.docs:
             num_docs += 1
             for word in set(doc.tokens):
-                if word not in vocab:
-                    word_index[word] = len(vocab)
-                    vocab.append(word)
-                word_occur_counter[word_index[word]] += 1
+                word_occur_counter[word] += 1
+
+        # vocab contains words in order of document frequency (decreasing)
+        vocab = [word for (word, c) in word_occur_counter.most_common()]
+        word_index = dict((word, i) for (i, word) in enumerate(vocab))
 
         assert len(word_index) == len(vocab)
         assert len(word_occur_counter) == len(vocab)
 
-        word_occur = np.array([c for (i, c) in sorted(word_occur_counter.items())], dtype=np.uint)
+        word_occur = np.array([word_occur_counter[word] for word in vocab], dtype=np.uint)
         cooccur_num_words = min(len(vocab), MAX_COOCCUR_NUM_WORDS)
-        cooccur_word_ids = [i for (i, c) in word_occur_counter.most_common(cooccur_num_words)]
-        cooccur_word_ids_set = set(cooccur_word_ids)
         word_cooccur = np.zeros((cooccur_num_words, cooccur_num_words), dtype=np.uint)
         for doc in self.docs:
-            doc_word_ids = set(
+            doc_word_ids = [
                 i
                 for i in (word_index[word] for word in set(doc.tokens))
-                if i in cooccur_word_ids_set
-            )
+                if i < cooccur_num_words
+            ]
             for (i1, i2) in product(doc_word_ids, repeat=2):
                 word_cooccur[i1, i2] += 1
 
@@ -143,7 +137,6 @@ class Corpus(Generic[T]):
             vocab=vocab,
             word_occur=word_occur,
             word_cooccur=word_cooccur,
-            cooccur_word_ids=cooccur_word_ids,
         )
 
 
