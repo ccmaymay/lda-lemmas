@@ -10,6 +10,7 @@ from random import sample
 from typing import Counter, Dict, Generic, Iterable, Iterator, List, Optional, Tuple, TypeVar
 
 DOC_ID_RE = re.compile(r'\[\[(?P<doc_id>\d+)\]\]')
+DOC_LOG_INTERVAL = 10
 
 MAX_COOCCUR_NUM_WORDS = 10000
 
@@ -115,7 +116,6 @@ class Corpus(Generic[T]):
         # vocab contains words in order of document frequency (decreasing)
         vocab = [word for (word, c) in word_occur_counter.most_common()]
         word_index = dict((word, i) for (i, word) in enumerate(vocab))
-
         assert len(word_index) == len(vocab)
         assert len(word_occur_counter) == len(vocab)
 
@@ -125,11 +125,14 @@ class Corpus(Generic[T]):
         for doc in self.docs:
             doc_word_ids = [
                 i
-                for i in (word_index[word] for word in set(doc.tokens))
+                for i in sorted(word_index[word] for word in set(doc.tokens))
                 if i < cooccur_num_words
             ]
-            for (i1, i2) in product(doc_word_ids, repeat=2):
-                word_cooccur[i1, i2] += 1
+            for i in doc_word_ids:
+                word_cooccur[i, doc_word_ids[i + 1:]] += 1
+        word_cooccur = (
+            word_cooccur + word_cooccur.transpose() + np.diag(word_occur[:cooccur_num_words])
+        )
 
         return CorpusSummary(
             corpus_id=self.corpus_id,
