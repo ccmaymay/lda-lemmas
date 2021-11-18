@@ -305,7 +305,6 @@ def task_mallet_train():
                 input_path = corpus_path.with_suffix('.mallet.dat')
                 topic_model_name = f'topic-model-{NUM_TOPICS}-{trial}'
                 name = f'{lang}.{corpus_path.stem}.{topic_model_name}'
-                output_model_path = input_path.with_suffix(f'.{topic_model_name}.dat')
                 output_state_path = input_path.with_suffix(f'.{topic_model_name}.state.txt.gz')
                 output_topic_keys_path = input_path.with_suffix(f'.{topic_model_name}.keys.txt')
                 yield {
@@ -318,11 +317,10 @@ def task_mallet_train():
                         '--num-iterations', f'{NUM_ITERATIONS}',
                         '--optimize-interval', f'{OPTIMIZE_INTERVAL}',
                         '--input', f'{input_path}',
-                        '--output-model', f'{output_model_path}',
                         '--output-state', f'{output_state_path}',
                         '--output-topic-keys', f'{output_topic_keys_path}',
                     ]],
-                    'targets': [output_model_path, output_state_path, output_topic_keys_path],
+                    'targets': [output_state_path, output_topic_keys_path],
                 }
 
 
