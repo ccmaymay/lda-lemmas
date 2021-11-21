@@ -10,7 +10,7 @@ from typing import (
     overload,
 )
 
-from .util import Corpus, CorpusSummary, Doc, PolyglotCorpus, load_corpus_summary
+from .util import Corpus, CorpusSummary, Doc, PolyglotCorpus, load_corpus_summary, load_word_list
 
 DEFAULT_NUM_KEYS = 5
 
@@ -130,15 +130,25 @@ def load_token_assignments(input_path: PathLike) -> Iterable[Doc[TokenAssignment
         yield doc
 
 
-def load_topic_keys(input_path: PathLike, num_keys: int = DEFAULT_NUM_KEYS) -> List[List[str]]:
+def load_topic_keys(
+        input_path: PathLike,
+        num_keys: int = DEFAULT_NUM_KEYS,
+        stop_list_path: Optional[PathLike] = None) -> List[List[str]]:
+    if stop_list_path is not None:
+        stop_words = set(load_word_list(stop_list_path))
+    else:
+        stop_words = set()
+
     topic_keys = []
     with open(input_path, encoding='utf-8') as f:
         for line in f:
             (_, _, keys_str) = line.strip().split('\t')
-            keys = keys_str.split()[:num_keys]
-            if len(keys) != num_keys:
-                raise Exception(f'Failed to extract {num_keys} keys from keys file {input_path}')
-            topic_keys.append(keys)
+            keys = [k for k in keys_str.split() if k not in stop_words]
+            if len(keys) < num_keys:
+                raise Exception(
+                    f'Less than {num_keys} keys in keys file {input_path}'
+                    f'using stop list {stop_list_path}')
+            topic_keys.append(keys[:num_keys])
 
     return topic_keys
 

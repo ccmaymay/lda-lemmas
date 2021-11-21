@@ -214,3 +214,8 @@ def compute_common_words(input_path: PathLike, output_path: PathLike, num_words:
     with open(output_path, encoding='utf-8', mode='w') as f:
         for (word, _) in load_corpus_summary(input_path).word_occur_counter.most_common(num_words):
             f.write(word + '\n')
+
+
+def load_word_list(path: PathLike) -> List[str]:
+    with open(path, encoding='utf-8') as f:
+        return [line.strip() for line in f]
