@@ -26,8 +26,8 @@ class TokenAssignment(NamedTuple):
 
 class TopicState(Corpus[TokenAssignment], Iterable[Doc[TokenAssignment]]):
     topic_state_path: PathLike
-    _alpha: Optional[List[float]]
-    _beta: Optional[float]
+    _alpha: Optional[List[float]] = None
+    _beta: Optional[float] = None
 
     def __init__(self, topic_state_path):
         self.topic_state_path = topic_state_path
