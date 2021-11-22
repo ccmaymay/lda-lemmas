@@ -317,6 +317,7 @@ def task_mallet_train():
                         '--num-topics', f'{NUM_TOPICS}',
                         '--num-iterations', f'{NUM_ITERATIONS}',
                         '--optimize-interval', f'{OPTIMIZE_INTERVAL}',
+                        '--num-top-words', f'{NUM_STOP_WORDS + 100}',
                         '--input', f'{input_path}',
                         '--output-state', f'{output_state_path}',
                         '--output-topic-keys', f'{output_topic_keys_path}',
