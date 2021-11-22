@@ -155,8 +155,8 @@ def load_topic_keys(
 
 def infer_topic_keys(
         topic_state: TopicState,
-        num_topics: int,
         num_keys: int = DEFAULT_NUM_KEYS) -> List[List[str]]:
+    num_topics = topic_state.num_topics
     topic_words: List[Counter[str]] = [collections.Counter() for topic_num in range(num_topics)]
     for doc in topic_state.docs:
         for token_assignment in doc.tokens:
@@ -206,7 +206,6 @@ def compute_coherence_lemmatized(
         load_corpus_summary(corpus_summary_path),
         infer_topic_keys(
             topic_state,
-            num_topics=topic_state.num_topics,
             num_keys=num_keys
         ),
         topic_state.beta
