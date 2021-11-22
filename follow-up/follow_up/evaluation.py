@@ -157,16 +157,12 @@ def infer_topic_keys(
         topic_state: TopicState,
         num_topics: int,
         num_keys: int = DEFAULT_NUM_KEYS) -> List[List[str]]:
+    topic_words: List[Counter[str]] = [collections.Counter() for topic_num in range(num_topics)]
+    for doc in topic_state.docs:
+        for token_assignment in doc.tokens:
+            topic_words[token_assignment.topic][token_assignment.word] += 1
     return [
-        [
-            word
-            for (word, _) in collections.Counter(
-                token_assignment.word
-                for doc in topic_state.docs
-                for token_assignment in doc.tokens
-                if token_assignment.topic == topic_num
-            ).most_common(num_keys)
-        ]
+        [word for (word, _) in topic_words[topic_num].most_common(num_keys)]
         for topic_num in range(num_topics)
     ]
 
