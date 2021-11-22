@@ -1,6 +1,8 @@
 import platform
 from itertools import product
+from os import PathLike
 from pathlib import Path
+from typing import Optional
 
 import pycountry  # type: ignore
 
@@ -10,8 +12,7 @@ from follow_up.util import (
 )
 from follow_up.evaluation import (
     check_corpus_alignment, check_token_assignment_alignment,
-    compute_coherence, compute_coherence_lemmatized, compute_topic_assignment_voi,
-    collect_subtask_scores,
+    compute_coherence_treated, compute_topic_assignment_voi, collect_subtask_scores,
 )
 from follow_up.lemmatization import parse_treetagger, parse_udpipe
 
@@ -353,29 +354,30 @@ def task_compute_coherence():
             for filename in DATA_SET_FILENAMES
         ]
         # First entry in DATA_SET_FILENAMES is unlemmatized corpus
-        is_lemmatized = False
+        untreated_state_path: Optional[PathLike] = None
+        untreated_corpus_summary_path: Optional[PathLike] = None
         for corpus_path in corpus_paths:
             for trial in range(NUM_TRIALS):
                 topic_model_name = f'topic-model-{NUM_TOPICS}-{trial}'
                 name = f'{lang}.{corpus_path.stem}.{topic_model_name}'
-                corpus_summary_path = corpus_path.with_suffix('.summary.npz')
-                topic_keys_path = corpus_path.with_suffix(f'.mallet.{topic_model_name}.keys.txt')
                 state_path = corpus_path.with_suffix(f'.mallet.{topic_model_name}.state.txt.gz')
+                corpus_summary_path = corpus_path.with_suffix('.summary.npz')
+                if untreated_state_path is None:
+                    untreated_state_path = state_path
+                if untreated_corpus_summary_path is None:
+                    untreated_corpus_summary_path = corpus_summary_path
                 yield {
                     'name': name,
-                    'file_dep': [corpus_summary_path, state_path, topic_keys_path],
+                    'file_dep': [untreated_corpus_summary_path, untreated_state_path, state_path],
                     'task_dep': [f'check_token_assignment_alignment:{name}'],
                     'actions': [(
-                        compute_coherence_lemmatized if is_lemmatized else compute_coherence,
-                        (),
-                        dict(
-                            corpus_summary_path=corpus_summary_path,
-                            topic_keys_path=topic_keys_path,
+                        compute_coherence_treated, (), dict(
+                            untreated_corpus_summary_path=untreated_corpus_summary_path,
+                            untreated_topic_state_path=untreated_state_path,
                             topic_state_path=state_path,
                         ),
                     )],
                 }
-                is_lemmatized = True
 
 
 def task_compute_voi():

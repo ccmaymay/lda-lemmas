@@ -155,12 +155,13 @@ def load_topic_keys(
 
 def infer_topic_keys(
         topic_state: TopicState,
+        untreated_topic_state: TopicState,
         num_keys: int = DEFAULT_NUM_KEYS) -> List[List[str]]:
     num_topics = topic_state.num_topics
     topic_words: List[Counter[str]] = [collections.Counter() for topic_num in range(num_topics)]
-    for doc in topic_state.docs:
-        for token_assignment in doc.tokens:
-            topic_words[token_assignment.topic][token_assignment.word] += 1
+    for (doc, untr_doc) in zip(topic_state.docs, untreated_topic_state.docs):
+        for (ta, untr_ta) in zip(doc.tokens, untr_doc.tokens):
+            topic_words[ta.topic][untr_ta.word] += 1
     return [
         [word for (word, _) in topic_words[topic_num].most_common(num_keys)]
         for topic_num in range(num_topics)
@@ -196,16 +197,17 @@ def compute_coherence(
     ))
 
 
-def compute_coherence_lemmatized(
-        corpus_summary_path: PathLike,
-        topic_keys_path: PathLike,
+def compute_coherence_treated(
+        untreated_corpus_summary_path: PathLike,
+        untreated_topic_state_path: PathLike,
         topic_state_path: PathLike,
         num_keys: int = DEFAULT_NUM_KEYS) -> Dict[str, float]:
     topic_state = TopicState(topic_state_path)
     return dict(coherence=_compute_coherence(
-        load_corpus_summary(corpus_summary_path),
+        load_corpus_summary(untreated_corpus_summary_path),
         infer_topic_keys(
             topic_state,
+            TopicState(untreated_topic_state_path),
             num_keys=num_keys
         ),
         topic_state.beta
