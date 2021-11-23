@@ -9,3 +9,6 @@ poetry.lock
 *.tar.gz
 *.tar.lzma
 *.npz
+# temporary scripts
+/?.py
+/??.py
