@@ -13,6 +13,7 @@ from follow_up.util import (
 from follow_up.evaluation import (
     check_corpus_alignment, check_token_assignment_alignment,
     compute_coherence_treated, compute_topic_assignment_voi, collect_subtask_scores,
+    compute_coherence,
 )
 from follow_up.lemmatization import parse_treetagger, parse_udpipe
 
@@ -372,6 +373,7 @@ def task_compute_coherence():
                     untreated_stop_list_path = corpus_path.with_suffix('.common-words.txt')
                 yield {
                     'name': name,
+                    # TODO add stop_list_path
                     'file_dep': [untreated_corpus_summary_path, untreated_state_path, state_path],
                     'task_dep': [f'check_token_assignment_alignment:{dep_name}'],
                     'actions': [(
@@ -429,6 +431,46 @@ def task_collect_voi():
     output_path = DATA_ROOT / 'voi.tsv'
     return {
         'getargs': {'scores': ('compute_voi', 'voi')},
+        'actions': [(collect_subtask_scores, (), dict(output_path=output_path))],
+        'targets': [output_path],
+    }
+
+
+def task_compute_coherence_sanity():
+    for lang in LANGUAGES:
+        corpus_paths = [
+            DATA_ROOT / lang / filename
+            for filename in DATA_SET_FILENAMES
+        ]
+        for trial in range(NUM_TRIALS):
+            for corpus_path in corpus_paths:
+                topic_model_name = f'topic-model-{NUM_TOPICS}-{trial}'
+                dep_name = f'{lang}.{corpus_path.stem}.{topic_model_name}'
+                name = f'{dep_name}.stop-top-200'
+                topic_keys_path = corpus_path.with_suffix(f'.mallet.{topic_model_name}.keys.txt')
+                state_path = corpus_path.with_suffix(f'.mallet.{topic_model_name}.state.txt.gz')
+                corpus_summary_path = corpus_path.with_suffix('.summary.npz')
+                stop_list_path = corpus_path.with_suffix('.common-words.txt')
+                yield {
+                    'name': name,
+                    # TODO add stop_list_path
+                    'file_dep': [corpus_summary_path, topic_keys_path, state_path],
+                    'task_dep': [f'check_token_assignment_alignment:{dep_name}'],
+                    'actions': [(
+                        compute_coherence, (), dict(
+                            corpus_summary_path=corpus_summary_path,
+                            topic_keys_path=topic_keys_path,
+                            topic_state_path=state_path,
+                            stop_list_path=stop_list_path,
+                        ),
+                    )],
+                }
+
+
+def task_collect_coherence_sanity():
+    output_path = DATA_ROOT / 'coherence-sanity.tsv'
+    return {
+        'getargs': {'scores': ('compute_coherence_sanity', 'coherence')},
         'actions': [(collect_subtask_scores, (), dict(output_path=output_path))],
         'targets': [output_path],
     }
