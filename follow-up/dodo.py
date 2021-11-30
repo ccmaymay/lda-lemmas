@@ -357,16 +357,18 @@ def task_compute_coherence():
         # First entry in DATA_SET_FILENAMES is unlemmatized corpus
         untreated_state_path: Optional[PathLike] = None
         untreated_corpus_summary_path: Optional[PathLike] = None
-        for corpus_path in corpus_paths:
-            for trial in range(NUM_TRIALS):
+        untreated_stop_list_path: Optional[PathLike] = None
+        for trial in range(NUM_TRIALS):
+            for corpus_path in corpus_paths:
                 topic_model_name = f'topic-model-{NUM_TOPICS}-{trial}'
-                name = f'{lang}.{corpus_path.stem}.{topic_model_name}'
+                name = f'{lang}.{corpus_path.stem}.{topic_model_name}.stop-top-200'
                 state_path = corpus_path.with_suffix(f'.mallet.{topic_model_name}.state.txt.gz')
-                corpus_summary_path = corpus_path.with_suffix('.summary.npz')
                 if untreated_state_path is None:
                     untreated_state_path = state_path
                 if untreated_corpus_summary_path is None:
-                    untreated_corpus_summary_path = corpus_summary_path
+                    untreated_corpus_summary_path = corpus_path.with_suffix('.summary.npz')
+                if untreated_stop_list_path is None:
+                    untreated_stop_list_path = corpus_path.with_suffix('.common-words.txt')
                 yield {
                     'name': name,
                     'file_dep': [untreated_corpus_summary_path, untreated_state_path, state_path],
@@ -376,6 +378,7 @@ def task_compute_coherence():
                             untreated_corpus_summary_path=untreated_corpus_summary_path,
                             untreated_topic_state_path=untreated_state_path,
                             topic_state_path=state_path,
+                            untreated_stop_list_path=untreated_stop_list_path,
                         ),
                     )],
                 }

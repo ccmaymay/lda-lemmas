@@ -157,17 +157,17 @@ def infer_topic_keys(
         topic_state: TopicState,
         untreated_topic_state: TopicState,
         num_keys: int = DEFAULT_NUM_KEYS,
-        stop_list_path: Optional[PathLike] = None) -> List[List[str]]:
-    if stop_list_path is not None:
-        stop_words = set(load_word_list(stop_list_path))
+        untreated_stop_list_path: Optional[PathLike] = None) -> List[List[str]]:
+    if untreated_stop_list_path is not None:
+        untreated_stop_words = set(load_word_list(untreated_stop_list_path))
     else:
-        stop_words = set()
+        untreated_stop_words = set()
 
     num_topics = topic_state.num_topics
     topic_words: List[Counter[str]] = [collections.Counter() for topic_num in range(num_topics)]
     for (doc, untr_doc) in zip(topic_state.docs, untreated_topic_state.docs):
         for (ta, untr_ta) in zip(doc.tokens, untr_doc.tokens):
-            if untr_ta.word not in stop_words:
+            if untr_ta.word not in untreated_stop_words:
                 topic_words[ta.topic][untr_ta.word] += 1
     return [
         [word for (word, _) in topic_words[topic_num].most_common(num_keys)]
@@ -196,11 +196,13 @@ def compute_coherence(
         corpus_summary_path: PathLike,
         topic_keys_path: PathLike,
         topic_state_path: PathLike,
-        num_keys: int = DEFAULT_NUM_KEYS) -> Dict[str, float]:
+        num_keys: int = DEFAULT_NUM_KEYS,
+        stop_list_path: Optional[PathLike] = None) -> Dict[str, float]:
+    topic_state = TopicState(topic_state_path)
     return dict(coherence=_compute_coherence(
         load_corpus_summary(corpus_summary_path),
-        load_topic_keys(topic_keys_path, num_keys=num_keys),
-        TopicState(topic_state_path).beta
+        load_topic_keys(topic_keys_path, num_keys=num_keys, stop_list_path=stop_list_path),
+        topic_state.beta,
     ))
 
 
@@ -208,14 +210,16 @@ def compute_coherence_treated(
         untreated_corpus_summary_path: PathLike,
         untreated_topic_state_path: PathLike,
         topic_state_path: PathLike,
-        num_keys: int = DEFAULT_NUM_KEYS) -> Dict[str, float]:
+        num_keys: int = DEFAULT_NUM_KEYS,
+        untreated_stop_list_path: Optional[PathLike] = None) -> Dict[str, float]:
     topic_state = TopicState(topic_state_path)
     return dict(coherence=_compute_coherence(
         load_corpus_summary(untreated_corpus_summary_path),
         infer_topic_keys(
             topic_state,
             TopicState(untreated_topic_state_path),
-            num_keys=num_keys
+            num_keys=num_keys,
+            untreated_stop_list_path=untreated_stop_list_path,
         ),
         topic_state.beta
     ))
