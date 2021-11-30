@@ -1,0 +1,44 @@
+---
+title: "Coherence Analysis"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+data <- read_tsv("polyglot/coherence.tsv") %>%
+  mutate(
+    subtask=subtask %>%
+      str_replace(fixed(".sub.lower"), ".none") %>%
+      str_remove(fixed(".sub")) %>%
+      str_remove(fixed(".lower")) %>%
+      str_remove(fixed(".parsed")) %>%
+      str_split(fixed("."))) %>%
+  hoist(
+    subtask,
+    language=1,
+    lemmatization=2,
+    topic_model=3,
+    stop_word_filtering=4) %>%
+  mutate(
+    lemmatization=lemmatization %>% str_remove("^lem-"),
+    stop_word_filtering=stop_word_filtering %>% str_remove("^stop-"),
+    topic_model=topic_model %>%
+      str_remove("^topic-model-") %>%
+      str_split(fixed("-"))) %>%
+  hoist(topic_model, num_topics=1, trial=2) %>%
+  type_convert(col_types=cols(
+    language=col_factor(levels=c("en", "fa", "ko", "ru")),
+    lemmatization=col_factor(levels=c("none", "treetagger", "udpipe")),
+    num_topics=col_integer(),
+    trial=col_factor(levels=as.character(0:9)),
+    stop_word_filtering=col_factor(),
+    score=col_double()))
+data %>%
+  ggplot(aes(x=lemmatization, y=score)) +
+  geom_boxplot() +
+  theme_bw() +
+  theme(axis.text.x=element_text(angle=-45, hjust=0)) +
+  facet_grid(~ language) +
+  ylab("coherence")
+ggsave('polyglot/coherence.pdf', width=4, height=4)
+```
