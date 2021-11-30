@@ -156,12 +156,19 @@ def load_topic_keys(
 def infer_topic_keys(
         topic_state: TopicState,
         untreated_topic_state: TopicState,
-        num_keys: int = DEFAULT_NUM_KEYS) -> List[List[str]]:
+        num_keys: int = DEFAULT_NUM_KEYS,
+        stop_list_path: Optional[PathLike] = None) -> List[List[str]]:
+    if stop_list_path is not None:
+        stop_words = set(load_word_list(stop_list_path))
+    else:
+        stop_words = set()
+
     num_topics = topic_state.num_topics
     topic_words: List[Counter[str]] = [collections.Counter() for topic_num in range(num_topics)]
     for (doc, untr_doc) in zip(topic_state.docs, untreated_topic_state.docs):
         for (ta, untr_ta) in zip(doc.tokens, untr_doc.tokens):
-            topic_words[ta.topic][untr_ta.word] += 1
+            if untr_ta.word not in stop_words:
+                topic_words[ta.topic][untr_ta.word] += 1
     return [
         [word for (word, _) in topic_words[topic_num].most_common(num_keys)]
         for topic_num in range(num_topics)
