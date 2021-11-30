@@ -361,7 +361,8 @@ def task_compute_coherence():
         for trial in range(NUM_TRIALS):
             for corpus_path in corpus_paths:
                 topic_model_name = f'topic-model-{NUM_TOPICS}-{trial}'
-                name = f'{lang}.{corpus_path.stem}.{topic_model_name}.stop-top-200'
+                dep_name = f'{lang}.{corpus_path.stem}.{topic_model_name}'
+                name = f'{dep_name}.stop-top-200'
                 state_path = corpus_path.with_suffix(f'.mallet.{topic_model_name}.state.txt.gz')
                 if untreated_state_path is None:
                     untreated_state_path = state_path
@@ -372,7 +373,7 @@ def task_compute_coherence():
                 yield {
                     'name': name,
                     'file_dep': [untreated_corpus_summary_path, untreated_state_path, state_path],
-                    'task_dep': [f'check_token_assignment_alignment:{name}'],
+                    'task_dep': [f'check_token_assignment_alignment:{dep_name}'],
                     'actions': [(
                         compute_coherence_treated, (), dict(
                             untreated_corpus_summary_path=untreated_corpus_summary_path,
