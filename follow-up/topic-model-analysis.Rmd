@@ -1,0 +1,99 @@
+---
+title: "Topic Model Analysis"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+```
+
+## Coherence
+
+```{r}
+data <- read_tsv("polyglot/coherence.tsv") %>%
+  mutate(
+    subtask=subtask %>%
+      str_replace(fixed(".sub.lower"), ".none") %>%
+      str_remove(fixed(".sub")) %>%
+      str_remove(fixed(".lower")) %>%
+      str_remove(fixed(".parsed")) %>%
+      str_split(fixed("."))) %>%
+  hoist(
+    subtask,
+    language=1,
+    lemmatization=2,
+    topic_model=3,
+    stop_word_filtering=4) %>%
+  mutate(
+    lemmatization=lemmatization %>% str_remove("^lem-"),
+    stop_word_filtering=stop_word_filtering %>% str_remove("^stop-"),
+    topic_model=topic_model %>%
+      str_remove("^topic-model-") %>%
+      str_split(fixed("-"))) %>%
+  hoist(topic_model, num_topics=1, trial=2) %>%
+  type_convert(col_types=cols(
+    language=col_factor(levels=c("en", "fa", "ko", "ru")),
+    lemmatization=col_factor(levels=c("none", "treetagger", "udpipe")),
+    num_topics=col_integer(),
+    trial=col_factor(levels=as.character(0:9)),
+    stop_word_filtering=col_factor(),
+    score=col_double()))
+data %>%
+  ggplot(aes(x=lemmatization, y=score)) +
+  geom_boxplot() +
+  theme_bw() +
+  theme(axis.text.x=element_text(angle=-45, hjust=0)) +
+  facet_grid(~ language) +
+  ylab("coherence")
+ggsave('polyglot/coherence.pdf', width=4, height=4)
+```
+
+## Variation of Information
+```{r}
+data <- read_tsv("polyglot/voi.tsv") %>%
+  mutate(
+    subtask=subtask %>%
+      str_replace_all(fixed(".sub.lower"), ".none") %>%
+      str_remove_all(fixed(".sub")) %>%
+      str_remove_all(fixed(".lower")) %>%
+      str_remove_all(fixed(".parsed")) %>%
+      str_split(fixed("."))) %>%
+  hoist(
+    subtask,
+    language=1,
+    lemmatization_1=2,
+    topic_model_1=3,
+    lemmatization_2=4,
+    topic_model_2=5) %>%
+  mutate(
+    lemmatization_1=lemmatization_1 %>% str_remove("^lem-"),
+    lemmatization_2=lemmatization_2 %>% str_remove("^lem-"),
+    topic_model_1=topic_model_1 %>%
+      str_remove("^topic-model-") %>%
+      str_split(fixed("-")),
+    topic_model_2=topic_model_2 %>%
+      str_remove("^topic-model-") %>%
+      str_split(fixed("-"))) %>%
+  hoist(topic_model_1, num_topics_1=1, trial_1=2) %>%
+  hoist(topic_model_2, num_topics_2=1, trial_2=2) %>%
+  type_convert(col_types=cols(
+    language=col_factor(levels=c("en", "fa", "ko", "ru")),
+    lemmatization_1=col_factor(levels=c("none", "treetagger", "udpipe")),
+    lemmatization_2=col_factor(levels=c("none", "treetagger", "udpipe")),
+    num_topics_1=col_integer(),
+    num_topics_2=col_integer(),
+    trial_1=col_factor(levels=as.character(0:9)),
+    trial_2=col_factor(levels=as.character(0:9)),
+    score=col_double()))
+data %>%
+  group_by(language, lemmatization_1, lemmatization_2) %>%
+  summarize(`mean VOI`=mean(score)) %>%
+  ggplot(aes(x=lemmatization_1, y=lemmatization_2, fill=`mean VOI`)) +
+  geom_tile() +
+  theme_bw() +
+  theme(axis.text.x=element_text(angle=-45, hjust=0)) +
+  facet_wrap(~ language) +
+  xlab("lemmatization 1") +
+  ylab("lemmatization 2")
+ggsave('polyglot/voi.png', width=4, height=3)
+```
