@@ -5,10 +5,9 @@ from difflib import unified_diff
 from math import log
 from os import PathLike
 from pathlib import PurePath
-from typing import (
-    Counter, Dict, Iterable, Iterator, List, Literal, Optional, NamedTuple, Tuple, TypeVar,
-    overload,
-)
+from typing import Counter, Dict, Iterable, Iterator, List, Optional, NamedTuple, TypeVar
+
+import numpy as np
 
 from .util import Corpus, CorpusSummary, Doc, PolyglotCorpus, load_corpus_summary, load_word_list
 
@@ -67,6 +66,16 @@ class TopicState(Corpus[TokenAssignment], Iterable[Doc[TokenAssignment]]):
     @property
     def num_topics(self) -> int:
         return len(self.alpha)
+
+
+def compute_topic_assignments(topic_state_path: PathLike, topic_assignments_path: PathLike):
+    np.save(
+        topic_assignments_path,
+        np.array([
+            ta.topic
+            for doc in TopicState(topic_state_path).docs
+            for ta in doc.tokens
+        ], dtype=np.uint))
 
 
 def check_corpus_alignment(corpus1_path: PathLike, corpus2_path: PathLike):
@@ -225,71 +234,60 @@ def compute_coherence_treated(
     ))
 
 
-def compute_entropy(pmf: Dict[X, float]) -> float:
-    return sum(-p * log(p) for p in pmf.values())
+def compute_entropy(pmf: np.ndarray) -> float:
+    pmf_pos = pmf[pmf > 0]
+    return - (pmf_pos * np.log(pmf_pos)).sum()
 
 
-def compute_pmf(counts: Dict[X, int]) -> Dict[X, float]:
-    total = sum(counts.values())
-    return dict((x, c / total) for (x, c) in counts.items())
+def compute_pmf(counts: np.ndarray) -> np.ndarray:
+    return counts / counts.sum()
 
 
 def compute_mi(entropy_x: float, entropy_y: float, entropy_xy: float) -> float:
     return entropy_x + entropy_y - entropy_xy
 
 
-def compute_voi(joint_counts: Dict[Tuple[X, Y], int]) -> float:
-    entropy_x = compute_entropy(compute_pmf(compute_marginal_counts(joint_counts, 0)))
-    entropy_y = compute_entropy(compute_pmf(compute_marginal_counts(joint_counts, 1)))
+def compute_voi(joint_counts: np.ndarray) -> float:
+    entropy_x = compute_entropy(compute_pmf(joint_counts.sum(axis=0)))
+    entropy_y = compute_entropy(compute_pmf(joint_counts.sum(axis=1)))
     mi = compute_mi(entropy_x, entropy_y, compute_entropy(compute_pmf(joint_counts)))
     return entropy_x + entropy_y - 2 * mi
 
 
 def compute_joint_topic_assignment_counts(
-        topic_state_1: TopicState,
-        topic_state_2: TopicState) -> Dict[Tuple[int, int], int]:
-    counts: Counter[Tuple[int, int]] = collections.Counter()
-    for (doc1, doc2) in zip(topic_state_1.docs, topic_state_2.docs):
-        for (ta1, ta2) in zip(doc1.tokens, doc2.tokens):
-            counts[(ta1.topic, ta2.topic)] += 1
+        topic_assignments_1: np.ndarray,
+        topic_assignments_2: np.ndarray) -> np.ndarray:
+    if topic_assignments_1.shape != topic_assignments_2.shape:
+        raise Exception(
+            'Expected same topic assignment shapes but got '
+            f'{topic_assignments_1.shape} and {topic_assignments_2.shape}')
+    if len(topic_assignments_1.shape) != 1:
+        raise Exception(
+            f'Expected flat topic assignments but got shape {topic_assignments_1.shape}')
+    num_topics_1 = int(topic_assignments_1.max() + 1)
+    num_topics_2 = int(topic_assignments_2.max() + 1)
+    counts: np.ndarray = np.zeros((num_topics_1, num_topics_2))
+    for i in range(topic_assignments_1.shape[0]):
+        counts[topic_assignments_1[i], topic_assignments_2[i]] += 1
 
     return counts
 
 
-@overload
-def compute_marginal_counts(
-        joint_counts: Dict[Tuple[X, Y], int],
-        index: Literal[0]) -> Dict[X, int]:
-    pass
-
-
-@overload
-def compute_marginal_counts(
-        joint_counts: Dict[Tuple[X, Y], int],
-        index: Literal[1]) -> Dict[Y, int]:
-    pass
-
-
-def compute_marginal_counts(
-        joint_counts,
-        index):
-    counts = collections.Counter()
-    for (topic_pair, count) in joint_counts.items():
-        counts[topic_pair[index]] += count
-
-    return counts
-
-
-def _compute_topic_assignment_voi(topic_state_1: TopicState, topic_state_2: TopicState) -> float:
-    return compute_voi(compute_joint_topic_assignment_counts(topic_state_1, topic_state_2))
+def _compute_topic_assignment_voi(
+        topic_assignments_1: np.ndarray,
+        topic_assignments_2: np.ndarray) -> float:
+    return compute_voi(compute_joint_topic_assignment_counts(
+        topic_assignments_1,
+        topic_assignments_2,
+    ))
 
 
 def compute_topic_assignment_voi(
-        topic_state_1_path: PathLike,
-        topic_state_2_path: PathLike) -> Dict[str, float]:
+        topic_assignments_1_path: PathLike,
+        topic_assignments_2_path: PathLike) -> Dict[str, float]:
     return dict(voi=_compute_topic_assignment_voi(
-        TopicState(topic_state_1_path),
-        TopicState(topic_state_2_path),
+        np.load(topic_assignments_1_path),
+        np.load(topic_assignments_2_path),
     ))
 
 

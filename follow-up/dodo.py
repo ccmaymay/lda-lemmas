@@ -13,7 +13,7 @@ from follow_up.util import (
 from follow_up.evaluation import (
     check_corpus_alignment, check_token_assignment_alignment,
     compute_coherence_treated, compute_topic_assignment_voi, collect_subtask_scores,
-    compute_coherence,
+    compute_coherence, compute_topic_assignments,
 )
 from follow_up.lemmatization import parse_treetagger, parse_udpipe
 
@@ -373,8 +373,12 @@ def task_compute_coherence():
                     untreated_stop_list_path = corpus_path.with_suffix('.common-words.txt')
                 yield {
                     'name': name,
-                    # TODO add stop_list_path
-                    'file_dep': [untreated_corpus_summary_path, untreated_state_path, state_path],
+                    'file_dep': [
+                        untreated_corpus_summary_path,
+                        untreated_state_path,
+                        untreated_stop_list_path,
+                        state_path,
+                    ],
                     'task_dep': [f'check_token_assignment_alignment:{dep_name}'],
                     'actions': [(
                         compute_coherence_treated, (), dict(
@@ -384,6 +388,32 @@ def task_compute_coherence():
                             untreated_stop_list_path=untreated_stop_list_path,
                         ),
                     )],
+                }
+
+
+def task_compute_topic_assignments():
+    for lang in LANGUAGES:
+        corpus_paths = [
+            DATA_ROOT / lang / filename
+            for filename in DATA_SET_FILENAMES
+        ]
+        for corpus_path in corpus_paths:
+            for trial in range(NUM_TRIALS):
+                tm_name = f'topic-model-{NUM_TOPICS}-{trial}'
+                name = f'{lang}.{corpus_path.stem}.{tm_name}'
+                state_path = corpus_path.with_suffix(f'.mallet.{tm_name}.state.txt.gz')
+                assignments_path = corpus_path.with_suffix(f'.mallet.{tm_name}.assignments.npy')
+                yield {
+                    'name': name,
+                    'file_dep': [state_path],
+                    'task_dep': [f'check_token_assignment_alignment:{name}'],
+                    'actions': [(
+                        compute_topic_assignments, (), dict(
+                            topic_state_path=state_path,
+                            topic_assignments_path=assignments_path,
+                        ),
+                    )],
+                    'targets': [assignments_path],
                 }
 
 
@@ -397,22 +427,16 @@ def task_compute_voi():
             for (trial1, trial2) in product(range(NUM_TRIALS), repeat=2):
                 tm_1_name = f'topic-model-{NUM_TOPICS}-{trial1}'
                 tm_2_name = f'topic-model-{NUM_TOPICS}-{trial2}'
-                name1 = f'{lang}.{corpus_1_path.stem}.{tm_1_name}'
-                name2 = f'{lang}.{corpus_2_path.stem}.{tm_2_name}'
                 name = f'{lang}.{corpus_1_path.stem}.{tm_1_name}.{corpus_2_path.stem}.{tm_2_name}'
-                state_1_path = corpus_1_path.with_suffix(f'.mallet.{tm_1_name}.state.txt.gz')
-                state_2_path = corpus_2_path.with_suffix(f'.mallet.{tm_2_name}.state.txt.gz')
+                ta_1_path = corpus_1_path.with_suffix(f'.mallet.{tm_1_name}.assignments.npy')
+                ta_2_path = corpus_2_path.with_suffix(f'.mallet.{tm_2_name}.assignments.npy')
                 yield {
                     'name': name,
-                    'file_dep': [state_1_path, state_2_path],
-                    'task_dep': [
-                        f'check_token_assignment_alignment:{name1}',
-                        f'check_token_assignment_alignment:{name2}',
-                    ],
+                    'file_dep': [ta_1_path, ta_2_path],
                     'actions': [(
                         compute_topic_assignment_voi, (), dict(
-                            topic_state_1_path=state_1_path,
-                            topic_state_2_path=state_2_path,
+                            topic_assignments_1_path=ta_1_path,
+                            topic_assignments_2_path=ta_2_path,
                         ),
                     )],
                 }
@@ -453,8 +477,12 @@ def task_compute_coherence_sanity():
                 stop_list_path = corpus_path.with_suffix('.common-words.txt')
                 yield {
                     'name': name,
-                    # TODO add stop_list_path
-                    'file_dep': [corpus_summary_path, topic_keys_path, state_path],
+                    'file_dep': [
+                        corpus_summary_path,
+                        topic_keys_path,
+                        state_path,
+                        stop_list_path,
+                    ],
                     'task_dep': [f'check_token_assignment_alignment:{dep_name}'],
                     'actions': [(
                         compute_coherence, (), dict(
