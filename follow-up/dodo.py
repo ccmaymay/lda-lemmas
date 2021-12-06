@@ -8,7 +8,7 @@ import pycountry  # type: ignore
 
 from follow_up.util import (
     subsample, convert_polyglot_to_mallet, lowercase_polyglot, compute_common_words,
-    summarize_corpus,
+    summarize_corpus, collect_keys,
 )
 from follow_up.evaluation import (
     check_corpus_alignment, check_token_assignment_alignment,
@@ -16,6 +16,7 @@ from follow_up.evaluation import (
     compute_coherence, compute_topic_assignments,
 )
 from follow_up.lemmatization import parse_treetagger, parse_udpipe
+from follow_up.translation import translate_words
 
 DATA_ROOT = Path('polyglot')
 
@@ -502,3 +503,46 @@ def task_collect_coherence_sanity():
         'actions': [(collect_subtask_scores, (), dict(output_path=output_path))],
         'targets': [output_path],
     }
+
+
+def task_collect_keys():
+    for lang in LANGUAGES:
+        output_path = DATA_ROOT / lang / 'keys.txt'
+        input_paths = [
+            (DATA_ROOT / lang / filename).with_suffix(
+                f'.mallet.topic-model-{NUM_TOPICS}-{trial}.keys.txt'
+            )
+            for filename in DATA_SET_FILENAMES
+            for trial in range(NUM_TRIALS)
+        ]
+        yield {
+            'name': lang,
+            'file_dep': input_paths,
+            'actions': [(
+                collect_keys, (), dict(
+                    input_paths=input_paths,
+                    output_path=output_path,
+                ),
+            )],
+            'targets': [output_path],
+        }
+
+
+def task_translate_keys():
+    for lang in LANGUAGES:
+        if lang != 'en':
+            input_path = DATA_ROOT / lang / 'keys.txt'
+            output_path = input_path.with_suffix('.translated.jsonl')
+            yield {
+                'name': lang,
+                'file_dep': [input_path],
+                'actions': [(
+                    translate_words, (), dict(
+                        input_path=input_path,
+                        output_path=output_path,
+                        from_lang=lang,
+                        to_lang='en',
+                    ),
+                )],
+                'targets': [output_path],
+            }
