@@ -219,15 +219,3 @@ def compute_common_words(input_path: PathLike, output_path: PathLike, num_words:
 def load_word_list(path: PathLike) -> List[str]:
     with open(path, encoding='utf-8') as f:
         return [line.strip() for line in f]
-
-
-def collect_keys(input_paths: List[PathLike], output_path: PathLike):
-    keys = set()
-    for input_path in input_paths:
-        with open(input_path, encoding='utf-8') as f:
-            for line in f:
-                keys.update(line.split('\t')[-1].split(' '))
-
-    with open(output_path, mode='w', encoding='utf-8') as f:
-        for key in sorted(keys):
-            f.write(key + '\n')

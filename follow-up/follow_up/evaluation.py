@@ -5,7 +5,7 @@ from difflib import unified_diff
 from math import log
 from os import PathLike
 from pathlib import PurePath
-from typing import Counter, Dict, Iterable, Iterator, List, Optional, NamedTuple, TypeVar
+from typing import Counter, Dict, Iterable, Iterator, List, Optional, NamedTuple, Set, TypeVar
 
 import numpy as np
 
@@ -142,11 +142,8 @@ def load_token_assignments(input_path: PathLike) -> Iterable[Doc[TokenAssignment
 def load_topic_keys(
         input_path: PathLike,
         num_keys: int = DEFAULT_NUM_KEYS,
-        stop_list_path: Optional[PathLike] = None) -> List[List[str]]:
-    if stop_list_path is not None:
-        stop_words = set(load_word_list(stop_list_path))
-    else:
-        stop_words = set()
+        stop_list_paths: Optional[List[PathLike]] = None) -> List[List[str]]:
+    stop_words = load_stop_words(stop_list_paths)
 
     topic_keys = []
     with open(input_path, encoding='utf-8') as f:
@@ -156,10 +153,43 @@ def load_topic_keys(
             if len(keys) < num_keys:
                 raise Exception(
                     f'Less than {num_keys} keys in keys file {input_path}'
-                    f'using stop list {stop_list_path}')
+                    f'using stop lists {stop_list_paths}')
             topic_keys.append(keys[:num_keys])
 
     return topic_keys
+
+
+def collect_keys(input_paths: List[PathLike], output_path: PathLike):
+    keys = set()
+    for input_path in input_paths:
+        with open(input_path, encoding='utf-8') as f:
+            for line in f:
+                keys.update(line.split('\t')[-1].split(' '))
+
+    with open(output_path, mode='w', encoding='utf-8') as f:
+        for key in sorted(keys):
+            f.write(key + '\n')
+
+
+def filter_keys(
+        input_path: PathLike,
+        output_path: PathLike,
+        stop_list_paths: Optional[List[PathLike]] = None):
+    stop_words = load_stop_words(stop_list_paths)
+
+    with open(input_path) as in_f, open(output_path, mode='w') as out_f:
+        for line in in_f:
+            (index_str, alpha_str, keys_str) = line.strip().split('\t')
+            keys_str = ' '.join([key for key in keys_str.split() if key not in stop_words])
+            out_f.write('\t'.join((index_str, alpha_str, keys_str)) + '\n')
+
+
+def load_stop_words(stop_list_paths: Optional[List[PathLike]]) -> Set[str]:
+    stop_words = set()
+    if stop_list_paths is not None:
+        for stop_list_path in stop_list_paths:
+            stop_words.update(load_word_list(stop_list_path))
+    return stop_words
 
 
 def infer_topic_keys(
@@ -208,9 +238,10 @@ def compute_coherence(
         num_keys: int = DEFAULT_NUM_KEYS,
         stop_list_path: Optional[PathLike] = None) -> Dict[str, float]:
     topic_state = TopicState(topic_state_path)
+    stop_list_paths = ([stop_list_path] if stop_list_path is not None else None)
     return dict(coherence=_compute_coherence(
         load_corpus_summary(corpus_summary_path),
-        load_topic_keys(topic_keys_path, num_keys=num_keys, stop_list_path=stop_list_path),
+        load_topic_keys(topic_keys_path, num_keys=num_keys, stop_list_paths=stop_list_paths),
         topic_state.beta,
     ))
 

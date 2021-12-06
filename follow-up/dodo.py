@@ -8,12 +8,12 @@ import pycountry  # type: ignore
 
 from follow_up.util import (
     subsample, convert_polyglot_to_mallet, lowercase_polyglot, compute_common_words,
-    summarize_corpus, collect_keys,
+    summarize_corpus,
 )
 from follow_up.evaluation import (
     check_corpus_alignment, check_token_assignment_alignment,
     compute_coherence_treated, compute_topic_assignment_voi, collect_subtask_scores,
-    compute_coherence, compute_topic_assignments,
+    compute_coherence, compute_topic_assignments, collect_keys, filter_keys
 )
 from follow_up.lemmatization import parse_treetagger, parse_udpipe
 from follow_up.translation import translate_words, translate_keys
@@ -580,3 +580,67 @@ def task_translate_keys():
                         )],
                         'targets': [translated_keys_path],
                     }
+
+
+def task_filter_translated_keys():
+    en_stop_list_paths = [
+        (DATA_ROOT / 'en' / filename).with_suffix('.common-words.txt')
+        for filename in DATA_SET_FILENAMES
+    ]
+    for lang in LANGUAGES:
+        if lang != 'en':
+            corpus_paths = [
+                DATA_ROOT / lang / filename
+                for filename in DATA_SET_FILENAMES
+            ]
+            for trial in range(NUM_TRIALS):
+                for corpus_path in corpus_paths:
+                    topic_model_name = f'topic-model-{NUM_TOPICS}-{trial}'
+                    dep_name = f'{lang}.{corpus_path.stem}.{topic_model_name}'
+                    name = f'{dep_name}.stop-top-200'
+                    input_path = corpus_path.with_suffix(
+                        f'.mallet.{topic_model_name}.keys.translated.txt')
+                    output_path = input_path.with_suffix('.filtered.txt')
+                    yield {
+                        'name': name,
+                        'file_dep': [input_path] + en_stop_list_paths,
+                        'actions': [(
+                            filter_keys, (), dict(
+                                input_path=input_path,
+                                output_path=output_path,
+                                stop_list_paths=en_stop_list_paths,
+                            ),
+                        )],
+                        'targets': [output_path],
+                    }
+
+
+def task_filter_keys():
+    for lang in LANGUAGES:
+        corpus_paths = [
+            DATA_ROOT / lang / filename
+            for filename in DATA_SET_FILENAMES
+        ]
+        stop_list_paths = [
+            corpus_path.with_suffix('.common-words.txt')
+            for corpus_path in corpus_paths
+        ]
+        for trial in range(NUM_TRIALS):
+            for corpus_path in corpus_paths:
+                topic_model_name = f'topic-model-{NUM_TOPICS}-{trial}'
+                dep_name = f'{lang}.{corpus_path.stem}.{topic_model_name}'
+                name = f'{dep_name}.stop-top-200'
+                input_path = corpus_path.with_suffix(f'.mallet.{topic_model_name}.keys.txt')
+                output_path = input_path.with_suffix('.filtered.txt')
+                yield {
+                    'name': name,
+                    'file_dep': [input_path] + stop_list_paths,
+                    'actions': [(
+                        filter_keys, (), dict(
+                            input_path=input_path,
+                            output_path=output_path,
+                            stop_list_paths=stop_list_paths,
+                        ),
+                    )],
+                    'targets': [output_path],
+                }
