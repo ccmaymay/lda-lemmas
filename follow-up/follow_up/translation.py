@@ -74,3 +74,25 @@ def translate_words(
     with open(output_path, mode='w', encoding='utf-8') as f:
         for word_translation in translate(words, from_lang=from_lang, to_lang=to_lang):
             f.write(json.dumps(word_translation) + '\n')
+
+
+def translate_keys(
+        keys_path: PathLike,
+        translated_keys_path: PathLike,
+        translations_source_path: PathLike,
+        translations_target_path: PathLike):
+    with open(translations_source_path) as source_f, open(translations_target_path) as target_f:
+        translations = dict(
+            (source_word, target['translations'][0]['normalizedTarget'])
+            for (source_word, target) in (
+                (source_line.strip(), json.loads(target_line))
+                for (source_line, target_line) in zip(source_f, target_f)
+            )
+            if target['translations']
+        )
+
+    with open(keys_path) as in_f, open(translated_keys_path, mode='w') as out_f:
+        for line in in_f:
+            (index_str, alpha_str, keys_str) = line.strip().split('\t')
+            keys_str = ' '.join(translations.get(key, key) for key in keys_str.split())
+            out_f.write('\t'.join((index_str, alpha_str, keys_str)) + '\n')

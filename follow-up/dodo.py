@@ -16,7 +16,7 @@ from follow_up.evaluation import (
     compute_coherence, compute_topic_assignments,
 )
 from follow_up.lemmatization import parse_treetagger, parse_udpipe
-from follow_up.translation import translate_words
+from follow_up.translation import translate_words, translate_keys
 
 DATA_ROOT = Path('polyglot')
 
@@ -528,7 +528,7 @@ def task_collect_keys():
         }
 
 
-def task_translate_keys():
+def task_translate_collected_keys():
     for lang in LANGUAGES:
         if lang != 'en':
             input_path = DATA_ROOT / lang / 'keys.txt'
@@ -546,3 +546,37 @@ def task_translate_keys():
                 )],
                 'targets': [output_path],
             }
+
+
+def task_translate_keys():
+    for lang in LANGUAGES:
+        if lang != 'en':
+            corpus_paths = [
+                DATA_ROOT / lang / filename
+                for filename in DATA_SET_FILENAMES
+            ]
+            translations_source_path = DATA_ROOT / lang / 'keys.txt'
+            translations_target_path = translations_source_path.with_suffix('.translated.jsonl')
+            for trial in range(NUM_TRIALS):
+                for corpus_path in corpus_paths:
+                    topic_model_name = f'topic-model-{NUM_TOPICS}-{trial}'
+                    name = f'{lang}.{corpus_path.stem}.{topic_model_name}'
+                    keys_path = corpus_path.with_suffix(f'.mallet.{topic_model_name}.keys.txt')
+                    translated_keys_path = keys_path.with_suffix('.translated.txt')
+                    yield {
+                        'name': name,
+                        'file_dep': [
+                            keys_path,
+                            translations_source_path,
+                            translations_target_path,
+                        ],
+                        'actions': [(
+                            translate_keys, (), dict(
+                                keys_path=keys_path,
+                                translated_keys_path=translated_keys_path,
+                                translations_source_path=translations_source_path,
+                                translations_target_path=translations_target_path,
+                            ),
+                        )],
+                        'targets': [translated_keys_path],
+                    }
