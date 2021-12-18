@@ -10,7 +10,7 @@ library(tidyverse)
 ## Coherence
 
 ```{r}
-data <- read_tsv("polyglot/coherence.tsv") %>%
+data <- read_tsv("results/coherence.tsv") %>%
   mutate(
     subtask=subtask %>%
       str_replace(fixed(".sub.lower"), ".none") %>%
@@ -39,19 +39,20 @@ data <- read_tsv("polyglot/coherence.tsv") %>%
     stop_word_filtering=col_factor(),
     score=col_double()))
 data %>%
+  mutate(score=-score) %>%
   ggplot(aes(x=lemmatization, y=score)) +
   geom_boxplot() +
   theme_bw() +
   theme(axis.text.x=element_text(angle=-45, hjust=0)) +
   facet_grid(~ language) +
-  ylab("coherence")
-ggsave('polyglot/coherence.pdf', width=4, height=4)
+  ylab("negative coherence")
+ggsave('results/coherence.pdf', width=5, height=4)
 ```
 
 ### Sanity Check
 
 ```{r}
-data_sanity <- read_tsv("polyglot/coherence-sanity.tsv") %>%
+data_sanity <- read_tsv("results/coherence-sanity.tsv") %>%
   mutate(
     subtask=subtask %>%
       str_replace(fixed(".sub.lower"), ".none") %>%
@@ -102,7 +103,7 @@ data %>%
 ## Variation of Information
 
 ```{r}
-data <- read_tsv("polyglot/voi.tsv") %>%
+data <- read_tsv("results/voi.tsv") %>%
   mutate(
     subtask=subtask %>%
       str_replace_all(fixed(".sub.lower"), ".none") %>%
@@ -147,5 +148,5 @@ data %>%
   facet_wrap(~ language) +
   xlab("lemmatization 1") +
   ylab("lemmatization 2")
-ggsave('polyglot/voi.png', width=4, height=3)
+ggsave('results/voi.pdf', width=5, height=4)
 ```
