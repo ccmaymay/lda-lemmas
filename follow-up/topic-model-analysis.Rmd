@@ -173,6 +173,22 @@ data %>%
   theme_bw() +
   facet_grid(interaction(lemmatization_1, lemmatization_2) ~ language, scales='free_y')
 ```
+
+```{r}
+tibble(one=1, lang=data$language %>% unique) %>%
+  inner_join(tibble(one=1, lem=data$lemmatization_1 %>% unique), by='one') %>%
+  inner_join(tibble(one=1, lem_other=data$lemmatization_1 %>% unique), by='one') %>%
+  select(-one) %>%
+  filter(lem != lem_other) %>%
+  rowwise %>%
+  mutate(p_value=t.test(
+    (data %>% filter(language == lang, lemmatization_1 == lem, lemmatization_2 == lem))$score,
+    (data %>% filter(language == lang, lemmatization_1 == lem, lemmatization_2 == lem_other))$score,
+    alternative='less'
+  )$p.value) %>%
+  count(p_value < 0.02)
+```
+
 ```{r}
 data_summarized <- data %>%
   group_by(language, lemmatization_1, lemmatization_2) %>%
