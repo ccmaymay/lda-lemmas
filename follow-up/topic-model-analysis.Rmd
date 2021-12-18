@@ -99,6 +99,19 @@ data %>%
   facet_grid(lemmatization ~ language) +
   ylab("negative coherence")
 ```
+### Unmodified Coherence
+
+```{r}
+data_sanity %>%
+  mutate(score=-score) %>%
+  ggplot(aes(x=lemmatization, y=score)) +
+  geom_boxplot() +
+  theme_bw() +
+  theme(axis.text.x=element_text(angle=-45, hjust=0)) +
+  facet_grid(~ language) +
+  ylab("negative coherence")
+ggsave('results/coherence-unmodified.pdf', width=5, height=4)
+```
 
 ## Variation of Information
 
@@ -135,18 +148,58 @@ data <- read_tsv("results/voi.tsv") %>%
     lemmatization_2=col_factor(levels=c("none", "treetagger", "udpipe")),
     num_topics_1=col_integer(),
     num_topics_2=col_integer(),
-    trial_1=col_factor(levels=as.character(0:9)),
-    trial_2=col_factor(levels=as.character(0:9)),
-    score=col_double()))
+    trial_1=col_integer(),
+    trial_2=col_integer(),
+    score=col_double())) %>%
+  filter((lemmatization_1 != lemmatization_2) | (trial_1 > trial_2))
+data %>% count(language, lemmatization_1, lemmatization_2)
+data %>% filter(language == 'en', lemmatization_1 != 'none', lemmatization_2 != 'none', lemmatization_1 != lemmatization_2)
+```
+
+```{r}
 data %>%
+  ggplot(aes(x=lemmatization_2, y=score)) +
+  geom_boxplot(notch=T) +
+  theme_bw() +
+  theme(axis.text.x=element_text(angle=-45, hjust=0)) +
+  facet_grid(language ~ lemmatization_1, scales='free_y')
+ggsave('results/voi-boxplot.pdf', width=5, height=8)
+```
+
+```{r}
+data %>%
+  ggplot(aes(x=score)) +
+  geom_histogram() +
+  theme_bw() +
+  facet_grid(interaction(lemmatization_1, lemmatization_2) ~ language, scales='free_y')
+```
+```{r}
+data_summarized <- data %>%
   group_by(language, lemmatization_1, lemmatization_2) %>%
   summarize(`mean VOI`=mean(score)) %>%
+  ungroup
+data_summarized %>%
   ggplot(aes(x=lemmatization_1, y=lemmatization_2, fill=`mean VOI`)) +
   geom_tile() +
   theme_bw() +
   theme(axis.text.x=element_text(angle=-45, hjust=0)) +
-  facet_wrap(~ language) +
-  xlab("lemmatization 1") +
-  ylab("lemmatization 2")
+  xlab("lemmatization") +
+  ylab("lemmatization") +
+  facet_wrap(~ language)
 ggsave('results/voi.pdf', width=5, height=4)
+```
+
+
+```{r}
+for (lang in c('en', 'fa', 'ko', 'ru')) {
+  data_summarized %>%
+    filter(language == lang) %>%
+    ggplot(aes(x=lemmatization_1, y=lemmatization_2, fill=`mean VOI`)) +
+    geom_tile() +
+    theme_bw() +
+    theme(axis.text.x=element_text(angle=-45, hjust=0)) +
+    xlab("") +
+    ylab("")
+  ggsave(str_c('results/voi-', lang, '.pdf'), width=3.5, height=2.5)
+}
 ```
