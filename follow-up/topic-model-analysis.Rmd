@@ -153,7 +153,6 @@ data <- read_tsv("results/voi.tsv") %>%
     score=col_double())) %>%
   filter((lemmatization_1 != lemmatization_2) | (trial_1 > trial_2))
 data %>% count(language, lemmatization_1, lemmatization_2)
-data %>% filter(language == 'en', lemmatization_1 != 'none', lemmatization_2 != 'none', lemmatization_1 != lemmatization_2)
 ```
 
 ```{r}
@@ -187,6 +186,85 @@ tibble(one=1, lang=data$language %>% unique) %>%
     alternative='less'
   )$p.value) %>%
   count(p_value < 0.02)
+```
+
+```{r}
+t.test(
+  (data %>% filter(language == 'ru', lemmatization_1 == 'treetagger', lemmatization_2 == 'udpipe'))$score,
+  (data %>% filter(language == 'ru', lemmatization_1 == 'treetagger', lemmatization_2 == 'none'))$score,
+  alternative='less'
+)
+t.test(
+  (data %>% filter(language == 'ru', lemmatization_1 == 'treetagger', lemmatization_2 == 'udpipe'))$score,
+  (data %>% filter(language == 'ru', lemmatization_1 == 'udpipe', lemmatization_2 == 'none'))$score,
+  alternative='less'
+)
+```
+
+```{r}
+t.test(
+  (data %>% filter(language == 'en', lemmatization_1 == 'treetagger', lemmatization_2 == 'udpipe'))$score,
+  (data %>% filter(language == 'en', lemmatization_1 == 'udpipe', lemmatization_2 == 'none'))$score,
+  alternative='greater'
+)
+t.test(
+  (data %>% filter(language == 'ko', lemmatization_1 == 'treetagger', lemmatization_2 == 'udpipe'))$score,
+  (data %>% filter(language == 'ko', lemmatization_1 == 'udpipe', lemmatization_2 == 'none'))$score,
+  alternative='greater'
+)
+t.test(
+  (data %>% filter(language == 'fa', lemmatization_1 == 'treetagger', lemmatization_2 == 'udpipe'))$score,
+  (data %>% filter(language == 'fa', lemmatization_1 == 'treetagger', lemmatization_2 == 'none'))$score,
+  alternative='greater'
+)
+```
+
+```{r}
+t.test(
+  (data %>% filter(language == 'en', lemmatization_1 == 'treetagger', lemmatization_2 == 'treetagger'))$score,
+  (data %>% filter(language == 'en', lemmatization_1 == 'none', lemmatization_2 == 'none'))$score,
+  alternative='greater'
+)
+t.test(
+  (data %>% filter(language == 'en', lemmatization_1 == 'udpipe', lemmatization_2 == 'udpipe'))$score,
+  (data %>% filter(language == 'en', lemmatization_1 == 'none', lemmatization_2 == 'none'))$score,
+  alternative='greater'
+)
+t.test(
+  (data %>% filter(language == 'fa', lemmatization_1 == 'treetagger', lemmatization_2 == 'treetagger'))$score,
+  (data %>% filter(language == 'fa', lemmatization_1 == 'none', lemmatization_2 == 'none'))$score,
+  alternative='greater'
+)
+t.test(
+  (data %>% filter(language == 'fa', lemmatization_1 == 'udpipe', lemmatization_2 == 'udpipe'))$score,
+  (data %>% filter(language == 'fa', lemmatization_1 == 'none', lemmatization_2 == 'none'))$score,
+  alternative='greater'
+)
+t.test(
+  (data %>% filter(language == 'fa', lemmatization_1 == 'udpipe', lemmatization_2 == 'udpipe'))$score,
+  (data %>% filter(language == 'fa', lemmatization_1 == 'treetagger', lemmatization_2 == 'treetagger'))$score,
+  alternative='greater'
+)
+t.test(
+  (data %>% filter(language == 'ko', lemmatization_1 == 'treetagger', lemmatization_2 == 'treetagger'))$score,
+  (data %>% filter(language == 'ko', lemmatization_1 == 'none', lemmatization_2 == 'none'))$score,
+  alternative='greater'
+)
+t.test(
+  (data %>% filter(language == 'ko', lemmatization_1 == 'udpipe', lemmatization_2 == 'udpipe'))$score,
+  (data %>% filter(language == 'ko', lemmatization_1 == 'none', lemmatization_2 == 'none'))$score,
+  alternative='greater'
+)
+t.test(
+  (data %>% filter(language == 'ru', lemmatization_1 == 'treetagger', lemmatization_2 == 'treetagger'))$score,
+  (data %>% filter(language == 'ru', lemmatization_1 == 'none', lemmatization_2 == 'none'))$score,
+  alternative='greater'
+)
+t.test(
+  (data %>% filter(language == 'ru', lemmatization_1 == 'udpipe', lemmatization_2 == 'udpipe'))$score,
+  (data %>% filter(language == 'ru', lemmatization_1 == 'none', lemmatization_2 == 'none'))$score,
+  alternative='greater'
+)
 ```
 
 ```{r}
