@@ -5,6 +5,7 @@ from difflib import unified_diff
 from math import log
 from os import PathLike
 from pathlib import PurePath
+from string import ascii_letters
 from typing import Counter, Dict, Iterable, Iterator, List, Optional, NamedTuple, Set, TypeVar
 
 import numpy as np
@@ -174,13 +175,23 @@ def collect_keys(input_paths: List[PathLike], output_path: PathLike):
 def filter_keys(
         input_path: PathLike,
         output_path: PathLike,
-        stop_list_paths: Optional[List[PathLike]] = None):
+        stop_list_paths: Optional[List[PathLike]] = None,
+        min_word_length: int = 1,
+        filter_non_alpha: bool = False,
+        ):
     stop_words = load_stop_words(stop_list_paths)
 
     with open(input_path) as in_f, open(output_path, mode='w') as out_f:
         for line in in_f:
             (index_str, alpha_str, keys_str) = line.strip().split('\t')
-            keys_str = ' '.join([key for key in keys_str.split() if key not in stop_words])
+            keys = keys_str.split()
+            keys = [key for key in keys if key not in stop_words]
+            keys = [key for key in keys if len(key) >= min_word_length]
+            keys = [
+                key for key in keys
+                if (not filter_non_alpha or all(c in ascii_letters for c in key))
+            ]
+            keys_str = ' '.join(keys)
             out_f.write('\t'.join((index_str, alpha_str, keys_str)) + '\n')
 
 

@@ -58,6 +58,8 @@ NUM_TRIALS = 10
 OPTIMIZE_INTERVAL = 10
 
 NUM_STOP_WORDS = 200
+MIN_WORD_LENGTH = 4
+FILTER_NON_ALPHA = True
 
 LANGUAGES = ('en', 'fa', 'ko', 'ru')
 LANGUAGE_NAMES = dict(
@@ -609,6 +611,8 @@ def task_filter_translated_keys():
                                 input_path=input_path,
                                 output_path=output_path,
                                 stop_list_paths=en_stop_list_paths,
+                                min_word_length=MIN_WORD_LENGTH,
+                                filter_non_alpha=FILTER_NON_ALPHA,
                             ),
                         )],
                         'targets': [output_path],
@@ -640,6 +644,8 @@ def task_filter_keys():
                             input_path=input_path,
                             output_path=output_path,
                             stop_list_paths=stop_list_paths,
+                            min_word_length=MIN_WORD_LENGTH,
+                            filter_non_alpha=FILTER_NON_ALPHA,
                         ),
                     )],
                     'targets': [output_path],
