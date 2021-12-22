@@ -3,7 +3,7 @@
 set -e
 
 sed=gsed
-shuf=gshuf
+shuf=head # gshuf
 
 for f in polyglot/en/*-100-0.keys.filtered.txt polyglot/??/*-100-0.keys.translated.filtered.txt
 do

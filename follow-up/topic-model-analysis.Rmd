@@ -5,6 +5,10 @@ output: html_notebook
 
 ```{r}
 library(tidyverse)
+library(shades)
+main_color <- '#7a378b'
+high_color <- saturation(brightness(main_color, 1.), delta(-0.3))
+low_color <- saturation(brightness(main_color, 0.2), delta(-0.3))
 ```
 
 ## Coherence
@@ -275,6 +279,7 @@ data_summarized <- data %>%
 data_summarized %>%
   ggplot(aes(x=lemmatization_1, y=lemmatization_2, fill=`mean VOI`)) +
   geom_tile() +
+  scale_fill_gradient(high=high_color, low=low_color) +
   theme_bw() +
   theme(axis.text.x=element_text(angle=-45, hjust=0)) +
   xlab("lemmatization") +
@@ -290,6 +295,7 @@ for (lang in c('en', 'fa', 'ko', 'ru')) {
     filter(language == lang) %>%
     ggplot(aes(x=lemmatization_1, y=lemmatization_2, fill=`mean VOI`)) +
     geom_tile() +
+    scale_fill_gradient(high=high_color, low=low_color) +
     theme_bw() +
     theme(axis.text.x=element_text(angle=-45, hjust=0)) +
     xlab("") +
