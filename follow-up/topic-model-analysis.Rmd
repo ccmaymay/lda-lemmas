@@ -5,10 +5,8 @@ output: html_notebook
 
 ```{r}
 library(tidyverse)
-library(shades)
-main_color <- '#7a378b'
-high_color <- saturation(brightness(main_color, 1.), delta(-0.3))
-low_color <- saturation(brightness(main_color, 0.2), delta(-0.3))
+low_color <- '#660066'
+high_color <- '#ffffff'
 ```
 
 ## Coherence
