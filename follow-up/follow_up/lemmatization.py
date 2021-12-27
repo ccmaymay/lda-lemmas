@@ -112,10 +112,31 @@ def _parse_conllu_sentence(sentence: conllu.TokenList) -> Iterable[LemmaData]:
 
 def parse_udpipe(lang: str, input_path: PathLike, output_path: PathLike):
     with open(input_path, encoding='utf-8') as f:
-        save_polyglot(
-            output_path,
-            parse_polyglot_lemmas(
-                list(_parse_conllu_sentence(sentence))
-                for sentence in conllu.parse_incr(f)
-            )
+        save_polyglot(output_path, _parse_udpipe(lang, f))
+
+
+def _parse_udpipe(lang: str, f: TextIO) -> Iterable[Doc[str]]:
+    if lang == 'ko':
+        return parse_polyglot_lemmas(
+            [
+                LemmaData(
+                    form=token['form'],
+                    lemma=(
+                        token['lemma'].split('+')[0]
+                        if (
+                            token['lemma'] is not None and
+                            token['xpos'] is not None and
+                            '+' in token['xpos']
+                        ) else token['lemma']
+                    ) if token['lemma'] != '_' else None,
+                    pos=token['upos']
+                )
+                for token in sentence
+            ]
+            for sentence in conllu.parse_incr(f)
+        )
+    else:
+        return parse_polyglot_lemmas(
+            list(_parse_conllu_sentence(sentence))
+            for sentence in conllu.parse_incr(f)
         )
