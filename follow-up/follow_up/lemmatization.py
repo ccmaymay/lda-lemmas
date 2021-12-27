@@ -122,7 +122,7 @@ def _parse_udpipe(lang: str, f: TextIO) -> Iterable[Doc[str]]:
                 LemmaData(
                     form=token['form'],
                     lemma=(
-                        token['lemma'].split('+')[0]
+                        token['lemma'].strip('+').split('+')[0]
                         if (
                             token['lemma'] is not None and
                             token['xpos'] is not None and
