@@ -56,6 +56,7 @@ class Doc(Generic[T]):
 class CorpusSummary(Generic[T]):
     corpus_id: str
     num_docs: int
+    num_tokens: int
     vocab: List[T]
     word_occur: np.ndarray
     word_cooccur: np.ndarray
@@ -78,10 +79,11 @@ class CorpusSummary(Generic[T]):
         ))
 
     def save(self, path: PathLike):
-        np.savez(
+        np.savez_compressed(
             path,
             corpus_id=self.corpus_id,
             num_docs=self.num_docs,
+            num_tokens=self.num_tokens,
             vocab=self.vocab,
             word_occur=self.word_occur,
             word_cooccur=self.word_cooccur,
@@ -93,6 +95,7 @@ def load_corpus_summary(path: PathLike) -> CorpusSummary:
     return CorpusSummary(
         corpus_id=archive['corpus_id'].item(),
         num_docs=archive['num_docs'].item(),
+        num_tokens=archive['num_tokens'].item(),
         vocab=archive['vocab'].tolist(),
         word_occur=archive['word_occur'],
         word_cooccur=archive['word_cooccur'],
@@ -107,9 +110,11 @@ class Corpus(Generic[T]):
     @cached_property
     def summary(self) -> CorpusSummary[T]:
         num_docs: int = 0
+        num_tokens: int = 0
         word_occur_counter: Counter[T] = collections.Counter()
         for doc in self.docs:
             num_docs += 1
+            num_tokens += doc.num_tokens
             for word in set(doc.tokens):
                 word_occur_counter[word] += 1
 
@@ -137,6 +142,7 @@ class Corpus(Generic[T]):
         return CorpusSummary(
             corpus_id=self.corpus_id,
             num_docs=num_docs,
+            num_tokens=num_tokens,
             vocab=vocab,
             word_occur=word_occur,
             word_cooccur=word_cooccur,
