@@ -174,6 +174,7 @@ data %>%
   theme_bw() +
   facet_grid(interaction(lemmatization_1, lemmatization_2) ~ language, scales='free_y')
 ```
+### Intra-treatment VOI is lower than inter-treatment VOI
 
 ```{r}
 tibble(one=1, lang=data$language %>% unique) %>%
@@ -186,11 +187,21 @@ tibble(one=1, lang=data$language %>% unique) %>%
     (data %>% filter(language == lang, lemmatization_1 == lem, lemmatization_2 == lem))$score,
     (data %>% filter(language == lang, lemmatization_1 == lem, lemmatization_2 == lem_other))$score,
     alternative='less'
-  )$p.value) %>%
-  count(p_value < 0.02)
+  )$p.value)
 ```
+### Korean and Russian: Lemmatized treatments are closer to each other than to the unlemmatized treatment
 
 ```{r}
+t.test(
+  (data %>% filter(language == 'ko', lemmatization_1 == 'treetagger', lemmatization_2 == 'udpipe'))$score,
+  (data %>% filter(language == 'ko', lemmatization_1 == 'treetagger', lemmatization_2 == 'none'))$score,
+  alternative='less'
+)
+t.test(
+  (data %>% filter(language == 'ko', lemmatization_1 == 'treetagger', lemmatization_2 == 'udpipe'))$score,
+  (data %>% filter(language == 'ko', lemmatization_1 == 'udpipe', lemmatization_2 == 'none'))$score,
+  alternative='less'
+)
 t.test(
   (data %>% filter(language == 'ru', lemmatization_1 == 'treetagger', lemmatization_2 == 'udpipe'))$score,
   (data %>% filter(language == 'ru', lemmatization_1 == 'treetagger', lemmatization_2 == 'none'))$score,
@@ -210,64 +221,46 @@ t.test(
   alternative='greater'
 )
 t.test(
-  (data %>% filter(language == 'ko', lemmatization_1 == 'treetagger', lemmatization_2 == 'udpipe'))$score,
-  (data %>% filter(language == 'ko', lemmatization_1 == 'udpipe', lemmatization_2 == 'none'))$score,
-  alternative='greater'
-)
-t.test(
   (data %>% filter(language == 'fa', lemmatization_1 == 'treetagger', lemmatization_2 == 'udpipe'))$score,
   (data %>% filter(language == 'fa', lemmatization_1 == 'treetagger', lemmatization_2 == 'none'))$score,
   alternative='greater'
 )
 ```
 
+### Lemmatized intra-treatment VOI is greater than unlemmatized in most cases
+
 ```{r}
-t.test(
-  (data %>% filter(language == 'en', lemmatization_1 == 'treetagger', lemmatization_2 == 'treetagger'))$score,
-  (data %>% filter(language == 'en', lemmatization_1 == 'none', lemmatization_2 == 'none'))$score,
-  alternative='greater'
-)
-t.test(
-  (data %>% filter(language == 'en', lemmatization_1 == 'udpipe', lemmatization_2 == 'udpipe'))$score,
-  (data %>% filter(language == 'en', lemmatization_1 == 'none', lemmatization_2 == 'none'))$score,
-  alternative='greater'
-)
-t.test(
-  (data %>% filter(language == 'fa', lemmatization_1 == 'treetagger', lemmatization_2 == 'treetagger'))$score,
-  (data %>% filter(language == 'fa', lemmatization_1 == 'none', lemmatization_2 == 'none'))$score,
-  alternative='greater'
-)
-t.test(
-  (data %>% filter(language == 'fa', lemmatization_1 == 'udpipe', lemmatization_2 == 'udpipe'))$score,
-  (data %>% filter(language == 'fa', lemmatization_1 == 'none', lemmatization_2 == 'none'))$score,
-  alternative='greater'
-)
-t.test(
-  (data %>% filter(language == 'fa', lemmatization_1 == 'udpipe', lemmatization_2 == 'udpipe'))$score,
-  (data %>% filter(language == 'fa', lemmatization_1 == 'treetagger', lemmatization_2 == 'treetagger'))$score,
-  alternative='greater'
-)
-t.test(
-  (data %>% filter(language == 'ko', lemmatization_1 == 'treetagger', lemmatization_2 == 'treetagger'))$score,
-  (data %>% filter(language == 'ko', lemmatization_1 == 'none', lemmatization_2 == 'none'))$score,
-  alternative='greater'
-)
+tibble(one=1, lang=data$language %>% unique) %>%
+  inner_join(tibble(one=1, lem=data$lemmatization_1 %>% unique), by='one') %>%
+  select(-one) %>%
+  filter(lem != 'none') %>%
+  rowwise %>%
+  mutate(p_value=t.test(
+    (data %>% filter(language == lang, lemmatization_1 == lem, lemmatization_2 == lem))$score,
+    (data %>% filter(language == lang, lemmatization_1 == 'none', lemmatization_2 == 'none'))$score,
+    alternative='greater'
+  )$p.value)
+```
+
+```{r}
 t.test(
   (data %>% filter(language == 'ko', lemmatization_1 == 'udpipe', lemmatization_2 == 'udpipe'))$score,
   (data %>% filter(language == 'ko', lemmatization_1 == 'none', lemmatization_2 == 'none'))$score,
-  alternative='greater'
+  alternative='less'
 )
+```
+
+### Intra-treatment VOI on Farsi is greater for UDPipe than for TreeTagger
+
+```{r}
 t.test(
-  (data %>% filter(language == 'ru', lemmatization_1 == 'treetagger', lemmatization_2 == 'treetagger'))$score,
-  (data %>% filter(language == 'ru', lemmatization_1 == 'none', lemmatization_2 == 'none'))$score,
-  alternative='greater'
-)
-t.test(
-  (data %>% filter(language == 'ru', lemmatization_1 == 'udpipe', lemmatization_2 == 'udpipe'))$score,
-  (data %>% filter(language == 'ru', lemmatization_1 == 'none', lemmatization_2 == 'none'))$score,
+  (data %>% filter(language == 'fa', lemmatization_1 == 'udpipe', lemmatization_2 == 'udpipe'))$score,
+  (data %>% filter(language == 'fa', lemmatization_1 == 'treetagger', lemmatization_2 == 'treetagger'))$score,
   alternative='greater'
 )
 ```
+
+### Summary plots
 
 ```{r}
 data_summarized <- data %>%
