@@ -8,7 +8,7 @@ import pycountry  # type: ignore
 
 from follow_up.util import (
     subsample, convert_polyglot_to_mallet, lowercase_polyglot, compute_common_words,
-    summarize_corpus,
+    summarize_corpus, extract_corpus_stats, collect_corpus_stats,
 )
 from follow_up.evaluation import (
     check_corpus_alignment, check_token_assignment_alignment,
@@ -650,3 +650,28 @@ def task_filter_keys():
                     )],
                     'targets': [output_path],
                 }
+
+
+def task_extract_corpus_stats():
+    for lang in LANGUAGES:
+        corpus_paths = [
+            DATA_ROOT / lang / filename
+            for filename in DATA_SET_FILENAMES
+        ]
+        for corpus_path in corpus_paths:
+            input_path = corpus_path.with_suffix('.summary.npz')
+            name = f'{lang}.{corpus_path.stem}'
+            yield {
+                'name': name,
+                'file_dep': [input_path],
+                'actions': [(extract_corpus_stats, (), dict(corpus_summary_path=input_path))],
+            }
+
+
+def task_collect_corpus_stats():
+    output_path = DATA_ROOT / 'corpus-stats.tsv'
+    return {
+        'getargs': {'stat_dicts': ('extract_corpus_stats', None)},
+        'actions': [(collect_corpus_stats, (), dict(output_path=output_path))],
+        'targets': [output_path],
+    }

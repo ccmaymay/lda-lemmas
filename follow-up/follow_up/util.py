@@ -225,3 +225,19 @@ def compute_common_words(input_path: PathLike, output_path: PathLike, num_words:
 def load_word_list(path: PathLike) -> List[str]:
     with open(path, encoding='utf-8') as f:
         return [line.strip() for line in f]
+
+
+def extract_corpus_stats(corpus_summary_path: PathLike) -> Dict[str, int]:
+    summary = load_corpus_summary(corpus_summary_path)
+    return dict(
+        num_docs=summary.num_docs,
+        num_word_types=len(summary.vocab),
+        num_word_tokens=summary.num_tokens,
+    )
+
+
+def collect_corpus_stats(stat_dicts: Dict[str, Dict[str, int]], output_path: PathLike):
+    with open(output_path, encoding='utf-8', mode='w') as f:
+        f.write('subtask\tnum_docs\tnum_word_types\tnum_word_tokens\n')
+        for (subtask, d) in stat_dicts.items():
+            f.write(f'{subtask}\t{d["num_docs"]}\t{d["num_word_types"]}\t{d["num_word_tokens"]}\n')

@@ -333,7 +333,7 @@ def compute_topic_assignment_voi(
     ))
 
 
-def collect_subtask_scores(scores, output_path):
+def collect_subtask_scores(scores: Dict[str, float], output_path: PathLike):
     with open(output_path, encoding='utf-8', mode='w') as f:
         f.write('subtask\tscore\n')
         for (subtask, score) in scores.items():
